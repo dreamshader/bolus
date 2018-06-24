@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  datarecord.h - class for re/store settings
+ *  datafile.h - class for re/store settings
  *
  *  Copyright (C) 2018 Dreamshader (aka Dirk Schanz)
  *
@@ -82,6 +82,8 @@ class datafile {
   protected:
       int dataFd = -1;
       char dataFileName[PATH_MAX];
+      int currYear;
+      int currMonth;
 
   public:
 
@@ -93,9 +95,7 @@ class datafile {
   public:
       datafile( void ) { };
       int init( void );
-      int end( void );
-      int Open( int year, int month );
-      int Close( void );
+      int use( int year, int month );
       int readLastRecord( unsigned long *recno, struct _record *pData );
       int readRecord( unsigned long recno, struct _record *pData );
       int writeRecord( unsigned long recno, struct _record *pData );

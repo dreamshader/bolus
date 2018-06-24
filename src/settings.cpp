@@ -634,6 +634,34 @@ int settings::readDeviceId( void )
 }
 
 /* ----------------------------------------------------------------------------
+ * int settings::end( void )
+ *
+ * store settings to file
+ ------------------------------------------------------------------------------
+*/
+int settings::end( void )
+{
+    int retVal = E_SETTINGS_OK;
+
+    return( retVal );
+}
+
+/* ----------------------------------------------------------------------------
+ * int settings::init( void )
+ *
+ * store settings to file
+ ------------------------------------------------------------------------------
+*/
+int settings::init( void )
+{
+    int retVal = E_SETTINGS_OK;
+
+    return( retVal );
+}
+
+
+
+/* ----------------------------------------------------------------------------
  * int settings::write( void )
  *
  * store settings to file

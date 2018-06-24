@@ -61,11 +61,24 @@ class bolus {
 
   public:
       bolus( void ) { 
-             pSettings = new settings(); 
-             pDatafile = new datafile();
       };
+
+      ~bolus( void ) { 
+             if( pSettings != NULL )
+             {
+                 pSettings->end();
+                 delete pSettings;
+             }
+             if( pDatafile != NULL )
+             {
+                 delete pDatafile;
+             }
+      };
+
       int init( void );
       int end( void );
+
+      int use( int year, int month );
 };
 
 

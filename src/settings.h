@@ -190,10 +190,9 @@ class settings {
       FILE *settingsFile;
       char settingsFileName[PATH_MAX];
       char settingsBuffer[MAX_SETTINGS_RECLEN];
-      bool _timeblkModified = false;
-      bool _adjustModified = false;
-      bool _globalsModified = false;
       uint8_t devId[DEV_ID_LEN];
+      bool _modified = false;
+      bool _cancel = false;
 
   public:
     struct _timeblk timeblock[MAX_TIME_BLOCKS];
@@ -201,27 +200,6 @@ class settings {
     struct _globals globals;
 
   private:
-      void defaults( void );
-      int open( void );
-      void close( void );
-      int writeTimeblocks( void );
-      int readTimeblocks( void );
-      int writeGlobals( void );
-      int readGlobals( void );
-      int writeAdjustments( void );
-      int readAdjustments( void );
-      int writeDeviceId( void );
-      int readDeviceId( void );
-      void dumpDeviceId( void );
-      void dumpAdjustments( void );
-      void dumpGlobals( void );
-      void dumpTimeblocks( void );
-
-  public:
-      settings( void ) { settingsFile = (FILE*) NULL; };
-      int write( void );
-      void dump( void );
-      int read( void );
       //
       // **********************************************************************
       // CRC calculation e.g. over a buffer
@@ -239,6 +217,30 @@ class settings {
             }
             return crc;
       }
+
+      void defaults( void );
+      int open( void );
+      void close( void );
+      int writeTimeblocks( void );
+      int readTimeblocks( void );
+      int writeGlobals( void );
+      int readGlobals( void );
+      int writeAdjustments( void );
+      int readAdjustments( void );
+      int writeDeviceId( void );
+      int readDeviceId( void );
+      void dumpDeviceId( void );
+      void dumpAdjustments( void );
+      void dumpGlobals( void );
+      void dumpTimeblocks( void );
+      int write( void );
+      void dump( void );
+      int read( void );
+
+  public:
+      settings( void ) { settingsFile = (FILE*) NULL; };
+      int init( void );
+      int end( void );
 
 };
 

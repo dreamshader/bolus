@@ -36,17 +36,26 @@ int bolus::init( void )
 
     if( pSettings != NULL )
     {
-        if( (retVal = pSettings->read()) == E_SETTINGS_OK )
+        delete pSettings;
+        pSettings = NULL;
+    }
+
+    if( pDatafile != NULL )
+    {
+        delete pDatafile;
+        pDatafile = NULL;
+    }
+
+    if( (pSettings = new settings()) != NULL )
+    {
+        if( (retVal = pSettings->init()) == E_SETTINGS_OK )
         {
-            if( pDatafile != NULL )
+            if( (pDatafile = new datafile() )!= NULL )
             {
                 if( (retVal = pDatafile->init()) == E_DATAFILE_OK )
                 {
                     initialized = true;
                     retVal = E_BOLUS_OK;
-//
-                    pSettings->dump();
-                    retVal = pSettings->write();
                 }
             }
             else
@@ -75,22 +84,39 @@ int bolus::end( void )
 
     if( initialized )
     {
-        retVal = pSettings->write();
-        if( retVal == E_SETTINGS_OK )
-        {
-            if( pDatafile != NULL )
-            {
-                if( (retVal = pDatafile->end()) == E_DATAFILE_OK )
-                {
-                    retVal = E_BOLUS_OK;
-                }
-            }
-            else
-            {
-                retVal = E_BOLUS_DATAFILE;
-            }
-        }
+        retVal = pSettings->end();
         initialized = false;
+    }
+    else
+    {
+        retVal = E_BOLUS_INIT;
+    }
+
+    return( retVal );
+}
+
+
+/* ----------------------------------------------------------------------------
+ * int bolus::use( int year, int month )
+ *
+ * close settings file
+ ------------------------------------------------------------------------------
+*/
+int bolus::use( int year, int month )
+{
+    int retVal;
+
+    if( initialized )
+    {
+fprintf(stderr, "Use datafile year %d, month %d\n", year, month);
+        if( pDatafile != NULL )
+        {
+            retVal = pDatafile->use( year, month );
+        }
+        else
+        {
+            retVal = E_BOLUS_DATAFILE;
+        }
     }
     else
     {

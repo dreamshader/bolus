@@ -231,10 +231,17 @@ int main( int argc, char *argv[] )
 {
     int retVal = 0;
     bolus *pNewBolus;
+    time_t now;
+    struct tm *pActual;
 
     if( (pNewBolus = new(bolus)) != NULL )
     {
+        now = time(NULL);
+        pActual = localtime(&now);
+
         retVal = pNewBolus->init( );
+
+        retVal = pNewBolus->use( pActual->tm_year+1900, pActual->tm_mon+1 );
 
         pNewBolus->end( );
     }

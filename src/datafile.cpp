@@ -40,12 +40,12 @@ int datafile::init( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int datafile::Open( void )
+ * int datafile::use( void )
  *
  * close settings file
  ------------------------------------------------------------------------------
 */
-int datafile::Open( int year, int month )
+int datafile::use( int year, int month )
 {
     int retVal = E_DATAFILE_OK;
     char *pHome;
@@ -56,98 +56,70 @@ int datafile::Open( int year, int month )
     {
         if( dataFd > 0 )
         {
-            retVal = this->Close();
+            close( dataFd );
+            dataFd = -1;
         }
 
-        if( retVal == E_DATAFILE_OK )
+        if( (pHome = getenv("HOME")) != NULL )
         {
+            sprintf(dataFileName, DATA_FILE_NAME, pHome, BOLUS_BASE_DIR, 
+                    year, month );
 
-            if( (pHome = getenv("HOME")) != NULL )
+            if( (retVal = access( dataFileName , R_OK | W_OK )) < 0 )
             {
-                sprintf(dataFileName, DATA_FILE_NAME, pHome, BOLUS_BASE_DIR, 
-                        year, month );
-
-                if( (retVal = access( dataFileName , R_OK | W_OK )) < 0 )
+                switch( errno )
                 {
-                    switch( errno )
-                    {
-                        case EACCES:
-                            retVal = E_DATAFILE_ACCESS;
-                            break;
-                        case ENOENT:
-                            flags = O_RDWR|O_CREAT|O_TRUNC;
-                            retVal = E_DATAFILE_OK;
-                            break;
-                        case EROFS:
-                            retVal = E_DATAFILE_ROFS;
-                            break;
-                        case ENOTDIR:
-                            retVal = E_DATAFILE_PATH;
-                            break;
-                        case EINVAL:
-                            retVal = E_DATAFILE_FLAGS;
-                            break;
-                        default:
-                            retVal = E_DATAFILE_UNKNOWN;
-                            break;
-                    }
-                }
-                else
-                {
-                    flags = O_RDWR;
-                    retVal = E_DATAFILE_OK;
-                }
-    
-                if( retVal == E_DATAFILE_OK )
-                {
-                    if( flags & O_CREAT )
-                    {
-                        if( (dataFd = open(dataFileName, flags, mode)) < 0 )
-                        {
-                            retVal = E_DATAFILE_UNKNOWN;
-                        }
-                    }
-                    else
-                    {
-                        if( (dataFd = open(dataFileName, flags)) < 0 )
-                        {
-                            retVal = E_DATAFILE_UNKNOWN;
-                        }
-                    }
+                    case EACCES:
+                        retVal = E_DATAFILE_ACCESS;
+                        break;
+                    case ENOENT:
+                        flags = O_RDWR|O_CREAT|O_TRUNC;
+                        retVal = E_DATAFILE_OK;
+                        break;
+                    case EROFS:
+                        retVal = E_DATAFILE_ROFS;
+                        break;
+                    case ENOTDIR:
+                        retVal = E_DATAFILE_PATH;
+                        break;
+                    case EINVAL:
+                        retVal = E_DATAFILE_FLAGS;
+                        break;
+                    default:
+                        retVal = E_DATAFILE_UNKNOWN;
+                        break;
                 }
             }
             else
             {
-                retVal = E_DATAFILE_ENV;
+                flags = O_RDWR;
+                retVal = E_DATAFILE_OK;
+            }
+    
+            if( retVal == E_DATAFILE_OK )
+            {
+                if( flags & O_CREAT )
+                {
+                    if( (dataFd = open(dataFileName, flags, mode)) < 0 )
+                    {
+                        retVal = E_DATAFILE_UNKNOWN;
+                    }
+                }
+                else
+                {
+                    if( (dataFd = open(dataFileName, flags)) < 0 )
+                    {
+                        retVal = E_DATAFILE_UNKNOWN;
+                    }
+                }
+                currYear = year;
+                currMonth = month;
             }
         }
-    }
-    else
-    {
-        retVal = E_DATAFILE_INIT;
-    }
-
-    return( retVal );
-}
-
-/* ----------------------------------------------------------------------------
- * int datafile::Close( void )
- *
- * close settings file
- ------------------------------------------------------------------------------
-*/
-int datafile::Close( void )
-{
-    int retVal = E_DATAFILE_OK;
-
-    if( initialized )
-    {
-        if( dataFd > 0 )
+        else
         {
-            close( dataFd );
+            retVal = E_DATAFILE_ENV;
         }
-        dataFd = -1;
-        retVal = E_DATAFILE_OK;
     }
     else
     {
@@ -156,29 +128,6 @@ int datafile::Close( void )
 
     return( retVal );
 }
-
-/* ----------------------------------------------------------------------------
- * int datafile::end( void )
- *
- * close settings file
- ------------------------------------------------------------------------------
-*/
-int datafile::end( void )
-{
-    int retVal;
-
-    if( initialized )
-    {
-        this->Close();
-    }
-    else
-    {
-        retVal = E_DATAFILE_INIT;
-    }
-
-    return( retVal );
-}
-
 
 
 

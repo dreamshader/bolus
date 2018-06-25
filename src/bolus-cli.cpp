@@ -206,8 +206,15 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                 case 'm':
                     pParam->mealType = optarg[0];
                     // -m b --meal=b(efore)
+                    // -m B --meal=B(efore)
                     // -m a --meal=a(fter)
+                    // -m A --meal=A(fter)
                     // -m n --meal=n(one)
+                    // -m N --meal=N(one)
+                    // -m s --meal=s(leeptime)
+                    // -m s --meal=s(leeptime)
+                    // -m x --meal=x(tra)
+                    // -m S --meal=X(tra)
                     break;
                 case 't':
                     pParam->measType = optarg[0];

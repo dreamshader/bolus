@@ -164,14 +164,10 @@ void settings::defaults( void )
     globals.timeBlocksActive = ACTIVE_TIMEBLOCKS;
     globals.increaseLevel = INCREASE_LEVEL;
     globals.snacksize10BE = SNACKSIZE_10_BE;
-    globals.actHours = ACT_HOURS;
-    globals.actMinutes = ACT_MINUTES;
-    globals.delayHours = DELAY_HOURS;
-    globals.delayMinutes = DELAY_MINUTES;
-    globals.basalActHours = BASAL_ACT_HOURS;
-    globals.basalActMinutes = BASAL_ACT_MINUTES;
-    globals.basalDelayHours = BASAL_DELAY_HOURS;
-    globals.basalDelayMinutes = BASAL_DELAY_MINUTES;
+    globals.actTime = ACT_TIME;
+    globals.delayTime = DELAY_TIME;
+    globals.basalActTime = BASAL_ACT_TIME;
+    globals.basalDelayTime = BASAL_DELAY_TIME;
 
     adjustments.sports1 = ADJUST_SPORTS_1;
     adjustments.sports2 = ADJUST_SPORTS_2;
@@ -305,14 +301,10 @@ int settings::writeGlobals( void )
                  globals.timeBlocksActive,
                  globals.increaseLevel,
                  globals.snacksize10BE,
-                 globals.actHours,
-                 globals.actMinutes,
-                 globals.delayHours,
-                 globals.delayMinutes,
-                 globals.basalActHours,
-                 globals.basalActMinutes,
-                 globals.basalDelayHours,
-                 globals.basalDelayMinutes,
+                 globals.actTime,
+                 globals.delayTime,
+                 globals.basalActTime,
+                 globals.basalDelayTime,
                  recCrc );
 
         // calc crc with crc field = 0
@@ -323,14 +315,10 @@ int settings::writeGlobals( void )
                  globals.timeBlocksActive,
                  globals.increaseLevel,
                  globals.snacksize10BE,
-                 globals.actHours,
-                 globals.actMinutes,
-                 globals.delayHours,
-                 globals.delayMinutes,
-                 globals.basalActHours,
-                 globals.basalActMinutes,
-                 globals.basalDelayHours,
-                 globals.basalDelayMinutes,
+                 globals.actTime,
+                 globals.delayTime,
+                 globals.basalActTime,
+                 globals.basalDelayTime,
                  recCrc );
     }
 
@@ -361,14 +349,10 @@ int settings::readGlobals( void )
                     &globals.timeBlocksActive,
                     &globals.increaseLevel,
                     &globals.snacksize10BE,
-                    &globals.actHours,
-                    &globals.actMinutes,
-                    &globals.delayHours,
-                    &globals.delayMinutes,
-                    &globals.basalActHours,
-                    &globals.basalActMinutes,
-                    &globals.basalDelayHours,
-                    &globals.basalDelayMinutes,
+                    &globals.actTime,
+                    &globals.delayTime,
+                    &globals.basalActTime,
+                    &globals.basalDelayTime,
                     &recCrc );
 
             if( retVal == GLOBALS_REC_ITEMS )
@@ -378,14 +362,10 @@ int settings::readGlobals( void )
                      globals.timeBlocksActive,
                      globals.increaseLevel,
                      globals.snacksize10BE,
-                     globals.actHours,
-                     globals.actMinutes,
-                     globals.delayHours,
-                     globals.delayMinutes,
-                     globals.basalActHours,
-                     globals.basalActMinutes,
-                     globals.basalDelayHours,
-                     globals.basalDelayMinutes,
+                     globals.actTime,
+                     globals.delayTime,
+                     globals.basalActTime,
+                     globals.basalDelayTime,
                      (unsigned int) 0 );
 
                 // calc crc with crc field = 0
@@ -815,14 +795,10 @@ void settings::dumpGlobals( void )
     fprintf( stderr, "Act. timeblocks : %d\n", globals.timeBlocksActive );
     fprintf( stderr, "Increase .......: %d\n", globals.increaseLevel );
     fprintf( stderr, "Snack size .....: %.1f\n", globals.snacksize10BE/10.0 );
-    fprintf( stderr, "active .........: %d:%d\n", globals.actHours, 
-             globals.actMinutes );
-    fprintf( stderr, "delay ..........: %d:%d\n", globals.delayHours, 
-             globals.delayMinutes );
-    fprintf( stderr, "basal active ...: %d:%d\n", globals.basalActHours, 
-             globals.basalActMinutes );
-    fprintf( stderr, "basal delay ....: %d:%d\n", globals.basalDelayHours, 
-             globals.basalDelayMinutes );
+    fprintf( stderr, "active .........: %d\n", globals.actTime );
+    fprintf( stderr, "delay ..........: %d\n", globals.delayTime );
+    fprintf( stderr, "basal active ...: %d\n", globals.basalActTime );
+    fprintf( stderr, "basal delay ....: %d\n", globals.basalDelayTime );
 }
 
 /* ----------------------------------------------------------------------------

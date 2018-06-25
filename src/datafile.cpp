@@ -354,15 +354,13 @@ int datafile::readLastRecord( unsigned int *pRecno, struct _record *pData )
         // set position in file to begin of last record
         newPos = lseek( dataFd, readPos, SEEK_SET );
 
- fprintf(stderr, "(%s[%d]) readPos %ld\n", __FILE__, __LINE__, readPos);
-
         // if file is not empty
         if( datafileSize > 0 )
         {
             if( readPos >= 0 )
             {
                 retVal = performRead( pData );
-fprintf(stderr, "(%s[%d]) lseek %ld\n", __FILE__, __LINE__, lseek( dataFd, 0, SEEK_CUR ));
+
                 if( retVal == E_DATAFILE_OK )
                 {
                     newPos = lseek( dataFd, 0L, SEEK_CUR );
@@ -391,8 +389,6 @@ fprintf(stderr, "(%s[%d]) lseek %ld\n", __FILE__, __LINE__, lseek( dataFd, 0, SE
         retVal = E_DATAFILE_NULL;
         *pRecno = -1;
     }
-
-fprintf(stderr, "(%s[%d]) retVal readLastRecord %d\n", __FILE__, __LINE__, retVal);
 
     return( retVal );
 }

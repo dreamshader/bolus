@@ -68,6 +68,8 @@ using namespace std;
 #define DATA_MEAL_BEFORE        1
 #define DATA_MEAL_AFTER         2
 #define DATA_MEAL_NONE          3
+#define DATA_MEAL_SLEEPTIME     4
+#define DATA_MEAL_EXTRA         5
 
 #define DATA_MEASURE_ACUCHECK   1
 #define DATA_MEASURE_FREESTYLE  2

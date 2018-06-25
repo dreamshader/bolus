@@ -57,9 +57,9 @@ using namespace std;
 #define ADJUSTMENTS_REC_ID      'a'
 #define ADJUSTMENTS_REC_ITEMS   7
 
-#define GLOBALS_REC_FMT         "%c:%u:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%u\n"
+#define GLOBALS_REC_FMT         "%c:%u:%d:%d:%d:%d:%d:%d:%d:%u\n"
 #define GLOBALS_REC_ID          'g'
-#define GLOBALS_REC_ITEMS      14
+#define GLOBALS_REC_ITEMS      10
 
 #define DEVICE_ID_REC_FMT       "%c:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%u\n"
 #define DEVICE_ID_REC_ID        'd'
@@ -67,7 +67,7 @@ using namespace std;
 //
 // timeblock defaults
 //
-#define TMBLCK0_TIME         1440
+#define TMBLCK0_TIME            0
 #define TMBLCK0_TGT_FROM      100
 #define TMBLCK0_TGT_TO        180
 #define TMBLCK0_U210BE         10
@@ -101,16 +101,13 @@ using namespace std;
 #define MINOR_VERSION           0
 #define PATCHLEVEL              0
 #define ACTIVE_TIMEBLOCKS       NUM_TIME_BLOCKS
-#define INCREASE_LEVEL          50
-#define SNACKSIZE_10_BE         10
-#define ACT_HOURS               3
-#define ACT_MINUTES             0
-#define DELAY_HOURS             1
-#define DELAY_MINUTES           30
-#define BASAL_ACT_HOURS         23
-#define BASAL_ACT_MINUTES       0
-#define BASAL_DELAY_HOURS       0
-#define BASAL_DELAY_MINUTES     30
+#define INCREASE_LEVEL         50
+#define SNACKSIZE_10_BE        10
+
+#define ACT_TIME              180
+#define DELAY_TIME             90
+#define BASAL_ACT_TIME       1380
+#define BASAL_DELAY_TIME       30
 //
 #define ADJUST_SPORTS_1       -10
 #define ADJUST_SPORTS_2       -30
@@ -156,14 +153,10 @@ struct _globals {
     int timeBlocksActive;
     int increaseLevel;
     int snacksize10BE;
-    int actHours;
-    int actMinutes;
-    int delayHours;
-    int delayMinutes;
-    int basalActHours;
-    int basalActMinutes;
-    int basalDelayHours;
-    int basalDelayMinutes;
+    int actTime;
+    int delayTime;
+    int basalActTime;
+    int basalDelayTime;
 };
 
 class settings {

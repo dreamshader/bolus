@@ -61,6 +61,10 @@ using namespace std;
 #define BOLUS_CALC_CARB_MODE    6
 #define BOLUS_EDIT_MODE         7
 
+#define SECONDS_A_MINUTE       60
+#define SECONDS_A_HOUR         (60 * SECONDS_A_MINUTE)
+#define SECONDS_A_DAY          (24 * SECONDS_A_HOUR)
+
 
 struct _bolus_param {
     bool fail;
@@ -69,7 +73,7 @@ struct _bolus_param {
     int  bread;
     char mealType;
     char measType;
-int adjust;
+    int adjust;
     bool last;
     char editType;
     char exportType;

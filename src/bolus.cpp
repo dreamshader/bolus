@@ -122,7 +122,7 @@ int bolus::checkArgs( )
             mode = BOLUS_INTERACTIVE_MODE;
         }
     }
-    
+
     return( retVal );
 }
 
@@ -258,7 +258,18 @@ int bolus::calcBolus( int timeBlk, struct _record *pLastData, struct _record *pN
     int gOffset = 0;
     float offUnits = 0.0;
     float insUnits = 0.0;
+    float diffUnits = 0.0;
+    float basUnits = 0.0;
+    float diffBasUnits = 0.0;
     float adjustment = 0.0;
+    time_t differenceSeconds;
+    time_t differenceMinutes;
+    time_t differenceHours;
+    int differenceDays;
+    float insFactor;
+    float basFactor;
+
+fprintf(stderr, "(%s[%d]) timeBlk is %d\n", __FILE__, __LINE__, timeBlk);
 
     if( pNewData != NULL )
     {
@@ -267,15 +278,22 @@ int bolus::calcBolus( int timeBlk, struct _record *pLastData, struct _record *pN
 
         if( pNewData->glucose > pSettings->timeblock[timeBlk].rangeTo )
         {
-            gOffset = pNewData->glucose - pSettings->timeblock[timeBlk].rangeTo;
+            gOffset = pNewData->glucose - ((pSettings->timeblock[timeBlk].rangeTo +
+                         pSettings->timeblock[timeBlk].rangeFrom ) / 2);
+
         }
 
         if( pNewData->glucose < pSettings->timeblock[timeBlk].rangeFrom )
         {
-            gOffset = pNewData->glucose - pSettings->timeblock[timeBlk].rangeFrom;
+            gOffset = pNewData->glucose - ((pSettings->timeblock[timeBlk].rangeTo +
+                         pSettings->timeblock[timeBlk].rangeFrom ) / 2);
         }
 
+fprintf(stderr, "(%s[%d]) gOffset is %d\n", __FILE__, __LINE__, gOffset);
+
         insUnits = (pNewData->carbon10 / 12.0) * (pSettings->timeblock[timeBlk].uTo10BE / 10.0);
+
+fprintf(stderr, "(%s[%d]) insUnits is %f\n", __FILE__, __LINE__, insUnits);
 
         if( pSettings->timeblock[timeBlk].sens > 0 )
         {
@@ -286,8 +304,11 @@ int bolus::calcBolus( int timeBlk, struct _record *pLastData, struct _record *pN
             offUnits = 0;
         }
 
+fprintf(stderr, "(%s[%d]) offUnits is %f\n", __FILE__, __LINE__, offUnits);
 
         adjustment = ( (float) pNewData->adjust / 100.0) * insUnits;
+
+fprintf(stderr, "(%s[%d]) adjustment is %f\n", __FILE__, __LINE__, adjustment);
 
         insUnits += offUnits;
         insUnits += adjustment;
@@ -298,12 +319,69 @@ int bolus::calcBolus( int timeBlk, struct _record *pLastData, struct _record *pN
         pNewData->basalUnits = 0;
         pNewData->actBasunits = pNewData->basalUnits;
 
+fprintf(stderr, "(%s[%d]) pNewData->units is %d\n", __FILE__, __LINE__, pNewData->units);
+
         if( pLastData != NULL )
         {
-//            pDatafile->dumpRec( pLastData );
+fprintf( stderr, "PREVIOUS RECORD:\n" );
+fprintf( stderr, "----------------\n" );
+            pDatafile->dumpRec( pLastData );
+fprintf( stderr, "----------------\n" );
 
-//            pNewData->actUnits += pLastData->units;
-//            pNewData->actBasunits += pLastData->basalUnits;
+            differenceSeconds = pNewData->timestamp - pLastData->timestamp;
+            differenceMinutes = differenceSeconds / SECONDS_A_MINUTE;
+            differenceHours = differenceSeconds / SECONDS_A_HOUR;
+            differenceDays = differenceSeconds / SECONDS_A_DAY;
+
+            if( pNewData->units > 0 || pLastData->units > 0 )
+            {
+                // active time since last record has not gone
+                if( differenceMinutes < 
+                    (pSettings->globals.actTime + 
+                     pSettings->globals.delayTime) )
+                {
+
+//                    insFactor = 100.0 / (pSettings->globals.actTime + 
+                    insFactor = 1.0 / (pSettings->globals.actTime + 
+                                 pSettings->globals.delayTime);
+
+fprintf(stderr, "(%s[%d]) differenceMinutes is %lu\n", __FILE__, __LINE__, differenceMinutes);
+fprintf(stderr, "(%s[%d]) insFactor is %f\n", __FILE__, __LINE__, insFactor);
+
+                    insFactor *= differenceMinutes;
+
+fprintf(stderr, "(%s[%d]) insFactor is %f\n", __FILE__, __LINE__, insFactor);
+
+                    // diffUnits = insFactor * pLastData active units
+                    diffUnits = insFactor * pLastData->units;
+
+fprintf(stderr, "(%s[%d]) diffUnits is %f\n", __FILE__, __LINE__, diffUnits);
+
+                    pNewData->units = (float) pNewData->units - diffUnits;
+    
+                    pNewData->actUnits = pNewData->units + diffUnits;
+                }
+            }
+
+            if( pNewData->basalUnits > 0 || pLastData->basalUnits > 0 )
+            {
+                if( differenceMinutes < 
+                    (pSettings->globals.basalActTime + 
+                     pSettings->globals.basalDelayTime) )
+                {
+                    basFactor = 100.0 / (pSettings->globals.basalActTime + 
+                                 pSettings->globals.basalDelayTime);
+    
+                    basFactor *= differenceMinutes;
+    
+                    diffBasUnits = basFactor * pLastData->basalUnits;
+    
+                    pNewData->basalUnits = (float) pNewData->basalUnits - 
+                                           diffBasUnits;
+    
+                    pNewData->actBasunits = pNewData->basalUnits + diffBasUnits;
+                }
+            }
         }
     }
 
@@ -333,11 +411,11 @@ int bolus::runCalcBread( void )
         tmblk4now = -1;
         timeTmblk = ( pActual->tm_hour * 60 ) + pActual->tm_min;
 
-        for( int i = MAX_TIME_BLOCKS-1; tmblk4now < 0 && i >= 0; i-- )
+        for( int i = 0; tmblk4now < 0 && i < MAX_TIME_BLOCKS; i++ )
         {
 
-fprintf(stderr, "(%s[%d]) now %d - setting %d\n",
-       __FILE__, __LINE__, timeTmblk, pSettings->timeblock[i].time );
+// fprintf(stderr, "(%s[%d]) now %d - setting %d\n",
+// __FILE__, __LINE__, timeTmblk, pSettings->timeblock[i].time );
 
             if( timeTmblk <= pSettings->timeblock[i].time )
             {
@@ -352,7 +430,7 @@ fprintf(stderr, "(%s[%d]) now %d - setting %d\n",
             }
         }
 
-fprintf(stderr, "(%s[%d]) timeblk4now is %d\n", __FILE__, __LINE__, tmblk4now);
+// fprintf(stderr, "(%s[%d]) timeblk4now is %d\n", __FILE__, __LINE__, tmblk4now);
 
         if( tmblk4now >= 0 )
         {
@@ -389,6 +467,14 @@ fprintf(stderr, "(%s[%d]) timeblk4now is %d\n", __FILE__, __LINE__, tmblk4now);
                             case 'N':
                                 newData.meal = DATA_MEAL_NONE;
                                 break;
+                            case 's':
+                            case 'S':
+                                newData.meal = DATA_MEAL_SLEEPTIME;
+                                break;
+                            case 'x':
+                            case 'X':
+                                newData.meal = DATA_MEAL_EXTRA;
+                                break;
                             default:
                                 break;
                         }
@@ -423,7 +509,10 @@ fprintf(stderr, "(%s[%d]) timeblk4now is %d\n", __FILE__, __LINE__, tmblk4now);
                     if( (retVal = calcBolus( tmblk4now, &lastData, 
                          &newData )) == E_BOLUS_OK )
                     {
+fprintf( stderr, "NEW RECORD:\n" );
+fprintf( stderr, "-----------\n" );
                         pDatafile->dumpRec( &newData );
+fprintf( stderr, "-----------\n" );
                         retVal = pDatafile->appendRecord( &currRecno, 
                                                           &newData );
                     }

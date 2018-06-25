@@ -341,25 +341,19 @@ fprintf( stderr, "----------------\n" );
                      pSettings->globals.delayTime) )
                 {
 
-//                    insFactor = 100.0 / (pSettings->globals.actTime + 
                     insFactor = 1.0 / (pSettings->globals.actTime + 
                                  pSettings->globals.delayTime);
 
-fprintf(stderr, "(%s[%d]) differenceMinutes is %lu\n", __FILE__, __LINE__, differenceMinutes);
-fprintf(stderr, "(%s[%d]) insFactor is %f\n", __FILE__, __LINE__, insFactor);
-
                     insFactor *= differenceMinutes;
 
-fprintf(stderr, "(%s[%d]) insFactor is %f\n", __FILE__, __LINE__, insFactor);
-
                     // diffUnits = insFactor * pLastData active units
-                    diffUnits = insFactor * pLastData->units;
+                    diffUnits = insFactor * pLastData->actUnits;
 
 fprintf(stderr, "(%s[%d]) diffUnits is %f\n", __FILE__, __LINE__, diffUnits);
 
-                    pNewData->units = (float) pNewData->units - diffUnits;
-    
-                    pNewData->actUnits = pNewData->units + diffUnits;
+                    pLastData->actUnits -= diffUnits;
+
+                    pNewData->units -= pLastData->actUnits;
                 }
             }
 
@@ -369,17 +363,16 @@ fprintf(stderr, "(%s[%d]) diffUnits is %f\n", __FILE__, __LINE__, diffUnits);
                     (pSettings->globals.basalActTime + 
                      pSettings->globals.basalDelayTime) )
                 {
-                    basFactor = 100.0 / (pSettings->globals.basalActTime + 
+                    basFactor = 1.0 / (pSettings->globals.basalActTime + 
                                  pSettings->globals.basalDelayTime);
     
                     basFactor *= differenceMinutes;
     
-                    diffBasUnits = basFactor * pLastData->basalUnits;
+                    diffBasUnits = basFactor * pLastData->actBasunits;
     
-                    pNewData->basalUnits = (float) pNewData->basalUnits - 
-                                           diffBasUnits;
+                    pNewData->actBasunits -= diffBasUnits;
     
-                    pNewData->actBasunits = pNewData->basalUnits + diffBasUnits;
+                    pNewData->actBasunits -= pNewData->actBasunits;
                 }
             }
         }

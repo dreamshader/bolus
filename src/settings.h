@@ -48,10 +48,10 @@ using namespace std;
 #define NUM_TIME_BLOCKS         5
 
 
-#define TIME_BLOCK_REC_FMT      "%c:%02d:%02d:%02d:%02d:%02d:%02d:%02d:%u\n"
+#define TIME_BLOCK_REC_FMT      "%c:%02d:%04d:%03d:%03d:%02d:%03d:%u\n"
 #define TIME_BLOCK_REC_ID       't'
-#define TIME_BLOCK_REC_LEN     22
-#define TIME_BLOCK_REC_ITEMS    9
+#define TIME_BLOCK_REC_LEN     24
+#define TIME_BLOCK_REC_ITEMS    8
 
 #define ADJUSTMENTS_REC_FMT     "%c:%d:%d:%d:%d:%d:%u\n"
 #define ADJUSTMENTS_REC_ID      'a'
@@ -67,40 +67,35 @@ using namespace std;
 //
 // timeblock defaults
 //
-#define TMBLCK0_HOUR            0
-#define TMBLCK0_MINUTE          0
-#define TMBLCK0_TGT_FROM        0
-#define TMBLCK0_TGT_TO          0
-#define TMBLCK0_U210BE          0
-#define TMBLCK0_SENSITIVITY     0
+#define TMBLCK0_TIME         1440
+#define TMBLCK0_TGT_FROM      100
+#define TMBLCK0_TGT_TO        180
+#define TMBLCK0_U210BE         10
+#define TMBLCK0_SENSITIVITY    50
 //
-#define TMBLCK1_HOUR            5
-#define TMBLCK1_MINUTE         30
-#define TMBLCK1_TGT_FROM        0
-#define TMBLCK1_TGT_TO          0
-#define TMBLCK1_U210BE          0
-#define TMBLCK1_SENSITIVITY     0
+#define TMBLCK1_TIME          330
+#define TMBLCK1_TGT_FROM       80
+#define TMBLCK1_TGT_TO        160
+#define TMBLCK1_U210BE         18
+#define TMBLCK1_SENSITIVITY    55
 //
-#define TMBLCK2_HOUR           11
-#define TMBLCK2_MINUTE          0
-#define TMBLCK2_TGT_FROM        0
-#define TMBLCK2_TGT_TO          0
-#define TMBLCK2_U210BE          0
-#define TMBLCK2_SENSITIVITY     0
+#define TMBLCK2_TIME          660
+#define TMBLCK2_TGT_FROM       80
+#define TMBLCK2_TGT_TO        160
+#define TMBLCK2_U210BE          7
+#define TMBLCK2_SENSITIVITY    75
 //
-#define TMBLCK3_HOUR           17
-#define TMBLCK3_MINUTE          0
-#define TMBLCK3_TGT_FROM        0
-#define TMBLCK3_TGT_TO          0
-#define TMBLCK3_U210BE          0
-#define TMBLCK3_SENSITIVITY     0
+#define TMBLCK3_TIME         1020
+#define TMBLCK3_TGT_FROM       80
+#define TMBLCK3_TGT_TO        160
+#define TMBLCK3_U210BE          3
+#define TMBLCK3_SENSITIVITY    85
 //
-#define TMBLCK4_HOUR           21
-#define TMBLCK4_MINUTE         30
-#define TMBLCK4_TGT_FROM        0
-#define TMBLCK4_TGT_TO          0
-#define TMBLCK4_U210BE          0
-#define TMBLCK4_SENSITIVITY     0
+#define TMBLCK4_TIME         1290
+#define TMBLCK4_TGT_FROM      100
+#define TMBLCK4_TGT_TO        180
+#define TMBLCK4_U210BE          5
+#define TMBLCK4_SENSITIVITY    70
 //
 #define MAJOR_VERSION           0
 #define MINOR_VERSION           0
@@ -140,8 +135,7 @@ using namespace std;
             
 struct _timeblk {
     int num;
-    int hour;
-    int minute;
+    int time;
     int rangeFrom;
     int rangeTo;
     int uTo10BE;
@@ -192,6 +186,7 @@ class settings {
       char settingsBuffer[MAX_SETTINGS_RECLEN];
       uint8_t devId[DEV_ID_LEN];
       bool _modified = false;
+      bool _new = false;
       bool _cancel = false;
 
   public:

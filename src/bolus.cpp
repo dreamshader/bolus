@@ -32,6 +32,7 @@ void bolus::dumpArgs( void )
     fprintf(stderr, "bread ..: %d\n", callerArgs.bread );
     fprintf(stderr, "meal ...: %c\n", callerArgs.mealType );
     fprintf(stderr, "measure.: %c\n", callerArgs.measType );
+    fprintf(stderr, "adjust .: %c\n", callerArgs.adjust );
     fprintf(stderr, "last ...: %s\n", 
             callerArgs.last == true ? "true" : "false" );
     fprintf(stderr, "edit ...: %c\n", callerArgs.editType );
@@ -53,6 +54,7 @@ void bolus::resetArgs( void )
     callerArgs.bread       = 0;
     callerArgs.mealType    = '\0';
     callerArgs.measType    = '\0';
+    callerArgs.adjust      = 0;
     callerArgs.last        = false;
     callerArgs.editType    = '\0';
     callerArgs.exportType  = '\0';
@@ -134,6 +136,7 @@ void bolus::setArgs( struct _bolus_param *pParam )
         callerArgs.bread       = pParam->bread;
         callerArgs.mealType    = pParam->mealType;
         callerArgs.measType    = pParam->measType;
+        callerArgs.adjust      = pParam->adjust;
         callerArgs.last        = pParam->last;
         callerArgs.editType    = pParam->editType;
         callerArgs.exportType  = pParam->exportType;
@@ -182,7 +185,7 @@ int bolus::init( struct _bolus_param *pParam )
                     if( (retVal = checkArgs()) == E_BOLUS_OK )
                     {
                         initialized = true;
-                        dumpArgs();
+//                        dumpArgs();
                     }
                 }
             }
@@ -246,36 +249,196 @@ int bolus::runList( void )
     int retVal = E_BOLUS_OK;
 }
 
+// fprintf(stderr, "(%s[%d]) offUnits is %f\n", __FILE__, __LINE__, offUnits);
+
+int bolus::calcBolus( int timeBlk, struct _record *pLastData, struct _record *pNewData )
+{
+    int retVal = E_BOLUS_OK;
+
+    int gOffset = 0;
+    float offUnits = 0.0;
+    float insUnits = 0.0;
+    float adjustment = 0.0;
+
+    if( pNewData != NULL )
+    {
+
+        gOffset = 0;
+
+        if( pNewData->glucose > pSettings->timeblock[timeBlk].rangeTo )
+        {
+            gOffset = pNewData->glucose - pSettings->timeblock[timeBlk].rangeTo;
+        }
+
+        if( pNewData->glucose < pSettings->timeblock[timeBlk].rangeFrom )
+        {
+            gOffset = pNewData->glucose - pSettings->timeblock[timeBlk].rangeFrom;
+        }
+
+        insUnits = (pNewData->carbon10 / 12.0) * (pSettings->timeblock[timeBlk].uTo10BE / 10.0);
+
+        if( pSettings->timeblock[timeBlk].sens > 0 )
+        {
+            offUnits = gOffset / pSettings->timeblock[timeBlk].sens;
+        }
+        else
+        {
+            offUnits = 0;
+        }
+
+
+        adjustment = ( (float) pNewData->adjust / 100.0) * insUnits;
+
+        insUnits += offUnits;
+        insUnits += adjustment;
+
+        pNewData->units = (int) insUnits;
+        pNewData->actUnits = pNewData->units;
+
+        pNewData->basalUnits = 0;
+        pNewData->actBasunits = pNewData->basalUnits;
+
+        if( pLastData != NULL )
+        {
+//            pDatafile->dumpRec( pLastData );
+
+//            pNewData->actUnits += pLastData->units;
+//            pNewData->actBasunits += pLastData->basalUnits;
+        }
+    }
+
+    return( retVal );
+}
+
+// fprintf(stderr, "(%s[%d]) retVal is %d\n", __FILE__, __LINE__, retVal);
+
 int bolus::runCalcBread( void )
 {
     int retVal = E_BOLUS_OK;
     time_t now;
     struct tm *pActual;
     int tmblk4now;
+    int timeTmblk;
+    unsigned int lastRecno;
+    unsigned int currRecno;
+    struct _record lastData;
+    struct _record newData;
 
-    now = time(NULL);
-    pActual = localtime(&now);
 
-    tmblk4now = -1;
-    for( int i = 0; tmblk4now < 0 && i < MAX_TIME_BLOCKS; i++ )
+    if( pSettings != NULL && pDatafile != NULL )
     {
+        now = time(NULL);
+        pActual = localtime(&now);
 
-    pActual->tm_hour
-    pActual->tm_min
-    tmbl4now;
+        tmblk4now = -1;
+        timeTmblk = ( pActual->tm_hour * 60 ) + pActual->tm_min;
 
-                 timeblock[i].num,
-                 timeblock[i].hour,
-                 timeblock[i].minute,
-                 timeblock[i].rangeFrom,
-                 timeblock[i].rangeTo,
-                 timeblock[i].uTo10BE,
-                 timeblock[i].sens,
+        for( int i = MAX_TIME_BLOCKS-1; tmblk4now < 0 && i >= 0; i-- )
+        {
 
+fprintf(stderr, "(%s[%d]) now %d - setting %d\n",
+       __FILE__, __LINE__, timeTmblk, pSettings->timeblock[i].time );
 
+            if( timeTmblk <= pSettings->timeblock[i].time )
+            {
+                if( i )
+                {
+                    tmblk4now = i-1;
+                }
+                else
+                {
+                    tmblk4now = i;
+                }
+            }
+        }
 
-    retVal = use( pActual->tm_year+1900, pActual->tm_mon+1 );
-fprintf(stderr, "retVal %s -> %d is %d\n", __FILE__, __LINE__, retVal);
+fprintf(stderr, "(%s[%d]) timeblk4now is %d\n", __FILE__, __LINE__, tmblk4now);
+
+        if( tmblk4now >= 0 )
+        {
+            retVal = use( pActual->tm_year+1900, pActual->tm_mon+1 );
+
+            if( retVal == E_BOLUS_OK )
+            {
+
+                pDatafile->resetRec( &lastData );
+                retVal = pDatafile->readLastRecord( &lastRecno, &lastData );
+
+                if( lastRecno >= 0 &&
+                    (retVal == E_DATAFILE_OK || retVal == E_DATAFILE_EMPTY) )
+                {
+                    pDatafile->resetRec( &newData );
+
+                    newData.timestamp = time(NULL);
+                    newData.recnum = lastRecno;
+                    newData.glucose = callerArgs.glucose;
+
+                    if( callerArgs.mealType != '\0' )
+                    {
+                        switch( callerArgs.mealType )
+                        {
+                            case 'b':
+                            case 'B':
+                                newData.meal = DATA_MEAL_BEFORE;
+                                break;
+                            case 'a':
+                            case 'A':
+                                newData.meal = DATA_MEAL_AFTER;
+                                break;
+                            case 'n':
+                            case 'N':
+                                newData.meal = DATA_MEAL_NONE;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if( callerArgs.carb > 0 )
+                    {
+                        newData.carbon10 = callerArgs.carb;
+                    }
+                    else
+                    {
+                        newData.carbon10 = callerArgs.bread * 12;
+                    }
+
+                    if( callerArgs.measType != '\0' )
+                    {
+                        switch( callerArgs.measType )
+                        {
+                            case 'f':
+                            case 'F':
+                                newData.type = DATA_MEASURE_FREESTYLE;
+                                break;
+                            case 'a':
+                            case 'A':
+                                newData.type = DATA_MEASURE_ACUCHECK;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if( (retVal = calcBolus( tmblk4now, &lastData, 
+                         &newData )) == E_BOLUS_OK )
+                    {
+                        pDatafile->dumpRec( &newData );
+                        retVal = pDatafile->appendRecord( &currRecno, 
+                                                          &newData );
+                    }
+                }
+            }
+        }
+        else
+        {
+            retVal = E_BOLUS_TIMEBLK;
+        }
+    }
+    else
+    {
+        retVal = E_BOLUS_NULL;
+    }
 
     return( retVal );
 }
@@ -363,7 +526,6 @@ int bolus::use( int year, int month )
 
     if( initialized )
     {
-fprintf(stderr, "Use datafile year %d, month %d\n", year, month);
         if( pDatafile != NULL )
         {
             retVal = pDatafile->use( year, month );

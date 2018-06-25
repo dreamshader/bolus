@@ -49,7 +49,7 @@ int datafile::use( int year, int month )
 {
     int retVal = E_DATAFILE_OK;
     char *pHome;
-    int flags = O_RDWR;
+    int flags = O_RDWR; // |O_SYNC;
     int mode = S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH;
 
     if( initialized )
@@ -73,7 +73,7 @@ int datafile::use( int year, int month )
                         retVal = E_DATAFILE_ACCESS;
                         break;
                     case ENOENT:
-                        flags = O_RDWR|O_CREAT|O_TRUNC;
+                        flags = O_RDWR|O_CREAT|O_TRUNC; // |O_SYNC;
                         retVal = E_DATAFILE_OK;
                         break;
                     case EROFS:
@@ -92,7 +92,7 @@ int datafile::use( int year, int month )
             }
             else
             {
-                flags = O_RDWR;
+                flags = O_RDWR; // |O_SYNC;
                 retVal = E_DATAFILE_OK;
             }
     
@@ -114,6 +114,8 @@ int datafile::use( int year, int month )
                 }
                 currYear = year;
                 currMonth = month;
+
+
             }
         }
         else
@@ -130,11 +132,49 @@ int datafile::use( int year, int month )
 }
 
 
+void datafile::resetRec( struct _record *pData )
+{
+    if( pData != NULL )
+    {
+        pData->timestamp = (time_t) 0;
+        pData->recnum = 0;
+        pData->glucose = 0;
+        pData->meal = 0;
+        pData->carbon10  = 0;
+        pData->adjust = 0;
+        pData->units = 0;
+        pData->basalUnits = 0;
+        pData->type = 0;
+        pData->actUnits = 0;
+        pData->actBasunits = 0;
+
+    }
+}
+
+void datafile::dumpRec( struct _record *pData )
+{
+    if( pData != NULL )
+    {
+        fprintf(stderr, "timestamp : %lu\n", pData->timestamp );
+        fprintf(stderr, "recno ....: %d\n", pData->recnum );
+        fprintf(stderr, "glucose ..: %d\n", pData->glucose );
+        fprintf(stderr, "meal .....: %d\n", pData->meal );
+        fprintf(stderr, "carbon10 .: %d\n", pData->carbon10 );
+        fprintf(stderr, "adjust ...: %d\n", pData->adjust );
+        fprintf(stderr, "units ....: %d\n", pData->units );
+        fprintf(stderr, "basalUnits: %d\n", pData->basalUnits );
+        fprintf(stderr, "type .....: %d\n", pData->type );
+        fprintf(stderr, "act Units : %d\n", pData->actUnits );
+        fprintf(stderr, "bact Units: %d\n", pData->actBasunits );
+    }
+}
+
 
 
 int datafile::performRead( struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
+    int fsize = 0;
 
     if( pData != NULL )
     {
@@ -182,10 +222,20 @@ int datafile::performRead( struct _record *pData )
                     fieldlen = sizeof(pData->type);
                     rdlen = read( dataFd, &pData->type, fieldlen );
                     break;
+                case 9:
+                    fieldlen = sizeof(pData->actUnits);
+                    rdlen = read( dataFd, &pData->actUnits, fieldlen );
+                    break;
+                case 10:
+                    fieldlen = sizeof(pData->actBasunits);
+                    rdlen = read( dataFd, &pData->actBasunits, fieldlen );
+                    break;
                 default:
+                    retVal = E_DATAFILE_FIELDS;
                     break;
             }
 
+            fsize += rdlen;
             if( rdlen != fieldlen )
             {
                 retVal = E_DATAFILE_READ;
@@ -203,6 +253,7 @@ int datafile::performRead( struct _record *pData )
 int datafile::performWrite( struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
+    int fsize = 0;
 
     if( pData != NULL )
     {
@@ -245,14 +296,25 @@ int datafile::performWrite( struct _record *pData )
                 case 7:
                     fieldlen = sizeof(pData->basalUnits);
                     wrlen = write( dataFd, &pData->basalUnits, fieldlen );
+                    break;
                 case 8:
                     fieldlen = sizeof(pData->type);
                     wrlen = write( dataFd, &pData->type, fieldlen );
                     break;
+                case 9:
+                    fieldlen = sizeof(pData->actUnits);
+                    wrlen = write( dataFd, &pData->actUnits, fieldlen );
+                    break;
+                case 10:
+                    fieldlen = sizeof(pData->actBasunits);
+                    wrlen = write( dataFd, &pData->actBasunits, fieldlen );
+                    break;
                 default:
+                    retVal = E_DATAFILE_FIELDS;
                     break;
             }
 
+            fsize += wrlen;
             if( wrlen != fieldlen )
             {
                 retVal = E_DATAFILE_WRITE;
@@ -268,38 +330,76 @@ int datafile::performWrite( struct _record *pData )
 }
 
 
-int datafile::readLastRecord( unsigned long *pRecno, struct _record *pData )
+int datafile::readLastRecord( unsigned int *pRecno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
-    off_t recPos;
+    off_t datafileSize;
+    off_t readPos;
     off_t newPos;
 
     if( pData != NULL && pRecno != NULL )
     {
-        recPos = (-1) * DATA_RECORD_LENGTH;
-        newPos = lseek( dataFd, recPos, SEEK_END );
+        // go to end of file
+        datafileSize = lseek( dataFd, 0L, SEEK_END );
 
-        if( newPos > 0 )
+        // last record position is size minus record length
+        readPos = datafileSize - DATA_RECORD_LENGTH;
+
+        // if file is empty, pos of last record is less than 0
+        if( readPos < 0 )
         {
-            retVal = performRead( pData );
-            *pRecno = newPos / DATA_RECORD_LENGTH;
+            readPos = 0;
+        }
+
+        // set position in file to begin of last record
+        newPos = lseek( dataFd, readPos, SEEK_SET );
+
+ fprintf(stderr, "(%s[%d]) readPos %ld\n", __FILE__, __LINE__, readPos);
+
+        // if file is not empty
+        if( datafileSize > 0 )
+        {
+            if( readPos >= 0 )
+            {
+                retVal = performRead( pData );
+fprintf(stderr, "(%s[%d]) lseek %ld\n", __FILE__, __LINE__, lseek( dataFd, 0, SEEK_CUR ));
+                if( retVal == E_DATAFILE_OK )
+                {
+                    newPos = lseek( dataFd, 0L, SEEK_CUR );
+                    *pRecno = newPos / DATA_RECORD_LENGTH;
+                }
+                else
+                {
+                    *pRecno = -1;
+                }
+            }
+            else
+            {
+                newPos = 0;
+                *pRecno = 0;
+            }
         }
         else
         {
+            //
+            *pRecno = 0;
             retVal = E_DATAFILE_EMPTY;
         }
     }
     else
     {
         retVal = E_DATAFILE_NULL;
+        *pRecno = -1;
     }
+
+fprintf(stderr, "(%s[%d]) retVal readLastRecord %d\n", __FILE__, __LINE__, retVal);
 
     return( retVal );
 }
 
 
 
-int datafile::readRecord( unsigned long recno, struct _record *pData )
+int datafile::readRecord( unsigned int recno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
     off_t recPos;
@@ -334,7 +434,7 @@ int datafile::readRecord( unsigned long recno, struct _record *pData )
     return( retVal );
 }
 
-int datafile::writeRecord( unsigned long recno, struct _record *pData )
+int datafile::writeRecord( unsigned int recno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
     off_t recPos;
@@ -370,7 +470,7 @@ int datafile::writeRecord( unsigned long recno, struct _record *pData )
 
 }
 
-int datafile::appendRecord( unsigned long *pRecno, struct _record *pData )
+int datafile::appendRecord( unsigned int *pRecno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
     off_t recPos;
@@ -378,9 +478,9 @@ int datafile::appendRecord( unsigned long *pRecno, struct _record *pData )
 
     if( pData != NULL && pRecno != NULL )
     {
-        newPos = lseek( dataFd, 0, SEEK_END );
+        newPos = lseek( dataFd, 0L, SEEK_END );
 
-        if( newPos > 0 )
+        if( newPos >= 0 )
         {
             *pRecno = newPos / DATA_RECORD_LENGTH;
             retVal = performWrite( pData );
@@ -394,7 +494,6 @@ int datafile::appendRecord( unsigned long *pRecno, struct _record *pData )
     {
         retVal = E_DATAFILE_NULL;
     }
-
     return( retVal );
 }
 

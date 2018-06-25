@@ -58,16 +58,23 @@ using namespace std;
 #define E_DATAFILE_RECNO      -13
 #define E_DATAFILE_READ       -14
 #define E_DATAFILE_WRITE      -15
+#define E_DATAFILE_FIELDS     -16
 
 
-#define DATA_RECORD_LENGTH     41
+#define DATA_RECORD_LENGTH     45
 
-#define DATA_RECORD_NUM_FIELDS  9
+#define DATA_RECORD_NUM_FIELDS 11
 
+#define DATA_MEAL_BEFORE        1
+#define DATA_MEAL_AFTER         2
+#define DATA_MEAL_NONE          3
+
+#define DATA_MEASURE_ACUCHECK   1
+#define DATA_MEASURE_FREESTYLE  2
 
 struct _record {
     time_t timestamp;
-    unsigned long recnum;
+    unsigned int recnum;
     int glucose;
     char meal;
     int carbon10; 
@@ -75,6 +82,8 @@ struct _record {
     int units;
     int basalUnits;
     int type;
+    int actUnits;
+    int actBasunits;
 };
 
 
@@ -97,10 +106,12 @@ class datafile {
       datafile( void ) { };
       int init( void );
       int use( int year, int month );
-      int readLastRecord( unsigned long *recno, struct _record *pData );
-      int readRecord( unsigned long recno, struct _record *pData );
-      int writeRecord( unsigned long recno, struct _record *pData );
-      int appendRecord( unsigned long *recno, struct _record *pData );
+      void resetRec( struct _record *pData );
+      void dumpRec( struct _record *pData );
+      int readLastRecord( unsigned int *recno, struct _record *pData );
+      int readRecord( unsigned int recno, struct _record *pData );
+      int writeRecord( unsigned int recno, struct _record *pData );
+      int appendRecord( unsigned int *recno, struct _record *pData );
 
 };
 

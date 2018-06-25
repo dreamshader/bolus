@@ -51,6 +51,7 @@ int settings::open( void )
                     case ENOENT:
                         pMode = (char*) "w+";
                         this->defaults();
+                        this->_new = true;
                         retVal = E_SETTINGS_OK;
                         break;
                     case EROFS:
@@ -119,40 +120,35 @@ void settings::defaults( void )
     uuid_generate_time(devId);
 
     timeblock[0].num = 0;
-    timeblock[0].hour = TMBLCK0_HOUR;
-    timeblock[0].minute = TMBLCK0_MINUTE;
+    timeblock[0].time = TMBLCK0_TIME;
     timeblock[0].rangeFrom = TMBLCK0_TGT_FROM;
     timeblock[0].rangeTo = TMBLCK0_TGT_TO;
     timeblock[0].uTo10BE = TMBLCK0_U210BE;
     timeblock[0].sens = TMBLCK0_SENSITIVITY;
 
     timeblock[1].num = 1;
-    timeblock[1].hour = TMBLCK1_HOUR;
-    timeblock[1].minute = TMBLCK1_MINUTE;
+    timeblock[1].time = TMBLCK1_TIME;
     timeblock[1].rangeFrom = TMBLCK1_TGT_FROM;
     timeblock[1].rangeTo = TMBLCK1_TGT_TO;
     timeblock[1].uTo10BE = TMBLCK1_U210BE;
     timeblock[1].sens = TMBLCK1_SENSITIVITY;
 
     timeblock[2].num = 2;
-    timeblock[2].hour = TMBLCK2_HOUR;
-    timeblock[2].minute = TMBLCK2_MINUTE;
+    timeblock[2].time = TMBLCK2_TIME;
     timeblock[2].rangeFrom = TMBLCK2_TGT_FROM;
     timeblock[2].rangeTo = TMBLCK2_TGT_TO;
     timeblock[2].uTo10BE = TMBLCK2_U210BE;
     timeblock[2].sens = TMBLCK2_SENSITIVITY;
 
     timeblock[3].num = 3;
-    timeblock[3].hour = TMBLCK3_HOUR;
-    timeblock[3].minute = TMBLCK3_MINUTE;
+    timeblock[3].time = TMBLCK3_TIME;
     timeblock[3].rangeFrom = TMBLCK3_TGT_FROM;
     timeblock[3].rangeTo = TMBLCK3_TGT_TO;
     timeblock[3].uTo10BE = TMBLCK3_U210BE;
     timeblock[3].sens = TMBLCK3_SENSITIVITY;
 
     timeblock[4].num = 4;
-    timeblock[4].hour = TMBLCK4_HOUR;
-    timeblock[4].minute = TMBLCK4_MINUTE;
+    timeblock[4].time = TMBLCK4_TIME;
     timeblock[4].rangeFrom = TMBLCK4_TGT_FROM;
     timeblock[4].rangeTo = TMBLCK4_TGT_TO;
     timeblock[4].uTo10BE = TMBLCK4_U210BE;
@@ -193,18 +189,17 @@ void settings::defaults( void )
 */
 int settings::writeTimeblocks( void )
 {
-    int retVal;
+    int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
         for( int i = 0; i < MAX_TIME_BLOCKS; i++ )
         {
             recCrc = 0;
             sprintf( settingsBuffer, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
                  timeblock[i].num,
-                 timeblock[i].hour,
-                 timeblock[i].minute,
+                 timeblock[i].time,
                  timeblock[i].rangeFrom,
                  timeblock[i].rangeTo,
                  timeblock[i].uTo10BE,
@@ -216,8 +211,7 @@ int settings::writeTimeblocks( void )
 
             fprintf( settingsFile, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
                  timeblock[i].num,
-                 timeblock[i].hour,
-                 timeblock[i].minute,
+                 timeblock[i].time,
                  timeblock[i].rangeFrom,
                  timeblock[i].rangeTo,
                  timeblock[i].uTo10BE,
@@ -242,46 +236,49 @@ int settings::readTimeblocks( void )
     uint32_t recCrc = 0;
     uint32_t calcCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
-        for( int i = 0; retVal == E_SETTINGS_OK && i < MAX_TIME_BLOCKS; i++ )
+        if( this->_new == false )
         {
-            retVal = fscanf( settingsFile, TIME_BLOCK_REC_FMT, &recId,
-                 &timeblock[i].num,
-                 &timeblock[i].hour,
-                 &timeblock[i].minute,
-                 &timeblock[i].rangeFrom,
-                 &timeblock[i].rangeTo,
-                 &timeblock[i].uTo10BE,
-                 &timeblock[i].sens,
-                 &recCrc );
-
-            if( retVal == TIME_BLOCK_REC_ITEMS )
+            for( int i = 0; retVal == E_SETTINGS_OK && i < MAX_TIME_BLOCKS; i++ )
             {
-                sprintf( settingsBuffer, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
-                    timeblock[i].num,
-                    timeblock[i].hour,
-                    timeblock[i].minute,
-                    timeblock[i].rangeFrom,
-                    timeblock[i].rangeTo,
-                    timeblock[i].uTo10BE,
-                    timeblock[i].sens,
-                    recCrc );
+               fgets(settingsBuffer, MAX_SETTINGS_RECLEN-1, settingsFile );
+//            retVal = fscanf( settingsFile, TIME_BLOCK_REC_FMT, &recId,
+                retVal = sscanf( settingsBuffer, TIME_BLOCK_REC_FMT, &recId,
+                     &timeblock[i].num,
+                     &timeblock[i].time,
+                     &timeblock[i].rangeFrom,
+                     &timeblock[i].rangeTo,
+                     &timeblock[i].uTo10BE,
+                     &timeblock[i].sens,
+                     &recCrc );
 
-                calcCrc = this->crc( settingsBuffer, TIME_BLOCK_REC_LEN );
-
-                if( calcCrc == recCrc )
+                if( retVal == TIME_BLOCK_REC_ITEMS )
                 {
-                    retVal = E_SETTINGS_OK;
+                    sprintf( settingsBuffer, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
+                        timeblock[i].num,
+                        timeblock[i].time,
+                        timeblock[i].rangeFrom,
+                        timeblock[i].rangeTo,
+                        timeblock[i].uTo10BE,
+                        timeblock[i].sens,
+                        recCrc );
+
+                    calcCrc = this->crc( settingsBuffer, TIME_BLOCK_REC_LEN );
+
+                    if( calcCrc == recCrc )
+                    {
+                        retVal = E_SETTINGS_OK;
+                    }
+                    else
+                    {
+                        retVal = E_SETTINGS_CRC;
+                    }
                 }
                 else
                 {
-                    retVal = E_SETTINGS_CRC;
+                    retVal = E_SETTINGS_INV_REC;
                 }
-            }
-            else
-            {
-                retVal = E_SETTINGS_INV_REC;
             }
         }
     }
@@ -297,10 +294,10 @@ int settings::readTimeblocks( void )
 */
 int settings::writeGlobals( void )
 {
-    int retVal;
+    int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
         recCrc = 0;
         sprintf( settingsBuffer, GLOBALS_REC_FMT, GLOBALS_REC_ID,
@@ -353,55 +350,60 @@ int settings::readGlobals( void )
     uint32_t recCrc = 0;
     uint32_t calcCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
-        retVal = fscanf( settingsFile, GLOBALS_REC_FMT, &recId,
-                &globals.version,
-                &globals.timeBlocksActive,
-                &globals.increaseLevel,
-                &globals.snacksize10BE,
-                &globals.actHours,
-                &globals.actMinutes,
-                &globals.delayHours,
-                &globals.delayMinutes,
-                &globals.basalActHours,
-                &globals.basalActMinutes,
-                &globals.basalDelayHours,
-                &globals.basalDelayMinutes,
-                &recCrc );
-
-        if( retVal == GLOBALS_REC_ITEMS )
+        if( this->_new == false )
         {
-            sprintf( settingsBuffer, GLOBALS_REC_FMT, GLOBALS_REC_ID,
-                 globals.version,
-                 globals.timeBlocksActive,
-                 globals.increaseLevel,
-                 globals.snacksize10BE,
-                 globals.actHours,
-                 globals.actMinutes,
-                 globals.delayHours,
-                 globals.delayMinutes,
-                 globals.basalActHours,
-                 globals.basalActMinutes,
-                 globals.basalDelayHours,
-                 globals.basalDelayMinutes,
-                 (unsigned int) 0 );
+           fgets(settingsBuffer, MAX_SETTINGS_RECLEN-1, settingsFile );
+//        retVal = fscanf( settingsFile, GLOBALS_REC_FMT, &recId,
+            retVal = sscanf( settingsBuffer, GLOBALS_REC_FMT, &recId,
+                    &globals.version,
+                    &globals.timeBlocksActive,
+                    &globals.increaseLevel,
+                    &globals.snacksize10BE,
+                    &globals.actHours,
+                    &globals.actMinutes,
+                    &globals.delayHours,
+                    &globals.delayMinutes,
+                    &globals.basalActHours,
+                    &globals.basalActMinutes,
+                    &globals.basalDelayHours,
+                    &globals.basalDelayMinutes,
+                    &recCrc );
 
-            // calc crc with crc field = 0
-            calcCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
- 
-            if( calcCrc == recCrc )
+            if( retVal == GLOBALS_REC_ITEMS )
             {
-                retVal = E_SETTINGS_OK;
+                sprintf( settingsBuffer, GLOBALS_REC_FMT, GLOBALS_REC_ID,
+                     globals.version,
+                     globals.timeBlocksActive,
+                     globals.increaseLevel,
+                     globals.snacksize10BE,
+                     globals.actHours,
+                     globals.actMinutes,
+                     globals.delayHours,
+                     globals.delayMinutes,
+                     globals.basalActHours,
+                     globals.basalActMinutes,
+                     globals.basalDelayHours,
+                     globals.basalDelayMinutes,
+                     (unsigned int) 0 );
+
+                // calc crc with crc field = 0
+                calcCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
+ 
+                if( calcCrc == recCrc )
+                {
+                    retVal = E_SETTINGS_OK;
+                }
+                else
+                {
+                    retVal = E_SETTINGS_CRC;
+                }
             }
             else
             {
-                retVal = E_SETTINGS_CRC;
+                retVal = E_SETTINGS_INV_REC;
             }
-        }
-        else
-        {
-            retVal = E_SETTINGS_INV_REC;
         }
     }
 
@@ -416,10 +418,10 @@ int settings::readGlobals( void )
 */
 int settings::writeAdjustments( void )
 {
-    int retVal;
+    int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
         recCrc = 0;
         sprintf( settingsBuffer, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
@@ -458,41 +460,46 @@ int settings::readAdjustments( void )
     uint32_t recCrc = 0;
     uint32_t calcCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
-        retVal = fscanf( settingsFile, ADJUSTMENTS_REC_FMT, &recId,
-                &adjustments.sports1,
-                &adjustments.sports2,
-                &adjustments.stress,
-                &adjustments.ill,
-                &adjustments.female,
-                &recCrc );
-
-        if( retVal == ADJUSTMENTS_REC_ITEMS )
+        if( this->_new == false )
         {
-            sprintf( settingsBuffer, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
-                 adjustments.sports1,
-                 adjustments.sports2,
-                 adjustments.stress,
-                 adjustments.ill,
-                 adjustments.female,
-                 (unsigned int) 0 );
+            fgets(settingsBuffer, MAX_SETTINGS_RECLEN-1, settingsFile );
+        //retVal = fscanf( settingsFile, ADJUSTMENTS_REC_FMT, &recId,
+            retVal = sscanf( settingsBuffer, ADJUSTMENTS_REC_FMT, &recId,
+                    &adjustments.sports1,
+                    &adjustments.sports2,
+                    &adjustments.stress,
+                    &adjustments.ill,
+                    &adjustments.female,
+                    &recCrc );
 
-            // calc crc with crc field = 0
-            calcCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
-
-            if( calcCrc == recCrc )
+            if( retVal == ADJUSTMENTS_REC_ITEMS )
             {
-                retVal = E_SETTINGS_OK;
+                sprintf( settingsBuffer, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
+                     adjustments.sports1,
+                     adjustments.sports2,
+                     adjustments.stress,
+                     adjustments.ill,
+                     adjustments.female,
+                     (unsigned int) 0 );
+    
+                // calc crc with crc field = 0
+                calcCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
+    
+                if( calcCrc == recCrc )
+                {
+                    retVal = E_SETTINGS_OK;
+                }
+                else
+                {
+                    retVal = E_SETTINGS_CRC;
+                }
             }
             else
             {
-                retVal = E_SETTINGS_CRC;
+                retVal = E_SETTINGS_INV_REC;
             }
-        }
-        else
-        {
-            retVal = E_SETTINGS_INV_REC;
         }
     }
 
@@ -507,10 +514,10 @@ int settings::readAdjustments( void )
 */
 int settings::writeDeviceId( void )
 {
-    int retVal;
+    int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
         recCrc = 0;
         sprintf( settingsBuffer, DEVICE_ID_REC_FMT, DEVICE_ID_REC_ID,
@@ -571,62 +578,67 @@ int settings::readDeviceId( void )
     uint32_t recCrc = 0;
     uint32_t calcCrc = 0;
 
-    if( (retVal = this->open()) == E_SETTINGS_OK )
+    if( settingsFile != (FILE*) NULL )
     {
-        retVal = fscanf( settingsFile, DEVICE_ID_REC_FMT, &recId,
-                (int*) &devId[ 0],
-                (int*) &devId[ 1],
-                (int*) &devId[ 2],
-                (int*) &devId[ 3],
-                (int*) &devId[ 4],
-                (int*) &devId[ 5],
-                (int*) &devId[ 6],
-                (int*) &devId[ 7],
-                (int*) &devId[ 8],
-                (int*) &devId[ 9],
-                (int*) &devId[10],
-                (int*) &devId[11],
-                (int*) &devId[12],
-                (int*) &devId[13],
-                (int*) &devId[14],
-                (int*) &devId[15],
-                &recCrc );
-
-        if( retVal == DEVICE_ID_REC_ITEMS )
+        if( this->_new == false )
         {
-            sprintf( settingsBuffer, DEVICE_ID_REC_FMT, DEVICE_ID_REC_ID,
-                 devId[ 0],
-                 devId[ 1],
-                 devId[ 2],
-                 devId[ 3],
-                 devId[ 4],
-                 devId[ 5],
-                 devId[ 6],
-                 devId[ 7],
-                 devId[ 8],
-                 devId[ 9],
-                 devId[10],
-                 devId[11],
-                 devId[12],
-                 devId[13],
-                 devId[14],
-                 devId[15],
-                 (unsigned int) 0 );
+            fgets(settingsBuffer, MAX_SETTINGS_RECLEN-1, settingsFile );
+        // retVal = fscanf( settingsFile, DEVICE_ID_REC_FMT, &recId,
+            retVal = sscanf( settingsBuffer, DEVICE_ID_REC_FMT, &recId,
+                    (int*) &devId[ 0],
+                    (int*) &devId[ 1],
+                    (int*) &devId[ 2],
+                    (int*) &devId[ 3],
+                    (int*) &devId[ 4],
+                    (int*) &devId[ 5],
+                    (int*) &devId[ 6],
+                    (int*) &devId[ 7],
+                    (int*) &devId[ 8],
+                    (int*) &devId[ 9],
+                    (int*) &devId[10],
+                    (int*) &devId[11],
+                    (int*) &devId[12],
+                    (int*) &devId[13],
+                    (int*) &devId[14],
+                    (int*) &devId[15],
+                    &recCrc );
 
-            calcCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
-
-            if( calcCrc == recCrc )
+            if( retVal == DEVICE_ID_REC_ITEMS )
             {
-                retVal = E_SETTINGS_OK;
+                sprintf( settingsBuffer, DEVICE_ID_REC_FMT, DEVICE_ID_REC_ID,
+                     devId[ 0],
+                     devId[ 1],
+                     devId[ 2],
+                     devId[ 3],
+                     devId[ 4],
+                     devId[ 5],
+                     devId[ 6],
+                     devId[ 7],
+                     devId[ 8],
+                     devId[ 9],
+                     devId[10],
+                     devId[11],
+                     devId[12],
+                     devId[13],
+                     devId[14],
+                     devId[15],
+                     (unsigned int) 0 );
+
+                calcCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
+
+                if( calcCrc == recCrc )
+                {
+                    retVal = E_SETTINGS_OK;
+                }
+                else
+                {
+                    retVal = E_SETTINGS_CRC;
+                }
             }
             else
             {
-                retVal = E_SETTINGS_CRC;
+                retVal = E_SETTINGS_INV_REC;
             }
-        }
-        else
-        {
-            retVal = E_SETTINGS_INV_REC;
         }
     }
 
@@ -642,7 +654,7 @@ int settings::readDeviceId( void )
 int settings::end( void )
 {
     int retVal = E_SETTINGS_OK;
-
+this-write();
     return( retVal );
 }
 
@@ -655,7 +667,7 @@ int settings::end( void )
 int settings::init( void )
 {
     int retVal = E_SETTINGS_OK;
-
+this-read();
     return( retVal );
 }
 
@@ -669,7 +681,9 @@ int settings::init( void )
 */
 int settings::write( void )
 {
-    int retVal;
+    int retVal = E_SETTINGS_OK;
+
+    this->open();
 
     if( (retVal = writeDeviceId()) == E_SETTINGS_OK )
     {
@@ -678,8 +692,32 @@ int settings::write( void )
             if( (retVal = writeAdjustments()) == E_SETTINGS_OK )
             {
                 retVal = writeTimeblocks();
+
+                if( retVal != E_SETTINGS_OK )
+                {
+                    fprintf(stderr, 
+                      "write timeblock records failed with code %d\n", retVal );
+                }
+                else
+                {
+                    this->_new = false;
+                    rewind( settingsFile );
+                }
+            }
+            else
+            {
+                fprintf(stderr, 
+                   "write adjustmend record failed with code %d\n", retVal );
             }
         }
+        else
+        {
+            fprintf(stderr, "write global rec failed with code %d\n", retVal );
+        }
+    }
+    else
+    {
+        fprintf(stderr, "write dev Id failed with code %d\n", retVal );
     }
 
     this->close();
@@ -695,8 +733,10 @@ int settings::write( void )
 */
 int settings::read( void )
 {
-    int retVal;
+    int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
+
+    this->open();
 
     if( (retVal = readDeviceId()) == E_SETTINGS_OK )
     {
@@ -796,8 +836,8 @@ void settings::dumpTimeblocks( void )
     for( int i = 0; i < MAX_TIME_BLOCKS; i++ )
     {
        fprintf( stderr, "timeblock ........: %d\n", timeblock[i].num );
-       fprintf( stderr, "Time .......: %02d:%02d\n", timeblock[i].hour,
-                 timeblock[i].minute );
+       fprintf( stderr, "Time .......: %02d:%02d\n", timeblock[i].time,
+                 timeblock[i].time );
        fprintf( stderr, "Range ......: %02d-%02d\n", timeblock[i].rangeFrom,
                  timeblock[i].rangeTo );
        fprintf( stderr, "Factor .....: %02d\n", timeblock[i].uTo10BE );

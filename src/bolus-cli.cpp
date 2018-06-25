@@ -115,6 +115,7 @@ void dumpArgs( struct _bolus_param *pParam )
         fprintf(stderr, "bread ..: %d\n", pParam->bread );
         fprintf(stderr, "meal ...: %c\n", pParam->mealType );
         fprintf(stderr, "measure.: %c\n", pParam->measType );
+        fprintf(stderr, "adjust .: %c\n", pParam->adjust );
         fprintf(stderr, "last ...: %s\n", 
                 pParam->last == true ? "true" : "false" );
         fprintf(stderr, "edit ...: %c\n", pParam->editType );
@@ -138,6 +139,7 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->bread       = 0;
         pParam->mealType    = '\0';
         pParam->measType    = '\0';
+        pParam->adjust      = 0;
         pParam->last        = false;
         pParam->editType    = '\0';
         pParam->exportType  = '\0';
@@ -205,11 +207,38 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     pParam->mealType = optarg[0];
                     // -m b --meal=b(efore)
                     // -m a --meal=a(fter)
+                    // -m n --meal=n(one)
                     break;
                 case 't':
                     pParam->measType = optarg[0];
                     // -t a --type=(a)cucheck
                     // -t f --type=(f)reestyle
+                    break;
+                case 'a':
+                    switch( optarg[0] )
+                    {
+                        case '1':
+                            pParam->adjust = ADJUST_SPORTS_1;
+                            break;
+                        case '2':
+                            pParam->adjust = ADJUST_SPORTS_2;
+                            break;
+                        case 's':
+                        case 'S':
+                            pParam->adjust = ADJUST_STRESS;
+                            break;
+                        case 'i':
+                        case 'I':
+                            pParam->adjust = ADJUST_ILL;
+                            break;
+                        case 'f':
+                        case 'F':
+                            pParam->adjust = ADJUST_FEMALE;
+                            break;
+                        default:
+                            pParam->adjust = 0;
+                            break;
+                    }
                     break;
                 case 'l':
                     pParam->last = true;

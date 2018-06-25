@@ -48,6 +48,8 @@ using namespace std;
 #define E_BOLUS_DATAFILE       -3
 #define E_BOLUS_CARB_N_BREAD   -4
 #define E_BOLUS_RUN_MODE       -5
+#define E_BOLUS_NULL           -6
+#define E_BOLUS_TIMEBLK        -7
 
 
 #define BOLUS_NO_MODE           0
@@ -67,6 +69,7 @@ struct _bolus_param {
     int  bread;
     char mealType;
     char measType;
+int adjust;
     bool last;
     char editType;
     char exportType;
@@ -99,6 +102,7 @@ class bolus {
       int runCalcBread( void );
       int runCalcCarb( void );
       int runEdit( void );
+      int calcBolus( int timeBlk, struct _record *pLastData, struct _record *pNewData );
 
   public:
       bolus( void ) { 

@@ -38,34 +38,34 @@
  * ---------------- databit for serial connection ----------------------
  *
  * --data bits (same as --data=bits resp. -d bits)
- *			may be 5 up to 8
+ *            may be 5 up to 8
  *
  *   Default is --data=8
  *
  * ---------------- parity for serial connection -----------------------
  *
  * --parity parity (same as --parity=parity resp. -p parity)
- *			may be e/E (even), o/O (odd), n/N (none)
+ *            may be e/E (even), o/O (odd), n/N (none)
  *
  *   Default is --parity=n
  *
  * --------------- stoppbits for serial connection ---------------------
  *
  * --stop stoppbits (same as --stop=stoppbits resp. -s stoppbits)
- *			may be 1 or 2
+ *            may be 1 or 2
  *
  *   Default is --stop=1
  *
  * --------------- handshake for serial connection ---------------------
  *
  * --handshake handshake (same as --handshake=handshake resp. -h handshake)
- *			may be n/N (no handshake), x/X (XON/XOFF)
+ *            may be n/N (no handshake), x/X (XON/XOFF)
  *
  *   Default is --handshake=n
  *
  * ----------------------------- help ----------------------------------
  *
- * --help 	(same as -? )
+ * --help     (same as -? )
  *
  *   Show options and exit
  *
@@ -86,14 +86,11 @@
 #include <fcntl.h>
 #include <termios.h>
 
-
-
 #include <iostream>
 #include <string>
 
 #include "bolus.h"
 
-#ifdef NEVERDEF
 /* ---------------------------------------------------------------------------------
  | void help( struct serial_param_t *ctl_param, short failed )
  |
@@ -101,42 +98,53 @@
  -----------------------------------------------------------------------------------
 */
 
-void help( struct serial_param_t *ctl_param, short failed )
+void help( void )
 {
+    fprintf(stderr, "HELP!\n");
+    exit(0);
+}
 
-	fprintf(stderr, "soehnle printer on RPi\n");
-	fprintf(stderr, "valid options are:\n");
-	fprintf(stderr, 
-		"--com devicename (same as --com=devicename resp. -c devicename)\n");
-	fprintf(stderr, "use device devicename\n");
-	fprintf(stderr, "Default is --com=/dev/ttyUSB0\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "--baud baudrate (same as --baud=baudrate resp. -b baudrate)\n");
-	fprintf(stderr, "set speed to baudrate\n");
-	fprintf(stderr, "Default is --baud=38400\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "--data bits (same as --data=bits resp. -d bits)\n");
-	fprintf(stderr, "set databits to bits (5 up to 8 )\n");
-	fprintf(stderr, "Default is --data=8\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "--parity parity (same as --parity=parity resp. -p parity)\n");
-	fprintf(stderr, 
-		"which parity to use (e/E for even, o/O for odd, n/N for no parity check)\n");
-	fprintf(stderr, "Default is --parity=n\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "--stop stoppbits (same as --stop=stoppbits resp. -s stoppbits)\n");
-	fprintf(stderr, "amount of stoppbits ( 1 or 2 )\n");
-	fprintf(stderr, "Default is --stop=1\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, 
-		"--handshake handshake (same as --handshake=handshake resp. -h handshake)\n");
-	fprintf(stderr, "handshake for transmission (n/N for none, x/X for ixon/ixoff)\n");
-	fprintf(stderr, "Default is --handshake=n\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "--help 	(same as -? )\n");
-	fprintf(stderr, "display help info\n");
+void dumpArgs( struct _bolus_param *pParam )
+{
+    if( pParam != NULL )
+    {
+        fprintf(stderr, "fail ...: %s\n", 
+                pParam->fail == true ? "true" : "false" );
+        fprintf(stderr, "glucose.: %d\n", pParam->glucose );
+        fprintf(stderr, "carb ...: %d\n", pParam->carb );
+        fprintf(stderr, "bread ..: %d\n", pParam->bread );
+        fprintf(stderr, "meal ...: %c\n", pParam->mealType );
+        fprintf(stderr, "measure.: %c\n", pParam->measType );
+        fprintf(stderr, "last ...: %s\n", 
+                pParam->last == true ? "true" : "false" );
+        fprintf(stderr, "edit ...: %c\n", pParam->editType );
+        fprintf(stderr, "export .: %c\n", pParam->exportType );
+        fprintf(stderr, "import .: %s\n", pParam->importFile );
+        fprintf(stderr, "interact: %s\n", 
+                pParam->interactive == true ? "true" : "false" );
+        fprintf(stderr, "nostore : %s\n", 
+                pParam->noStore == true ? "true" : "false" );
+    }
+}
 
-	exit(failed);
+
+void resetArgs( struct _bolus_param *pParam )
+{
+    if( pParam != NULL )
+    {
+        pParam->fail        = false;
+        pParam->glucose     = 0;
+        pParam->carb        = 0;
+        pParam->bread       = 0;
+        pParam->mealType    = '\0';
+        pParam->measType    = '\0';
+        pParam->last        = false;
+        pParam->editType    = '\0';
+        pParam->exportType  = '\0';
+        pParam->importFile  = NULL;
+        pParam->interactive = false;
+        pParam->noStore = false;
+    }
 }
 
 /* ---------------------------------------------------------------------------------
@@ -148,84 +156,110 @@ void help( struct serial_param_t *ctl_param, short failed )
  -----------------------------------------------------------------------------------
 */
 
-void get_arguments ( int argc, char **argv, struct serial_param_t *ctl_param, short *myst)
+void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
 {
 
-	int failed = 0;
-	int next_option;
-	/* valid short options letters */
-	const char* const short_options = "c:b:d:p:s:h:m?";
+    int failed = 0;
+    int next_option;
+    /* valid short options letters */
+    const char* const short_options = "g:c:b:m:t:le:X:I:inh?";
 
-	/* valid long options */
-	const struct option long_options[] = {
- 		{ "com",		1, NULL, 'c' },
- 		{ "baud",		1, NULL, 'b' },
- 		{ "data",		1, NULL, 'd' },
- 		{ "parity",		1, NULL, 'p' },
- 		{ "stop",		1, NULL, 's' },
- 		{ "handshake",		1, NULL, 'h' },
- 		{ "mystery",		0, NULL, 'm' },
- 		{ "help",		0, NULL, '?' },
-		{ NULL,			0, NULL,  0  }
-	};
+    if( pParam != NULL )
+    {
 
-	set_defaults( ctl_param );
-	if( myst != NULL )
-	{
-		*myst = 0;
-	}
-	failed = 0;
+        /* valid long options */
+        const struct option long_options[] = {
+             { "glucose",     1, NULL, 'g' },
+             { "carb",        1, NULL, 'c' },
+             { "bread",       1, NULL, 'b' },
+             { "meal",        1, NULL, 'm' },
+             { "type",        1, NULL, 't' },
+             { "last",        0, NULL, 'l' },
+             { "edit",        1, NULL, 'e' },
+             { "export",      1, NULL, 'X' },
+             { "import",      1, NULL, 'I' },
+             { "interactive", 0, NULL, 'i' },
+             { "nostore",     0, NULL, 'n' },
+             { "help",        0, NULL, 'h' },
+            { NULL,           0, NULL,  0  }
+        };
+    
+        resetArgs( pParam );
+    
+        do
+        {
+            next_option = getopt_long (argc, argv, short_options,
+                long_options, NULL);
+    
+            switch (next_option) {
+                case 'g':
+                    pParam->glucose = atoi(optarg);
+                    break;
+                case 'c':
+                    pParam->carb = atoi(optarg);
+                    break;
+                case 'b':
+                    pParam->bread = atoi(optarg);
+                    break;
+                case 'm':
+                    pParam->mealType = optarg[0];
+                    // -m b --meal=b(efore)
+                    // -m a --meal=a(fter)
+                    break;
+                case 't':
+                    pParam->measType = optarg[0];
+                    // -t a --type=(a)cucheck
+                    // -t f --type=(f)reestyle
+                    break;
+                case 'l':
+                    pParam->last = true;
+                    break;
+                case 'e':
+                    pParam->editType = optarg[0];
+                    // -e --edit=T(imeblocks)
+                    // -e --edit=G(lobals)
+                    // -e --edit=A(djustments)
+                    // -e T
+                    // -e G
+                    // -e A
+                     break;
+                case 'X':
+                    pParam->exportType = optarg[0];
+                    // -X --export=T(imeblocks)
+                    // -X --export=G(lobals)
+                    // -X --export=A(djustments)
+                    // -X --export=J(ason)
+                    // -X T
+                    // -X G
+                    // -X A
+                    // -X J
+                    break;
+                case 'I':
+                    if( strlen( optarg ) )
+                    {
+                        pParam->importFile = strdup(optarg);
+                    }
+                    break;
+                case 'i':
+                    pParam->interactive = true;
+                    break;
+                case 'n':
+                    pParam->noStore = true;
+                    break;
+                case '?':
+                    help();
+                    break;
+                case -1:
+                    break;
+                default:
+                    fprintf(stderr, "Invalid option %c! \n", next_option);
+                    help();
+            }
+        } while (next_option != -1);
+    }
 
-	do
-	{
-		next_option = getopt_long (argc, argv, short_options,
-			long_options, NULL);
-
-		switch (next_option) {
-			case 'c':
-				if( strlen(optarg) )
-				{
-					ctl_param->device = strdup( optarg );
-				}
-				else
-				{
-					help( ctl_param, E_DEVICE);
-				}
-				break;
-			case 'b':
-				ctl_param->baud = atoi(optarg);
-				break;
-			case 'd':
-				ctl_param->databit =atoi(optarg);
-				break;
-			case 'p':
-				ctl_param->parity = optarg[0];
-				break;
-			case 's':
-				ctl_param->stoppbits =atoi(optarg);
-				break;
-			case 'h':
-				ctl_param->handshake = optarg[0];
-				break;
-			case 'm':
-				if( myst != NULL )
-				{
-					*myst = 1;
-				}
-				break;
-			case '?':
-				help( ctl_param, 0 );
-				break;
-			case -1:
-				break;
-			default:
-				fprintf(stderr, "Invalid option %c! \n", next_option);
-				help( ctl_param, 0 );
-		}
-	} while (next_option != -1);
 }
 
-#endif // NEVERDEF
 
 int main( int argc, char *argv[] )
 {
@@ -233,17 +267,26 @@ int main( int argc, char *argv[] )
     bolus *pNewBolus;
     time_t now;
     struct tm *pActual;
+    struct _bolus_param bParam;
 
     if( (pNewBolus = new(bolus)) != NULL )
     {
         now = time(NULL);
         pActual = localtime(&now);
 
-        retVal = pNewBolus->init( );
+        get_arguments ( argc, argv, &bParam );
 
-        retVal = pNewBolus->use( pActual->tm_year+1900, pActual->tm_mon+1 );
+        if( (retVal = pNewBolus->init( &bParam )) == E_BOLUS_OK )
+        {
+            if( pNewBolus->getMode() != BOLUS_NO_MODE )
+            {
+                retVal = pNewBolus->run();
+            }
+            pNewBolus->end( );
+        }
 
-        pNewBolus->end( );
+//        retVal = pNewBolus->use( pActual->tm_year+1900, pActual->tm_mon+1 );
+
     }
 
     return( retVal );

@@ -41,27 +41,70 @@ extern "C" {
  
 using namespace std;
 
+#define W_BOLUS_IDLE            1
 #define E_BOLUS_OK              0
 #define E_BOLUS_SETTINGS       -1
 #define E_BOLUS_INIT           -2
 #define E_BOLUS_DATAFILE       -3
+#define E_BOLUS_CARB_N_BREAD   -4
+#define E_BOLUS_RUN_MODE       -5
 
+
+#define BOLUS_NO_MODE           0
+#define BOLUS_IMPORT_MODE       1
+#define BOLUS_EXPORT_MODE       2
+#define BOLUS_INTERACTIVE_MODE  3
+#define BOLUS_LIST_MODE         4
+#define BOLUS_CALC_BREAD_MODE   5
+#define BOLUS_CALC_CARB_MODE    6
+#define BOLUS_EDIT_MODE         7
+
+
+struct _bolus_param {
+    bool fail;
+    int  glucose;
+    int  carb;
+    int  bread;
+    char mealType;
+    char measType;
+    bool last;
+    char editType;
+    char exportType;
+    char *importFile;
+    bool interactive;
+    bool noStore;
+};
 
 
 class bolus {
 
-  protected:
+  private:
+      bool initialized = false;
+      int mode = BOLUS_NO_MODE;
 
   public:
     settings *pSettings;
     datafile *pDatafile;
+    struct _bolus_param callerArgs;
 
-  private:
-      bool initialized = false;
+  protected:
+      void dumpArgs( void );
+      void resetArgs( void );
+      void setArgs( struct _bolus_param *pParam );
+      int checkArgs( void );
+      int runImport( void );
+      int runEsport( void );
+      int runInteractive( void );
+      int runList( void );
+      int runCalcBread( void );
+      int runCalcCarb( void );
+      int runEdit( void );
 
   public:
       bolus( void ) { 
-      };
+             callerArgs.importFile = NULL;
+             mode = BOLUS_NO_MODE;
+       };
 
       ~bolus( void ) { 
              if( pSettings != NULL )
@@ -73,12 +116,21 @@ class bolus {
              {
                  delete pDatafile;
              }
+             if( callerArgs.importFile != NULL )
+             {
+                 free( callerArgs.importFile );
+                 callerArgs.importFile = NULL;
+             }
       };
 
-      int init( void );
+      int init( struct _bolus_param *pParam );
       int end( void );
-
+      int run( void );
       int use( int year, int month );
+      int getMode( void ) {
+                  return mode;
+      };
+
 };
 
 

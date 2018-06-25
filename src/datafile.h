@@ -60,9 +60,9 @@ using namespace std;
 #define E_DATAFILE_WRITE      -15
 
 
-#define DATA_RECORD_LENGTH     37
+#define DATA_RECORD_LENGTH     41
 
-#define DATA_RECORD_NUM_FIELDS  8
+#define DATA_RECORD_NUM_FIELDS  9
 
 
 struct _record {
@@ -74,6 +74,7 @@ struct _record {
     int adjust;
     int units;
     int basalUnits;
+    int type;
 };
 
 

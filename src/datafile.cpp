@@ -177,6 +177,11 @@ int datafile::performRead( struct _record *pData )
                 case 7:
                     fieldlen = sizeof(pData->basalUnits);
                     rdlen = read( dataFd, &pData->basalUnits, fieldlen );
+                    break;
+                case 8:
+                    fieldlen = sizeof(pData->type);
+                    rdlen = read( dataFd, &pData->type, fieldlen );
+                    break;
                 default:
                     break;
             }
@@ -240,6 +245,10 @@ int datafile::performWrite( struct _record *pData )
                 case 7:
                     fieldlen = sizeof(pData->basalUnits);
                     wrlen = write( dataFd, &pData->basalUnits, fieldlen );
+                case 8:
+                    fieldlen = sizeof(pData->type);
+                    wrlen = write( dataFd, &pData->type, fieldlen );
+                    break;
                 default:
                     break;
             }

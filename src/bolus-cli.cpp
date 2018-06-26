@@ -252,24 +252,31 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     pParam->last = true;
                     break;
                 case 'e':
-                    pParam->editType = optarg[0];
-                    // -e --edit=T(imeblocks)
-                    // -e --edit=G(lobals)
-                    // -e --edit=A(djustments)
-                    // -e T
-                    // -e G
-                    // -e A
-                     break;
+                    switch( optarg[0] )
+                    {
+                        case DATA_EDIT_TYPE_TIMEBLOCKS:
+                        case DATA_EDIT_TYPE_GLOBALS:
+                        case DATA_EDIT_TYPE_ADJUSTMENTS:
+                            pParam->editType = optarg[0];
+                            break;
+                        default:
+                            pParam->editType = DATA_EDIT_TYPE_NO_TYPE;
+                            break;
+                    }
+                    break;
                 case 'X':
-                    pParam->exportType = optarg[0];
-                    // -X --export=T(imeblocks)
-                    // -X --export=G(lobals)
-                    // -X --export=A(djustments)
-                    // -X --export=J(ason)
-                    // -X T
-                    // -X G
-                    // -X A
-                    // -X J
+                    switch( optarg[0] )
+                    {
+                        case DATA_EXPORT_TIMEBLOCKS:
+                        case DATA_EXPORT_GLOBALS:
+                        case DATA_EXPORT_ADJUSTMENTS:
+                        case DATA_EXPORT_ALL_JSON:
+                            pParam->exportType = optarg[0];
+                            break;
+                        default:
+                            pParam->exportType = DATA_EXPORT_NOTHING;
+                            break;
+                    }
                     break;
                 case 'I':
                     if( strlen( optarg ) )

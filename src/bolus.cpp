@@ -287,6 +287,16 @@ int bolus::runImport( void )
 int bolus::runExport( void )
 {
     int retVal = E_BOLUS_OK;
+
+// -X --export=T(imeblocks)
+// -X --export=G(lobals)
+// -X --export=A(djustments)
+// -X --export=J(ason)
+// -X T
+// -X G
+// -X A
+// -X J
+
 }
 
 int bolus::runInteractive( FILE *pIn, FILE *pOut )
@@ -327,13 +337,20 @@ int bolus::runInteractive( FILE *pIn, FILE *pOut )
                     skip = true;
                     break;
                 case BOLUS_FIELD_GLUCOSE:
-                    fprintf(pOut, "glucose    (= %d): ", newData.glucose );
+                    fprintf(pOut, "glucose ( %d to %d ): ",
+                              DATA_GLUCOSE_MIN, DATA_GLUCOSE_MAX );
                     break;
                 case BOLUS_FIELD_MEAL:
-                    fprintf(pOut, "meal       (= %d): ", newData.meal );
+                    fprintf(pOut, "meal (%c,%c,%c,%c,%c,%c,%c,%c,%c,%c): ",
+                              DATA_MEAL_BEFORE, DATA_MEAL_U_BEFORE,
+                              DATA_MEAL_AFTER, DATA_MEAL_U_AFTER,
+                              DATA_MEAL_NONE, DATA_MEAL_U_NONE,
+                              DATA_MEAL_SLEEPTIME, DATA_MEAL_U_SLEEPTIME,
+                              DATA_MEAL_EXTRA, DATA_MEAL_U_EXTRA );
                     break;
                 case BOLUS_FIELD_CARBON:
-                    fprintf(pOut, "carbon10   (= %d): ", newData.carbon10 );
+                    fprintf(pOut, "carbon10 ( %d to %d ): ",
+                              DATA_CARBON10_MIN, DATA_CARBON10_MAX );
                     break;
                 case BOLUS_FIELD_ADJUST:
                     fprintf(pOut, "adjust     (= %d): ", newData.adjust );
@@ -348,10 +365,14 @@ int bolus::runInteractive( FILE *pIn, FILE *pOut )
                     skip = true;
                     break;
                 case BOLUS_FIELD_BASALUNITS:
-                    fprintf(pOut, "basalUnits (= %d): ", newData.basalUnits );
+                    fprintf(pOut, "basalUnits ( %d to %d): ",
+                              DATA_BASAL_UNITS_MIN, DATA_BASAL_UNITS_MAX );
                     break;
                 case BOLUS_FIELD_TYPE:
-                    fprintf(pOut, "type       (= %d): ", newData.type );
+                    fprintf(pOut, "type (%d,%c,%c,%c,%c): ", 0,
+                              DATA_MEASURE_ACUCHECK, DATA_MEASURE_U_ACUCHECK,
+                              DATA_MEASURE_FREESTYLE, DATA_MEASURE_U_FREESTYLE);
+
                     break;
                 case BOLUS_FIELD_ACTUNITS:
                     fprintf(pOut, "act Units  (= %d): ", newData.actUnits );
@@ -694,62 +715,140 @@ int bolus::runCalcBread( void )
 
                     newData.timestamp = time(NULL);
                     newData.recnum = lastRecno;
-                    newData.glucose = callerArgs.glucose;
+
+                    if( callerArgs.glucose < DATA_GLUCOSE_MIN )
+                    {
+                        newData.glucose = DATA_GLUCOSE_MIN;
+                    }
+                    else
+                    {
+                        if( callerArgs.glucose > DATA_GLUCOSE_MAX )
+                        {
+                            newData.glucose = DATA_GLUCOSE_MAX;
+                        }
+                        else
+                        {
+                            newData.glucose = callerArgs.glucose;
+                        }
+                    }
+                    callerArgs.glucose = newData.glucose;
 
                     if( callerArgs.mealType != '\0' )
                     {
                         switch( callerArgs.mealType )
                         {
-                            case 'b':
-                            case 'B':
-                                newData.meal = DATA_MEAL_BEFORE;
-                                break;
-                            case 'a':
-                            case 'A':
-                                newData.meal = DATA_MEAL_AFTER;
-                                break;
-                            case 'n':
-                            case 'N':
-                                newData.meal = DATA_MEAL_NONE;
-                                break;
-                            case 's':
-                            case 'S':
-                                newData.meal = DATA_MEAL_SLEEPTIME;
-                                break;
-                            case 'x':
-                            case 'X':
-                                newData.meal = DATA_MEAL_EXTRA;
+                            case DATA_MEAL_BEFORE:
+                            case DATA_MEAL_U_BEFORE:
+                            case DATA_MEAL_AFTER:
+                            case DATA_MEAL_U_AFTER:
+                            case DATA_MEAL_NONE:
+                            case DATA_MEAL_U_NONE:
+                            case DATA_MEAL_SLEEPTIME:
+                            case DATA_MEAL_U_SLEEPTIME:
+                            case DATA_MEAL_EXTRA:
+                            case DATA_MEAL_U_EXTRA:
+                                newData.meal = callerArgs.mealType;
                                 break;
                             default:
+                                newData.meal = DATA_MEAL_NONE;
                                 break;
                         }
                     }
+                    callerArgs.mealType = newData.meal;
 
-                    if( callerArgs.carb > 0 )
+                    if( callerArgs.carb == 0 )
                     {
-                        newData.carbon10 = callerArgs.carb;
+                        newData.carbon10 = callerArgs.bread * 
+                                        BOLUS_FACTOR_CARB2BREAD;
                     }
-                    else
+
+                    if( callerArgs.carb != 0 )
                     {
-                        newData.carbon10 = callerArgs.bread * 12;
+                        if( callerArgs.carb < DATA_CARBON10_MIN )
+                        {
+                            newData.carbon10 = DATA_CARBON10_MIN;
+                        }
+                        else
+                        {
+                            if( callerArgs.carb > DATA_CARBON10_MAX )
+                            {
+                                newData.carbon10 = DATA_CARBON10_MAX;
+                            }
+                            else
+                            {
+                                newData.carbon10 = callerArgs.carb;
+                            }
+                        }
                     }
+                    callerArgs.carb = newData.carbon10;
+
+                    if( callerArgs.bread == 0 )
+                    {
+                        callerArgs.bread = callerArgs.carb / 
+                                           BOLUS_FACTOR_CARB2BREAD;
+                    }
+
+                    if( callerArgs.bread != 0 )
+                    {
+                        if( callerArgs.bread < DATA_BREAD_MIN )
+                        {
+                            callerArgs.bread = DATA_BREAD_MIN;
+                        }
+                        else
+                        {
+                            if( callerArgs.bread > DATA_BREAD_MAX )
+                            {
+                                callerArgs.bread = DATA_BREAD_MAX;
+                            }
+                            else
+                            {
+                                callerArgs.bread = callerArgs.bread;
+                            }
+                        }
+                    }
+
+                    if( callerArgs.carb == 0 )
+                    {
+                        newData.carbon10 = callerArgs.bread * 
+                                 BOLUS_FACTOR_CARB2BREAD;
+                    }
+
+                    if( callerArgs.carb != 0 )
+                    {
+                        if( callerArgs.carb < DATA_CARBON10_MIN )
+                        {
+                            newData.carbon10 = DATA_CARBON10_MIN;
+                        }
+                        else
+                        {
+                            if( callerArgs.carb > DATA_CARBON10_MAX )
+                            {
+                                newData.carbon10 = DATA_CARBON10_MAX;
+                            }
+                            else
+                            {
+                                newData.carbon10 = callerArgs.carb;
+                            }
+                        }
+                    }
+                    callerArgs.carb = newData.carbon10;
 
                     if( callerArgs.measType != '\0' )
                     {
                         switch( callerArgs.measType )
                         {
-                            case 'f':
-                            case 'F':
-                                newData.type = DATA_MEASURE_FREESTYLE;
-                                break;
-                            case 'a':
-                            case 'A':
-                                newData.type = DATA_MEASURE_ACUCHECK;
-                                break;
+                            case DATA_MEASURE_ACUCHECK:
+                            case DATA_MEASURE_U_ACUCHECK:
+                            case DATA_MEASURE_FREESTYLE:
+                            case DATA_MEASURE_U_FREESTYLE:
+                                newData.type = callerArgs.measType;
                             default:
+                                newData.type = DATA_MEASURE_NONE;
                                 break;
                         }
                     }
+
+                    callerArgs.measType = newData.type;
 
                     if( (retVal = calcBolus( tmblk4now, &lastData, 
                          &newData )) == E_BOLUS_OK )
@@ -802,6 +901,12 @@ int bolus::runEditor( void )
     int cmdPos;
 
 // fprintf(stderr, "edit ...: %c\n", callerArgs.editType );
+// -e --edit=T(imeblocks)
+// -e --edit=G(lobals)
+// -e --edit=A(djustments)
+// -e T
+// -e G
+// -e A
 
     do
     {

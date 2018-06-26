@@ -164,7 +164,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
     int failed = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "g:c:b:m:t:le:X:I:inh?";
+    const char* const short_options = "g:c:b:m:t:le:X:I:o:inh?";
 
     if( pParam != NULL )
     {
@@ -180,6 +180,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
              { "edit",        1, NULL, 'e' },
              { "export",      1, NULL, 'X' },
              { "import",      1, NULL, 'I' },
+             { "offset",      1, NULL, 'o' },
              { "interactive", 0, NULL, 'i' },
              { "nostore",     0, NULL, 'n' },
              { "help",        0, NULL, 'h' },
@@ -275,6 +276,9 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     {
                         pParam->importFile = strdup(optarg);
                     }
+                    break;
+                case 'o':
+                    pParam->offset = atoi(optarg);
                     break;
                 case 'i':
                     pParam->interactive = true;

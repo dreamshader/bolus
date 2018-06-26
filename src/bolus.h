@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <sys/types.h>
+#include <ctype.h>
 
 #include "settings.h"
 #include "datafile.h"
@@ -65,6 +66,46 @@ using namespace std;
 #define SECONDS_A_HOUR         (60 * SECONDS_A_MINUTE)
 #define SECONDS_A_DAY          (24 * SECONDS_A_HOUR)
 
+#define BOLUS_FACTOR_CARB2BREAD 12
+
+#define BOLUS_EDIT_CMD_AA       'a'
+#define BOLUS_EDIT_CMD_BB       'b'
+#define BOLUS_EDIT_CMD_ENDEDIT  'x'
+#define BOLUS_EDIT_CMD_WRITE    'w'
+#define BOLUS_EDIT_CMD_READ     'r'
+#define BOLUS_EDIT_CMD_REJECT   'c'
+#define BOLUS_EDIT_CMD_INVAL    '!'
+#define BOLUS_EDIT_CMD_HELP     '?'
+
+#define BOLUS_INTERACT_NONE     '\0'
+#define BOLUS_INTERACT_SKIP     's'
+#define BOLUS_INTERACT_BACK     'b'
+#define BOLUS_INTERACT_REJECT   'c'
+#define BOLUS_INTERACT_INVAL    '!'
+#define BOLUS_INTERACT_HELP     '?'
+#define BOLUS_INTERACT_YES_DE   'j'
+#define BOLUS_INTERACT_NO       'n'
+#define BOLUS_INTERACT_YES_EN   'y'
+
+#define BOLUS_INTERACT_U_YES_DE 'J'
+#define BOLUS_INTERACT_U_NO     'N'
+#define BOLUS_INTERACT_U_YES_EN 'Y'
+
+#define BOLUS_FIELD_TIMESTAMP   0
+#define BOLUS_FIELD_RECNUM      1
+#define BOLUS_FIELD_GLUCOSE     2
+#define BOLUS_FIELD_MEAL        3
+#define BOLUS_FIELD_CARBON      4
+#define BOLUS_FIELD_ADJUST      5
+#define BOLUS_FIELD_UNITS       6
+#define BOLUS_FIELD_BASALUNITS  7
+#define BOLUS_FIELD_TYPE        8
+#define BOLUS_FIELD_ACTUNITS    9
+#define BOLUS_FIELD_ACTBASUNITS 10
+#define BOLUS_FIELD_ASK_YESNO   11
+
+#define BOLUS_COMMAND_BUFSIZE 128
+#define BOLUS_DIALOG_BUFSIZE  128
 
 struct _bolus_param {
     bool fail;
@@ -80,6 +121,7 @@ struct _bolus_param {
     char *importFile;
     bool interactive;
     bool noStore;
+    bool offset;
 };
 
 
@@ -100,12 +142,12 @@ class bolus {
       void setArgs( struct _bolus_param *pParam );
       int checkArgs( void );
       int runImport( void );
-      int runEsport( void );
-      int runInteractive( void );
-      int runList( void );
+      int runExport( void );
+      int runInteractive( FILE *pIn, FILE *pOut );
+      int runListLast( void );
       int runCalcBread( void );
       int runCalcCarb( void );
-      int runEdit( void );
+      int runEditor( void );
       int calcBolus( int timeBlk, struct _record *pLastData, struct _record *pNewData );
 
   public:

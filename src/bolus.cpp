@@ -22,7 +22,15 @@
 
 #include "bolus.h"
 
-// char *getenv(const char *name);
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void bolus::dumpArgs( void )
+ * does:
+ *     display parameters given e.g. by a CLI call
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void bolus::dumpArgs( void )
 {
     fprintf(stderr, "fail ...: %s\n", 
@@ -43,9 +51,19 @@ void bolus::dumpArgs( void )
             callerArgs.interactive == true ? "true" : "false" );
     fprintf(stderr, "noStore : %s\n", 
             callerArgs.noStore == true ? "true" : "false" );
+    fprintf(stderr, "offset .: %d\n", callerArgs.offset);
 }
 
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void bolus::resetArgs( void )
+ * does:
+ *     set program parameters to useable defaults
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void bolus::resetArgs( void )
 {
     callerArgs.fail        = false;
@@ -61,8 +79,20 @@ void bolus::resetArgs( void )
     callerArgs.importFile  = NULL;
     callerArgs.interactive = false;
     callerArgs.noStore     = false;
+    callerArgs.offset      = 0;
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int bolus::checkArgs( )
+ * does:
+ *     check paramters and their combinations for validity
+ * returns:
+ *     E_BOLUS_OK on success, otherwise an error code
+ * TODO:
+ *     perform real checks for given args
+ ------------------------------------------------------------------------------
+*/
 int bolus::checkArgs( )
 {
     int retVal = E_BOLUS_OK;
@@ -126,6 +156,16 @@ int bolus::checkArgs( )
     return( retVal );
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void bolus::setArgs( struct _bolus_param *pParam )
+ * does:
+ *     transfer parameters given e.g. by a CLI call to
+ *     the corresponding internal structure
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void bolus::setArgs( struct _bolus_param *pParam )
 {
     if( pParam != NULL )
@@ -148,13 +188,23 @@ void bolus::setArgs( struct _bolus_param *pParam )
 
         callerArgs.interactive = pParam->interactive;
         callerArgs.noStore     = pParam->noStore;
+
+        callerArgs.glucose     += pParam->offset;
+        if( callerArgs.glucose < 0 )
+        {
+            callerArgs.glucose = 0;
+        }
     }
 }
 
 /* ----------------------------------------------------------------------------
- * int bolus::init( void )
- *
- * open settings file
+ * function:
+ *     int bolus::init( struct _bolus_param *pParam )
+ * does:
+ *     delete possible existing control structures and create them
+ *     new. Read settings and check/assign parameters
+ * returns:
+ *     E_BOLUS_OK on success, otherwise an error code
  ------------------------------------------------------------------------------
 */
 int bolus::init( struct _bolus_param *pParam )
@@ -234,19 +284,219 @@ int bolus::runImport( void )
     int retVal = E_BOLUS_OK;
 }
 
-int bolus::runEsport( void )
+int bolus::runExport( void )
 {
     int retVal = E_BOLUS_OK;
 }
 
-int bolus::runInteractive( void )
+int bolus::runInteractive( FILE *pIn, FILE *pOut )
 {
+    char inputBuffer[BOLUS_DIALOG_BUFSIZE];
     int retVal = E_BOLUS_OK;
+    char command;
+    int inpPos;
+    bool inputComplete;
+    bool skip;
+    int currFieldNo;
+    struct _record newData;
+    int intInput;
+
+// fprintf(stderr, "edit ...: %c\n", callerArgs.editType );
+
+    if( pIn != (FILE*) NULL && pOut != (FILE*) NULL )
+    {
+        pDatafile->resetRec( &newData );
+        inputComplete = false;
+        currFieldNo = 0;
+        command = BOLUS_INTERACT_NONE;
+        do
+        {
+            skip = false;
+            switch(currFieldNo)
+            {
+                case BOLUS_FIELD_TIMESTAMP:
+                    fprintf(pOut, "timestamp  (= %lu): ", newData.timestamp );
+                    fprintf(pOut, "skipped.\n");
+                    currFieldNo++;
+                    skip = true;
+                    break;
+                case BOLUS_FIELD_RECNUM:
+                    fprintf(pOut, "recno      (= %d): ", newData.recnum );
+                    fprintf(pOut, "skipped.\n");
+                    currFieldNo++;
+                    skip = true;
+                    break;
+                case BOLUS_FIELD_GLUCOSE:
+                    fprintf(pOut, "glucose    (= %d): ", newData.glucose );
+                    break;
+                case BOLUS_FIELD_MEAL:
+                    fprintf(pOut, "meal       (= %d): ", newData.meal );
+                    break;
+                case BOLUS_FIELD_CARBON:
+                    fprintf(pOut, "carbon10   (= %d): ", newData.carbon10 );
+                    break;
+                case BOLUS_FIELD_ADJUST:
+                    fprintf(pOut, "adjust     (= %d): ", newData.adjust );
+                    fprintf(pOut, "skipped.\n");
+                    currFieldNo++;
+                    skip = true;
+                    break;
+                case BOLUS_FIELD_UNITS:
+                    fprintf(pOut, "units      (= %d): ", newData.units );
+                    fprintf(pOut, "skipped.\n");
+                    currFieldNo++;
+                    skip = true;
+                    break;
+                case BOLUS_FIELD_BASALUNITS:
+                    fprintf(pOut, "basalUnits (= %d): ", newData.basalUnits );
+                    break;
+                case BOLUS_FIELD_TYPE:
+                    fprintf(pOut, "type       (= %d): ", newData.type );
+                    break;
+                case BOLUS_FIELD_ACTUNITS:
+                    fprintf(pOut, "act Units  (= %d): ", newData.actUnits );
+                    fprintf(pOut, "skipped.\n");
+                    currFieldNo++;
+                    skip = true;
+                    break;
+                case BOLUS_FIELD_ACTBASUNITS:
+                    fprintf(pOut, "bact Units (= %d): ", newData.actBasunits );
+                    fprintf(pOut, "skipped.\n");
+                    currFieldNo++;
+                    skip = true;
+                    break;
+                case BOLUS_FIELD_ASK_YESNO:
+                    pDatafile->dumpRec( &newData );
+                    fprintf(pOut, "save (y)es/(n)o: " );
+                    break;
+                default:
+                    break;
+            }
+
+           
+            if( !skip )
+            {
+                fgets( inputBuffer, BOLUS_DIALOG_BUFSIZE-1, pIn );
+
+                for( inpPos = 0; inpPos < strlen(inputBuffer) && 
+                        isspace( inputBuffer[inpPos] ) ; inpPos++ )
+                   ;
+    
+                switch( inputBuffer[inpPos] )
+                {
+                    case BOLUS_INTERACT_SKIP:
+                        command = inputBuffer[inpPos];
+                        break;
+                    case BOLUS_INTERACT_BACK:
+                        command = inputBuffer[inpPos];
+                        break;
+                    case BOLUS_INTERACT_REJECT:
+                        command = inputBuffer[inpPos];
+                        break;
+                    case BOLUS_INTERACT_HELP:
+                        command = inputBuffer[inpPos];
+                        break;
+                    case BOLUS_INTERACT_YES_DE:
+                    case BOLUS_INTERACT_YES_EN:
+                    case BOLUS_INTERACT_U_YES_DE:
+                    case BOLUS_INTERACT_U_YES_EN:
+                    case BOLUS_INTERACT_NO:
+                    case BOLUS_INTERACT_U_NO:
+                        command = inputBuffer[inpPos];
+                        break;
+                    default:
+                        command = BOLUS_INTERACT_INVAL;
+                        break;
+                }
+
+
+                switch(currFieldNo)
+                {
+                    case BOLUS_FIELD_GLUCOSE:
+                        intInput = atoi(inputBuffer);
+                        newData.glucose = intInput;
+                        currFieldNo++;
+                        break;
+                    case BOLUS_FIELD_MEAL:
+                        intInput = atoi(inputBuffer);
+                        newData.meal = intInput;
+                        currFieldNo++;
+                        break;
+                    case BOLUS_FIELD_CARBON:
+                        intInput = atoi(inputBuffer);
+                        newData.carbon10 = intInput;
+                        currFieldNo++;
+                        break;
+                    case BOLUS_FIELD_BASALUNITS:
+                        intInput = atoi(inputBuffer);
+                        newData.basalUnits = intInput;
+                        currFieldNo++;
+                        break;
+                    case BOLUS_FIELD_TYPE:
+                        intInput = atoi(inputBuffer);
+                        newData.type = intInput;
+                        currFieldNo++;
+                        break;
+                    case BOLUS_FIELD_ASK_YESNO:
+                        switch( command )
+                        {
+                            case BOLUS_INTERACT_YES_DE:
+                            case BOLUS_INTERACT_YES_EN:
+                            case BOLUS_INTERACT_U_YES_DE:
+                            case BOLUS_INTERACT_U_YES_EN:
+fprintf(stderr, "(%s[%d]) save data!\n", __FILE__, __LINE__ );
+                                break;
+                            case BOLUS_INTERACT_NO:
+                            case BOLUS_INTERACT_U_NO:
+fprintf(stderr, "(%s[%d]) DISCARD data!\n", __FILE__, __LINE__ );
+                                break;
+                            default:
+fprintf(stderr, "(%s[%d]) input was %c!\n", __FILE__, __LINE__, command );
+                                break;
+                        }
+                        inputComplete = true;
+                        break;
+                    default:
+                        currFieldNo++;
+                        break;
+                }
+            }
+fprintf(stderr, "(%s[%d]) inputComplete %s\n", __FILE__, __LINE__, 
+          inputComplete?"DONE!":"MORE");
+        } while( command != BOLUS_EDIT_CMD_REJECT && !inputComplete );
+    }
 }
 
-int bolus::runList( void )
+// fprintf(stderr, "(%s[%d]) command %c\n", __FILE__, __LINE__, command);
+
+int bolus::runListLast( void )
 {
     int retVal = E_BOLUS_OK;
+    unsigned int lastRecno;
+    struct _record lastData;
+    time_t now;
+    struct tm *pActual;
+
+    if( pSettings != NULL && pDatafile != NULL )
+    {
+        now = time(NULL);
+        pActual = localtime(&now);
+
+        retVal = use( pActual->tm_year+1900, pActual->tm_mon+1 );
+
+        if( retVal == E_BOLUS_OK )
+        {
+            pDatafile->resetRec( &lastData );
+            retVal = pDatafile->readLastRecord( &lastRecno, &lastData );
+        }
+
+        if( lastRecno >= 0 && retVal == E_DATAFILE_OK )
+        {
+            pDatafile->dumpRec( &lastData );
+        }
+    }
+
+    return( retVal );
 }
 
 // fprintf(stderr, "(%s[%d]) offUnits is %f\n", __FILE__, __LINE__, offUnits);
@@ -332,6 +582,8 @@ fprintf( stderr, "----------------\n" );
             differenceMinutes = differenceSeconds / SECONDS_A_MINUTE;
             differenceHours = differenceSeconds / SECONDS_A_HOUR;
             differenceDays = differenceSeconds / SECONDS_A_DAY;
+
+fprintf(stderr, "(%s[%d]) differenceMinutes is %ld\n", __FILE__, __LINE__, differenceMinutes);
 
             if( pNewData->units > 0 || pLastData->units > 0 )
             {
@@ -506,8 +758,15 @@ fprintf( stderr, "NEW RECORD:\n" );
 fprintf( stderr, "-----------\n" );
                         pDatafile->dumpRec( &newData );
 fprintf( stderr, "-----------\n" );
-                        retVal = pDatafile->appendRecord( &currRecno, 
+                        if( callerArgs.noStore )
+                        {
+fprintf( stderr, "WARN: data will not be save becaus of argument!\n");
+                        }
+                        else
+                        {
+                            retVal = pDatafile->appendRecord( &currRecno, 
                                                           &newData );
+                        }
                     }
                 }
             }
@@ -528,19 +787,70 @@ fprintf( stderr, "-----------\n" );
 int bolus::runCalcCarb( void )
 {
     int retVal = E_BOLUS_OK;
-    time_t now;
-    struct tm *pActual;
 
-    now = time(NULL);
-    pActual = localtime(&now);
-    retVal = use( pActual->tm_year+1900, pActual->tm_mon+1 );
+    callerArgs.bread = callerArgs.carb / BOLUS_FACTOR_CARB2BREAD;
+    retVal = runCalcBread();
 
     return( retVal );
 }
 
-int bolus::runEdit( void )
+int bolus::runEditor( void )
 {
+    char commandBuffer[BOLUS_COMMAND_BUFSIZE];
     int retVal = E_BOLUS_OK;
+    int editorCommand;
+    int cmdPos;
+
+// fprintf(stderr, "edit ...: %c\n", callerArgs.editType );
+
+    do
+    {
+        printf("\n>");
+        if( fgets( commandBuffer, BOLUS_COMMAND_BUFSIZE-1, stdin ) != NULL )
+        {
+            for( cmdPos = 0; cmdPos < strlen(commandBuffer) && 
+                    isspace( commandBuffer[cmdPos] ) ; cmdPos++ )
+               ;
+
+            switch( commandBuffer[cmdPos] )
+            {
+                case BOLUS_EDIT_CMD_AA:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_AA %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                case BOLUS_EDIT_CMD_BB:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_BB %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                case BOLUS_EDIT_CMD_ENDEDIT:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_ENDEDIT %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                case BOLUS_EDIT_CMD_WRITE:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_WRITE %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                case BOLUS_EDIT_CMD_READ:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_READ %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                case BOLUS_EDIT_CMD_REJECT:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_REJECT %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                case BOLUS_EDIT_CMD_HELP:
+                    editorCommand = commandBuffer[cmdPos];
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_HELP %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+                default:
+                    editorCommand = BOLUS_EDIT_CMD_INVAL;
+fprintf(stderr, "(%s[%d]) BOLUS_EDIT_CMD_INVAL %c\n", __FILE__, __LINE__, editorCommand);
+                    break;
+            }
+        }
+
+    } while( editorCommand != BOLUS_EDIT_CMD_ENDEDIT &&
+           editorCommand != BOLUS_EDIT_CMD_REJECT );
 }
 
 
@@ -565,13 +875,13 @@ int bolus::run( void )
                 retVal = runImport();
                 break;
             case BOLUS_EXPORT_MODE:
-                retVal = runEsport();
+                retVal = runExport();
                 break;
             case BOLUS_INTERACTIVE_MODE:
-                retVal = runInteractive();
+                retVal = runInteractive( stdin, stdout );
                 break;
             case BOLUS_LIST_MODE:
-                retVal = runList();
+                retVal = runListLast();
                 break;
             case BOLUS_CALC_BREAD_MODE:
                 retVal = runCalcBread();
@@ -580,7 +890,7 @@ int bolus::run( void )
                 retVal = runCalcCarb();
                 break;
             case BOLUS_EDIT_MODE:
-                retVal = runEdit();
+                retVal = runEditor();
                 break;
             default:
                 retVal = E_BOLUS_RUN_MODE;

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlgSettingsBolus</class>
+ <widget class="QDialog" name="dlgSettingsBolus">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Bolusvorschlag</string>
+  </property>
+  <widget class="QPushButton" name="btnMainMenu">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>260</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Menü</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnTimeBlocks">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>90</y>
+     <width>281</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Zeitblöcke</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnHealthEvents">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>130</y>
+     <width>281</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Gesundheits-Faktoren</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnBolusOptions">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>160</y>
+     <width>281</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bolus-Optionen</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnMainMenu</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgSettingsBolus</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>272</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

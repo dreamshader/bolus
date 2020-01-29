@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>bolusDlg</class>
+ <widget class="QDialog" name="bolusDlg">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>333</width>
+    <height>335</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Bolusvorschlag</string>
+  </property>
+  <widget class="QPushButton" name="btnBolusCalc">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>300</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bolus</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMealTime">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>79</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Essenszeit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblBreadUnits">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kohlenhydrate</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="breadUnits">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>130</y>
+     <width>71</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::UpDownArrows</enum>
+   </property>
+   <property name="accelerated">
+    <bool>true</bool>
+   </property>
+   <property name="decimals">
+    <number>1</number>
+   </property>
+   <property name="stepType">
+    <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="mealTimeSelect">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>80</y>
+     <width>131</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="currentText">
+    <string/>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="healthSelect">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>180</y>
+     <width>131</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblHealth">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Gesundheit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblCurrTime">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Uhrzeit</string>
+   </property>
+  </widget>
+  <widget class="QGraphicsView" name="glucoseStatus">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>10</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="backgroundBrush">
+    <brush brushstyle="SolidPattern">
+     <color alpha="255">
+      <red>0</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </brush>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblGlucoseValue">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>40</y>
+     <width>41</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Glucose</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblDataGlucose">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>40</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>mg/dL</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblActiveInsulin">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>121</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Aktives Insulin</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblDataActiveInsulin">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>230</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Insulin</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnMainMenu">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>300</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Menü</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chkNoStore">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>281</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>nur berechnen, nicht speichern</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnBolusCalc</sender>
+   <signal>clicked()</signal>
+   <receiver>bolusDlg</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>242</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnMainMenu</sender>
+   <signal>clicked()</signal>
+   <receiver>bolusDlg</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>77</x>
+     <y>282</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -61,6 +61,8 @@ using namespace std;
 #define BOLUS_CALC_BREAD_MODE   5
 #define BOLUS_CALC_CARB_MODE    6
 #define BOLUS_EDIT_MODE         7
+#define BOLUS_QUERY_MODE        8
+#define BOLUS_CALIBRATE_MODE    9
 
 #define SECONDS_A_MINUTE       60
 #define SECONDS_A_HOUR         (60 * SECONDS_A_MINUTE)
@@ -122,6 +124,12 @@ struct _bolus_param {
     bool interactive;
     bool noStore;
     bool offset;
+    bool query;
+    int timeBlockNumber;
+    bool timeBlockCount;
+    bool calibrate;
+    int freestyleValue;
+    int acucheckValue;
 };
 
 
@@ -148,6 +156,9 @@ class bolus {
       int runCalcBread( void );
       int runCalcCarb( void );
       int runEditor( void );
+      int runQuery( void );
+      int runCalibrate( void );
+
       int calcBolus( int timeBlk, struct _record *pLastData, struct _record *pNewData );
 
   public:
@@ -180,6 +191,8 @@ class bolus {
       int getMode( void ) {
                   return mode;
       };
+      int countTimeBlocks( void );
+
 
 };
 

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlgRecommendationOptions</class>
+ <widget class="QDialog" name="dlgRecommendationOptions">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>344</width>
+    <height>200</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Bolus-Optionen</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>160</y>
+     <width>196</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextGlucoRaise">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>101</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>BZ-Anstieg</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextSnackSize">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>101</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Snack-Größe</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextDuration">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>101</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Wirkzeit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextDelay">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Verzögerung</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spnGlucoRaise">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>20</y>
+     <width>52</width>
+     <height>27</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextGlucoUnits">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>20</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>mg/dL</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextBE">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>50</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>BE</string>
+   </property>
+  </widget>
+  <widget class="QTimeEdit" name="tmDuration">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>80</y>
+     <width>81</width>
+     <height>27</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTimeEdit" name="tmDelay">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>110</y>
+     <width>81</width>
+     <height>27</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="spnSnackSize">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>50</y>
+     <width>76</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>1</number>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>dlgRecommendationOptions</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>272</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>dlgRecommendationOptions</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>272</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlgShowData</class>
+ <widget class="QDialog" name="dlgShowData">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>334</width>
+    <height>286</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QLabel" name="lblTime">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Uhrzeit</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblDate">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>10</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="text">
+    <string>Datum</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextGlucoValue">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>BZ-Wert</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextMealTime">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Essenszeit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextCarbUnits">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kohlenhydrate</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextHealthness">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Gesundheit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextBolus">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bolus</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextBasal">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>200</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Basal</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblGlucoValue">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>50</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblMealTimeValue">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>80</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblCarbValue">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>110</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblHealthnessValue">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>140</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblBolusValue">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>170</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblBasalValue">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>200</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnMainMenu">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>250</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Menü</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnPrevRec">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>250</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Voriger</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnNextRec">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>250</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Nächster</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnMainMenu</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgShowData</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>57</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>166</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

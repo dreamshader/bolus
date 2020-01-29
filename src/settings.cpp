@@ -634,7 +634,7 @@ int settings::readDeviceId( void )
 int settings::end( void )
 {
     int retVal = E_SETTINGS_OK;
-this-write();
+this->write();
     return( retVal );
 }
 

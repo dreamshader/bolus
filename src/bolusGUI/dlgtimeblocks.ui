@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlgTimeBlocks</class>
+ <widget class="QDialog" name="dlgTimeBlocks">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>261</width>
+    <height>164</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Zeitblöcke</string>
+  </property>
+  <widget class="QListWidget" name="lstTimeBlocks">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>241</width>
+     <height>111</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnMainMenu">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Menü</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnMainMenu</sender>
+   <signal>clicked()</signal>
+   <receiver>dlgTimeBlocks</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>57</x>
+     <y>142</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>140</x>
+     <y>81</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

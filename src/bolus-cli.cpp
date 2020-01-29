@@ -125,6 +125,16 @@ void dumpArgs( struct _bolus_param *pParam )
                 pParam->interactive == true ? "true" : "false" );
         fprintf(stderr, "nostore : %s\n", 
                 pParam->noStore == true ? "true" : "false" );
+        fprintf(stderr, "query only : %s\n", 
+                pParam->query == true ? "true" : "false" );
+        fprintf(stderr, "timeblock count : %s\n", 
+                pParam->timeBlockCount == true ? "true" : "false" );
+        fprintf(stderr, "tmblk ..: %d\n", pParam->timeBlockNumber);
+
+        fprintf(stderr, "calibrate : %s\n", 
+                pParam->calibrate == true ? "true" : "false" );
+        fprintf(stderr, "acucheck ..: %d\n", pParam->acucheckValue );
+        fprintf(stderr, "freestyle ..: %d\n", pParam->freestyleValue );
     }
 }
 
@@ -134,6 +144,7 @@ void resetArgs( struct _bolus_param *pParam )
     if( pParam != NULL )
     {
         pParam->fail        = false;
+        pParam->offset      = 0;
         pParam->glucose     = 0;
         pParam->carb        = 0;
         pParam->bread       = 0;
@@ -146,6 +157,13 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->importFile  = NULL;
         pParam->interactive = false;
         pParam->noStore = false;
+        pParam->query = false;
+        pParam->timeBlockNumber = -1;
+        pParam->timeBlockCount = false;
+        pParam->calibrate = false;
+        pParam->acucheckValue = -1;
+        pParam->freestyleValue = -1;
+
     }
 }
 
@@ -164,7 +182,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
     int failed = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "g:c:b:m:t:le:X:I:o:inh?";
+    const char* const short_options = "g:c:b:m:t:le:X:I:o:T:F:A:Cinhq?";
 
     if( pParam != NULL )
     {
@@ -181,9 +199,17 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
              { "export",      1, NULL, 'X' },
              { "import",      1, NULL, 'I' },
              { "offset",      1, NULL, 'o' },
+             { "timeblock",   1, NULL, 'T' },
+
+             { "calibrate",   1, NULL, 'C' },
+             { "acucheck",    1, NULL, 'A' },
+             { "freestyle",   1, NULL, 'F' },
+
              { "interactive", 0, NULL, 'i' },
              { "nostore",     0, NULL, 'n' },
              { "help",        0, NULL, 'h' },
+             { "query",       0, NULL, 'q' },
+
             { NULL,           0, NULL,  0  }
         };
     
@@ -287,6 +313,18 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                 case 'o':
                     pParam->offset = atoi(optarg);
                     break;
+                case 'T':
+                    if( optarg[0] == '#' )
+                    {
+                        pParam->timeBlockCount = true;
+                        pParam->timeBlockNumber = -1;
+                    }
+                    else
+                    {
+                        pParam->timeBlockCount = false;
+                        pParam->timeBlockNumber = atoi(optarg);
+                    }
+                    break;
                 case 'i':
                     pParam->interactive = true;
                     break;
@@ -296,6 +334,20 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                 case '?':
                     help();
                     break;
+                case 'q':
+                    pParam->query = true;
+                    break;
+
+                case 'C':
+                    pParam->calibrate = true;
+                    break;
+                case 'A':
+                    pParam->acucheckValue = atoi(optarg);
+                    break;
+                case 'F':
+                    pParam->freestyleValue = atoi(optarg);
+                    break;
+
                 case -1:
                     break;
                 default:
@@ -322,6 +374,7 @@ int main( int argc, char *argv[] )
         pActual = localtime(&now);
 
         get_arguments ( argc, argv, &bParam );
+//	dumpArgs( &bParam );
 
         if( (retVal = pNewBolus->init( &bParam )) == E_BOLUS_OK )
         {

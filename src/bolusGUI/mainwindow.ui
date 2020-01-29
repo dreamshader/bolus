@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QPushButton" name="btnBolus">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>40</y>
+      <width>271</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Bolus berechnen</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnData">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>90</y>
+      <width>271</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Daten verwalten</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnSettings">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>140</y>
+      <width>271</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Einstellungen</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_Datei">
+    <property name="title">
+     <string>Datei</string>
+    </property>
+    <addaction name="action_Beenden"/>
+   </widget>
+   <widget class="QMenu" name="menuHilfe">
+    <property name="title">
+     <string>Hilfe</string>
+    </property>
+    <addaction name="action_ber_diesen_Bolusrechner"/>
+    <addaction name="separator"/>
+    <addaction name="actionHilfe"/>
+    <addaction name="separator"/>
+   </widget>
+   <addaction name="menu_Datei"/>
+   <addaction name="menuHilfe"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_Beenden">
+   <property name="text">
+    <string>Beenden</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_ber_diesen_Bolusrechner">
+   <property name="text">
+    <string>Inhalt</string>
+   </property>
+  </action>
+  <action name="actionHilfe">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

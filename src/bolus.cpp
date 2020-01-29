@@ -80,6 +80,13 @@ void bolus::resetArgs( void )
     callerArgs.interactive = false;
     callerArgs.noStore     = false;
     callerArgs.offset      = 0;
+    callerArgs.query       = false;
+    callerArgs.timeBlockCount = false;
+    callerArgs.timeBlockNumber = -1;
+    callerArgs.calibrate        = false;
+    callerArgs.acucheckValue   = -1;
+    callerArgs.freestyleValue   = -1;
+
 }
 
 /* ----------------------------------------------------------------------------
@@ -123,6 +130,13 @@ int bolus::checkArgs( )
                 retVal = E_BOLUS_CARB_N_BREAD;
             }
         }
+
+        if( callerArgs.carb == 0 && callerArgs.bread == 0 )
+        {
+            retVal = E_BOLUS_OK;
+            mode = BOLUS_CALC_BREAD_MODE;
+            callerArgs.fail = false;
+        }
     }
 
     if( !callerArgs.fail )
@@ -150,6 +164,16 @@ int bolus::checkArgs( )
         if( callerArgs.interactive )
         {
             mode = BOLUS_INTERACTIVE_MODE;
+        }
+
+        if( callerArgs.query )
+        {
+            mode = BOLUS_QUERY_MODE;
+        }
+
+        if( callerArgs.calibrate )
+        {
+            mode = BOLUS_CALIBRATE_MODE;
         }
     }
 
@@ -188,6 +212,13 @@ void bolus::setArgs( struct _bolus_param *pParam )
 
         callerArgs.interactive = pParam->interactive;
         callerArgs.noStore     = pParam->noStore;
+        callerArgs.query       = pParam->query;
+        callerArgs.timeBlockCount = pParam->timeBlockCount;
+        callerArgs.timeBlockNumber = pParam->timeBlockNumber;
+
+        callerArgs.calibrate = pParam->calibrate;
+        callerArgs.acucheckValue = pParam->acucheckValue;
+        callerArgs.freestyleValue = pParam->freestyleValue;
 
         callerArgs.glucose     += pParam->offset;
         if( callerArgs.glucose < 0 )
@@ -276,12 +307,175 @@ int bolus::end( void )
     return( retVal );
 }
 
+int bolus::countTimeBlocks( void )
+{
+    int retVal = E_BOLUS_OK;
 
+    retVal = NUM_TIME_BLOCKS;
+
+    return( retVal );
+}
+
+int bolus::runQuery( void )
+{
+    int retVal = E_BOLUS_OK;
+    time_t now;
+    struct tm *pActual;
+    int tmblk4now;
+    int timeTmblk;
+    int i;
+
+    if( callerArgs.timeBlockCount )
+    {
+fprintf( stderr, "query number of timeblocks.\n");
+        retVal = countTimeBlocks();
+        fprintf( stdout, "%d\n", retVal );
+    }
+    else
+    {
+        if( callerArgs.timeBlockNumber >= 0 )
+        {
+            int numTimeBlocks, tmIndex;
+
+            numTimeBlocks = countTimeBlocks();
+
+            if( callerArgs.timeBlockNumber < numTimeBlocks )
+            {
+                tmIndex = callerArgs.timeBlockNumber;
+                if( tmIndex + 1 < numTimeBlocks )
+                {
+                    fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
+
+                             pSettings->timeblock[tmIndex].time / 60,
+                             pSettings->timeblock[tmIndex].time % 60,
+                             pSettings->timeblock[tmIndex + 1].time / 60,
+                             pSettings->timeblock[tmIndex + 1].time % 60,
+                             pSettings->timeblock[tmIndex].rangeFrom,
+                             pSettings->timeblock[tmIndex].rangeTo,
+                             pSettings->timeblock[tmIndex].uTo10BE,
+                             pSettings->timeblock[tmIndex].sens );
+                }
+                else
+                {
+                    fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
+                             pSettings->timeblock[tmIndex].time / 60,
+                             pSettings->timeblock[tmIndex].time % 60,
+                             pSettings->timeblock[0].time / 60,
+                             pSettings->timeblock[0].time % 60,
+                             pSettings->timeblock[tmIndex].rangeFrom,
+                             pSettings->timeblock[tmIndex].rangeTo,
+                             pSettings->timeblock[tmIndex].uTo10BE,
+                             pSettings->timeblock[tmIndex].sens );
+                }
+
+                retVal = 0;
+            }
+            else
+            {
+                retVal = -1;
+            }
+        }
+        else
+        {
+            if( callerArgs.glucose > 0 )
+            {
+fprintf( stderr, "query glucose status for %d.\n", callerArgs.glucose);
+
+                now = time(NULL);
+                pActual = localtime(&now);
+
+                tmblk4now = -1;
+                timeTmblk = ( pActual->tm_hour * 60 ) + pActual->tm_min;
+
+                for( int i = 0; tmblk4now < 0 && i < MAX_TIME_BLOCKS; i++ )
+                {
+
+                    if( timeTmblk <= pSettings->timeblock[i].time )
+                    {
+                        if( i )
+                        {
+                            tmblk4now = i-1;
+                        }
+                        else
+                        {
+                            tmblk4now = i;
+                        }
+                    }
+                }
+        
+                if( tmblk4now >= 0 )
+                {
+                    if( callerArgs.glucose >= 
+                        pSettings->timeblock[tmblk4now].rangeFrom &&
+                        callerArgs.glucose <=
+                        pSettings->timeblock[tmblk4now].rangeTo )
+                    {
+                        retVal = 0;           // green - ok
+                    }
+                    else
+                    {
+                        if( callerArgs.glucose <
+                            pSettings->timeblock[tmblk4now].rangeFrom )
+                        {
+                            retVal = 2;           // red - too low
+                        }
+                        else
+                        {
+                            if( callerArgs.glucose >
+                                pSettings->timeblock[tmblk4now].rangeTo )
+                            {
+                                retVal = 1;           // yellow - too high
+                            }
+                            else
+                            {
+                                retVal = -1;           // no idea
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    retVal = -1;           // failed - timeblock not found
+                }
+
+                fprintf( stdout, "%d\n", retVal );
+            }
+            else
+            {
+fprintf( stderr, "UNKNOWN query, yet!\n");
+                retVal = -1;
+            }
+        }
+    }
+
+    return( retVal );
+}
+
+int bolus::runCalibrate( void )
+{
+    int retVal = E_BOLUS_OK;
+
+fprintf(stderr, "Calibrating for sensor values\n");
+//    bool callerArgs.calibrate;
+//    callerArgs.freestyleValue;
+//    callerArgs.acucheckValue;
+
+    if( callerArgs.freestyleValue > 0 && callerArgs.acucheckValue > 0 )
+    {
+fprintf( stderr, "real value of %d is equivalent to freestyle value %d\n",
+         callerArgs.acucheckValue, callerArgs.freestyleValue );
+
+    }
+
+    return( retVal );
+}
 
 
 int bolus::runImport( void )
 {
     int retVal = E_BOLUS_OK;
+
+    return( retVal );
 }
 
 int bolus::runExport( void )
@@ -297,6 +491,7 @@ int bolus::runExport( void )
 // -X A
 // -X J
 
+    return( retVal );
 }
 
 int bolus::runInteractive( FILE *pIn, FILE *pOut )
@@ -860,11 +1055,15 @@ fprintf( stderr, "-----------\n" );
                         if( callerArgs.noStore )
                         {
 fprintf( stderr, "WARN: data will not be save becaus of argument!\n");
+                            retVal = newData.units;
+                            // pNewData.units
+                            // retVal = 0;
+fprintf( stderr, "setting retVal to: %d!\n", retVal);
                         }
                         else
                         {
                             retVal = pDatafile->appendRecord( &currRecno, 
-                                                          &newData );
+                                                              &newData );
                         }
                     }
                 }
@@ -996,6 +1195,12 @@ int bolus::run( void )
                 break;
             case BOLUS_EDIT_MODE:
                 retVal = runEditor();
+                break;
+            case BOLUS_QUERY_MODE:
+                retVal = runQuery();
+                break;
+            case BOLUS_CALIBRATE_MODE:
+                retVal = runCalibrate();
                 break;
             default:
                 retVal = E_BOLUS_RUN_MODE;

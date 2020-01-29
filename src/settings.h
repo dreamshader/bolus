@@ -70,32 +70,32 @@ using namespace std;
 #define TMBLCK0_TIME            0
 #define TMBLCK0_TGT_FROM      100
 #define TMBLCK0_TGT_TO        180
-#define TMBLCK0_U210BE         10
-#define TMBLCK0_SENSITIVITY    50
+#define TMBLCK0_U210BE         12
+#define TMBLCK0_SENSITIVITY    70
 //
-#define TMBLCK1_TIME          330
+#define TMBLCK1_TIME          360
 #define TMBLCK1_TGT_FROM       80
 #define TMBLCK1_TGT_TO        160
-#define TMBLCK1_U210BE         18
-#define TMBLCK1_SENSITIVITY    55
+#define TMBLCK1_U210BE         13
+#define TMBLCK1_SENSITIVITY    70
 //
 #define TMBLCK2_TIME          660
 #define TMBLCK2_TGT_FROM       80
 #define TMBLCK2_TGT_TO        160
-#define TMBLCK2_U210BE          7
-#define TMBLCK2_SENSITIVITY    75
+#define TMBLCK2_U210BE         13
+#define TMBLCK2_SENSITIVITY    70
 //
-#define TMBLCK3_TIME         1020
+#define TMBLCK3_TIME          960
 #define TMBLCK3_TGT_FROM       80
 #define TMBLCK3_TGT_TO        160
-#define TMBLCK3_U210BE          3
-#define TMBLCK3_SENSITIVITY    85
+#define TMBLCK3_U210BE         15
+#define TMBLCK3_SENSITIVITY    75
 //
-#define TMBLCK4_TIME         1290
+#define TMBLCK4_TIME         1320
 #define TMBLCK4_TGT_FROM      100
 #define TMBLCK4_TGT_TO        180
-#define TMBLCK4_U210BE          5
-#define TMBLCK4_SENSITIVITY    70
+#define TMBLCK4_U210BE         14
+#define TMBLCK4_SENSITIVITY    75
 //
 #define MAJOR_VERSION           0
 #define MINOR_VERSION           0

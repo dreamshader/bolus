@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlgTimeBlockEdit</class>
+ <widget class="QDialog" name="dlgTimeBlockEdit">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>260</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextFrom">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>111</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Zeitblock von</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTmBlkFrom">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>10</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTmBlkTo">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>10</y>
+     <width>74</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>331</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Zielbereich</string>
+   </property>
+   <widget class="QSpinBox" name="spnTgtFrom">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>30</y>
+      <width>61</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="accelerated">
+     <bool>true</bool>
+    </property>
+    <property name="maximum">
+     <number>999</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spnTgtTo">
+    <property name="geometry">
+     <rect>
+      <x>181</x>
+      <y>30</y>
+      <width>61</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="accelerated">
+     <bool>true</bool>
+    </property>
+    <property name="maximum">
+     <number>999</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextGlucoUnitsFrom">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>30</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>mg/dL</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextGlucoUnitsTo">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>30</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>mg/dL</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextTo_2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>30</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>bis</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>331</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Kohlenhydrat-Faktor</string>
+   </property>
+   <widget class="QDoubleSpinBox" name="spnInsulinUnits">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>76</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="accelerated">
+     <bool>true</bool>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="spnBreadUnits">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>30</y>
+      <width>76</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="accelerated">
+     <bool>true</bool>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextTo_4">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>U für</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextBreadUnits">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>30</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>BE</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>331</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Insulin-Sensitivität</string>
+   </property>
+   <widget class="QDoubleSpinBox" name="spnInsulinUnits_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>76</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="accelerated">
+     <bool>true</bool>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextGlucoUnitsSens">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>30</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>mg/dL</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblTextTo_3">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>U für</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spnGlucoValue">
+    <property name="geometry">
+     <rect>
+      <x>191</x>
+      <y>30</y>
+      <width>61</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="accelerated">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="lblTextTo">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>10</y>
+     <width>31</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>bis</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>dlgTimeBlockEdit</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>dlgTimeBlockEdit</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

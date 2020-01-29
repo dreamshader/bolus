@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dataDlg</class>
+ <widget class="QDialog" name="dataDlg">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Daten verwalten</string>
+  </property>
+  <widget class="QPushButton" name="btnMainMenu">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>270</y>
+     <width>95</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Menü</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDataExport">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>60</y>
+     <width>221</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Daten exportieren</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDataImport">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>90</y>
+     <width>221</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Daten importieren</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDataAnalyze">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>120</y>
+     <width>221</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Auswertungen</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDataEdit">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>150</y>
+     <width>221</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Daten anzeigen/ändern</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDataAdd">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>180</y>
+     <width>221</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Daten hinzufügen</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnMainMenu</sender>
+   <signal>clicked()</signal>
+   <receiver>dataDlg</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>307</x>
+     <y>252</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

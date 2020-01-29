@@ -4,3 +4,4 @@ tmp/*
 *.so
 *.swp
 build/bolus-cli
+src/build-bolusGUI-Desktop_Qt_5_12_0_GCC_64bit-Debug

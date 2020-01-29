@@ -15,6 +15,12 @@ public:
     explicit dlgHealthOptions(QWidget *parent = nullptr);
     ~dlgHealthOptions();
 
+    int varSports1;
+    int varSports2;
+    int varStress;
+    int varIll;
+    int varFemale;
+
 private:
     Ui::dlgHealthOptions *ui;
     QWidget *pParent;

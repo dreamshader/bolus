@@ -15,6 +15,16 @@ public:
     explicit dlgRecommendationOptions(QWidget *parent = nullptr);
     ~dlgRecommendationOptions();
 
+    unsigned int varVersion;
+    int varTimeBlocksActive;
+    int varIncreaseLevel;
+    int varSnacksize10BE;
+    int varActTime;
+    int varDelayTime;
+    int varBasalActTime;
+    int varBasalDelayTime;
+
+
 private:
     Ui::dlgRecommendationOptions *ui;
     QWidget *pParent;

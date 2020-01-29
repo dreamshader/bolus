@@ -113,7 +113,7 @@ struct _bolus_param {
     bool fail;
     int  glucose;
     int  carb;
-    int  bread;
+    double  bread;
     char mealType;
     char measType;
     int adjust;
@@ -130,6 +130,8 @@ struct _bolus_param {
     bool calibrate;
     int freestyleValue;
     int acucheckValue;
+    bool qFactors;
+    bool qGlobals;
 };
 
 

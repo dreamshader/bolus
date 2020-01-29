@@ -74,8 +74,8 @@ void bolusDlg::on_btnBolusCalc_clicked()
 {
     extern int currCalcBolus;
     extern struct _bolus_param gParam;
-int bolus;
 
+    int bolus;
     char cmdBuffer[40];
 
     // Daten übernehmen
@@ -83,23 +83,26 @@ int bolus;
     int y = ui->healthSelect->currentIndex();
     double broteinheiten = ui->breadUnits->value();
 
-    sprintf(cmdBuffer,"~/bolus/bolus-cli -g%d -b%2.f -n", gParam.glucose, broteinheiten);
+    sprintf(cmdBuffer,"~/bolus/bolus-cli -g%d -c%d -n", gParam.glucose, (int) (broteinheiten*12) );
     bolus = system(cmdBuffer);
 
     if( bolus > 0 )
     {
         currCalcBolus = bolus / 256;
 
-        if( pDlgConfirmBolus == nullptr )
+        if( currCalcBolus < 128 )
         {
-            pDlgConfirmBolus = new dlgConfirmBolus(pParent);
-            pDlgConfirmBolus->show();
-            if( pDlgConfirmBolus->exec() == QDialog::Accepted )
+            if( pDlgConfirmBolus == nullptr )
             {
-                // save settings
-            }
+                pDlgConfirmBolus = new dlgConfirmBolus(pParent);
+                pDlgConfirmBolus->show();
+                if( pDlgConfirmBolus->exec() == QDialog::Accepted )
+                {
+                    // save settings
+                }
 
-            pDlgConfirmBolus = nullptr;
+                pDlgConfirmBolus = nullptr;
+            }
         }
     }
 }

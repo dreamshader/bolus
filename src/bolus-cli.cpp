@@ -112,7 +112,7 @@ void dumpArgs( struct _bolus_param *pParam )
                 pParam->fail == true ? "true" : "false" );
         fprintf(stderr, "glucose.: %d\n", pParam->glucose );
         fprintf(stderr, "carb ...: %d\n", pParam->carb );
-        fprintf(stderr, "bread ..: %d\n", pParam->bread );
+        fprintf(stderr, "bread ..: %.2f\n", pParam->bread );
         fprintf(stderr, "meal ...: %c\n", pParam->mealType );
         fprintf(stderr, "measure.: %c\n", pParam->measType );
         fprintf(stderr, "adjust .: %c\n", pParam->adjust );
@@ -135,6 +135,11 @@ void dumpArgs( struct _bolus_param *pParam )
                 pParam->calibrate == true ? "true" : "false" );
         fprintf(stderr, "acucheck ..: %d\n", pParam->acucheckValue );
         fprintf(stderr, "freestyle ..: %d\n", pParam->freestyleValue );
+
+        fprintf(stderr, "query factors : %s\n", 
+                pParam->qFactors == true ? "true" : "false" );
+        fprintf(stderr, "query globals : %s\n", 
+                pParam->qGlobals == true ? "true" : "false" );
     }
 }
 
@@ -147,7 +152,7 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->offset      = 0;
         pParam->glucose     = 0;
         pParam->carb        = 0;
-        pParam->bread       = 0;
+        pParam->bread       = 0.0;
         pParam->mealType    = '\0';
         pParam->measType    = '\0';
         pParam->adjust      = 0;
@@ -163,7 +168,8 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->calibrate = false;
         pParam->acucheckValue = -1;
         pParam->freestyleValue = -1;
-
+        pParam->qFactors = false;
+        pParam->qGlobals = false;
     }
 }
 
@@ -182,7 +188,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
     int failed = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "g:c:b:m:t:le:X:I:o:T:F:A:Cinhq?";
+    const char* const short_options = "g:c:b:m:t:le:X:I:o:T:F:A:GfCinhq?";
 
     if( pParam != NULL )
     {
@@ -210,6 +216,9 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
              { "help",        0, NULL, 'h' },
              { "query",       0, NULL, 'q' },
 
+             { "globals",     0, NULL, 'G' },
+             { "factors",     0, NULL, 'f' },
+
             { NULL,           0, NULL,  0  }
         };
     
@@ -228,7 +237,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     pParam->carb = atoi(optarg);
                     break;
                 case 'b':
-                    pParam->bread = atoi(optarg);
+                    pParam->bread = atof(optarg);
                     break;
                 case 'm':
                     pParam->mealType = optarg[0];
@@ -346,6 +355,13 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     break;
                 case 'F':
                     pParam->freestyleValue = atoi(optarg);
+                    break;
+
+                case 'f':
+                    pParam->qFactors = true;
+                    break;
+                case 'G':
+                    pParam->qGlobals = true;
                     break;
 
                 case -1:

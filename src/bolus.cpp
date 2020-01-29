@@ -37,7 +37,7 @@ void bolus::dumpArgs( void )
             callerArgs.fail == true ? "true" : "false" );
     fprintf(stderr, "glucose.: %d\n", callerArgs.glucose );
     fprintf(stderr, "carb ...: %d\n", callerArgs.carb );
-    fprintf(stderr, "bread ..: %d\n", callerArgs.bread );
+    fprintf(stderr, "bread ..: %.2f\n", callerArgs.bread );
     fprintf(stderr, "meal ...: %c\n", callerArgs.mealType );
     fprintf(stderr, "measure.: %c\n", callerArgs.measType );
     fprintf(stderr, "adjust .: %c\n", callerArgs.adjust );
@@ -69,7 +69,7 @@ void bolus::resetArgs( void )
     callerArgs.fail        = false;
     callerArgs.glucose     = 0;
     callerArgs.carb        = 0;
-    callerArgs.bread       = 0;
+    callerArgs.bread       = 0.0;
     callerArgs.mealType    = '\0';
     callerArgs.measType    = '\0';
     callerArgs.adjust      = 0;
@@ -86,6 +86,9 @@ void bolus::resetArgs( void )
     callerArgs.calibrate        = false;
     callerArgs.acucheckValue   = -1;
     callerArgs.freestyleValue   = -1;
+    callerArgs.qFactors = false;
+    callerArgs.qGlobals = false;
+
 
 }
 
@@ -131,7 +134,7 @@ int bolus::checkArgs( )
             }
         }
 
-        if( callerArgs.carb == 0 && callerArgs.bread == 0 )
+        if( callerArgs.carb == 0 && callerArgs.bread == 0.0 )
         {
             retVal = E_BOLUS_OK;
             mode = BOLUS_CALC_BREAD_MODE;
@@ -219,6 +222,9 @@ void bolus::setArgs( struct _bolus_param *pParam )
         callerArgs.calibrate = pParam->calibrate;
         callerArgs.acucheckValue = pParam->acucheckValue;
         callerArgs.freestyleValue = pParam->freestyleValue;
+
+        callerArgs.qFactors = pParam->qFactors;
+        callerArgs.qGlobals = pParam->qGlobals;
 
         callerArgs.glucose     += pParam->offset;
         if( callerArgs.glucose < 0 )
@@ -442,11 +448,76 @@ fprintf( stderr, "query glucose status for %d.\n", callerArgs.glucose);
             }
             else
             {
+                if( callerArgs.qFactors )
+                {
+fprintf( stderr, "query factor settings.\n" );
+                    fprintf( stdout, "%04d:%04d:%04d:%04d:%04d",
+                             pSettings->adjustments.sports1,
+                             pSettings->adjustments.sports2,
+                             pSettings->adjustments.stress,
+                             pSettings->adjustments.ill,
+                             pSettings->adjustments.female );
+                    retVal = 0;
+                }
+                else
+                {
+                    if( callerArgs.qGlobals )
+                    {
+fprintf( stderr, "query global settings.\n" );
+                        fprintf( stdout, 
+                                 "%08u:%04d:%04d:%04d:%04d:%04d:%04d:%04d",
+                                 pSettings->globals.version,
+                                 pSettings->globals.timeBlocksActive,
+                                 pSettings->globals.increaseLevel,
+                                 pSettings->globals.snacksize10BE,
+                                 pSettings->globals.actTime,
+                                 pSettings->globals.delayTime,
+                                 pSettings->globals.basalActTime,
+                                 pSettings->globals.basalDelayTime );
+                        retVal = 0;
+                    }
+                    else
+                    {
 fprintf( stderr, "UNKNOWN query, yet!\n");
-                retVal = -1;
+                        retVal = -1;
+                    }
+                }
             }
         }
     }
+
+
+#ifdef NEVERDEF
+
+
+struct _adjust {
+    int sports1;
+    int sports2;
+    int stress;
+    int ill;
+    int female;
+};
+
+
+struct _globals {
+    unsigned int version;
+    int timeBlocksActive;
+    int increaseLevel;
+    int snacksize10BE;
+    int actTime;
+    int delayTime;
+    int basalActTime;
+    int basalDelayTime;
+};
+
+pSettings->adjustments;
+pSettings->globals;
+
+
+#endif // NEVERDEF
+
+
+
 
     return( retVal );
 }
@@ -977,13 +1048,13 @@ int bolus::runCalcBread( void )
                     }
                     callerArgs.carb = newData.carbon10;
 
-                    if( callerArgs.bread == 0 )
+                    if( callerArgs.bread == 0.0 )
                     {
                         callerArgs.bread = callerArgs.carb / 
                                            BOLUS_FACTOR_CARB2BREAD;
                     }
 
-                    if( callerArgs.bread != 0 )
+                    if( callerArgs.bread != 0.0 )
                     {
                         if( callerArgs.bread < DATA_BREAD_MIN )
                         {

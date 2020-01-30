@@ -21,6 +21,9 @@ public:
     int varIll;
     int varFemale;
 
+private slots:
+    void on_dlgHealthOptions_finished(int result);
+
 private:
     Ui::dlgHealthOptions *ui;
     QWidget *pParent;

@@ -115,7 +115,8 @@ void dumpArgs( struct _bolus_param *pParam )
         fprintf(stderr, "bread ..: %.2f\n", pParam->bread );
         fprintf(stderr, "meal ...: %c\n", pParam->mealType );
         fprintf(stderr, "measure.: %c\n", pParam->measType );
-        fprintf(stderr, "adjust .: %c\n", pParam->adjust );
+        fprintf(stderr, "adjustT.: %c\n", pParam->adjustType );
+        fprintf(stderr, "adjust .: %d\n", pParam->adjust );
         fprintf(stderr, "last ...: %s\n", 
                 pParam->last == true ? "true" : "false" );
         fprintf(stderr, "edit ...: %c\n", pParam->editType );
@@ -140,6 +141,8 @@ void dumpArgs( struct _bolus_param *pParam )
                 pParam->qFactors == true ? "true" : "false" );
         fprintf(stderr, "query globals : %s\n", 
                 pParam->qGlobals == true ? "true" : "false" );
+        fprintf(stderr, "blocks flag : %s\n", 
+                pParam->qBlocks == true ? "true" : "false" );
     }
 }
 
@@ -155,6 +158,7 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->bread       = 0.0;
         pParam->mealType    = '\0';
         pParam->measType    = '\0';
+        pParam->adjustType  = '\0';
         pParam->adjust      = 0;
         pParam->last        = false;
         pParam->editType    = '\0';
@@ -170,6 +174,7 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->freestyleValue = -1;
         pParam->qFactors = false;
         pParam->qGlobals = false;
+        pParam->qBlocks = false;
     }
 }
 
@@ -188,13 +193,14 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
     int failed = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "g:c:b:m:t:le:X:I:o:T:F:A:GfCinhq?";
+    const char* const short_options = "a:g:c:b:m:t:le:X:I:o:T:F:A:BGfCinhq?";
 
     if( pParam != NULL )
     {
 
         /* valid long options */
         const struct option long_options[] = {
+             { "adjustType",  1, NULL, 'a' },
              { "glucose",     1, NULL, 'g' },
              { "carb",        1, NULL, 'c' },
              { "bread",       1, NULL, 'b' },
@@ -218,6 +224,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
 
              { "globals",     0, NULL, 'G' },
              { "factors",     0, NULL, 'f' },
+             { "blocks",      0, NULL, 'B' },
 
             { NULL,           0, NULL,  0  }
         };
@@ -258,7 +265,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     // -t f --type=(f)reestyle
                     break;
                 case 'a':
-                    switch( optarg[0] )
+                    switch( pParam->adjustType = optarg[0] )
                     {
                         case '1':
                             pParam->adjust = ADJUST_SPORTS_1;
@@ -281,6 +288,23 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                         default:
                             pParam->adjust = 0;
                             break;
+// gParam.adjustType = '-';
+// gParam.adjustType = 'n';
+// gParam.adjustType = '1';
+// gParam.adjustType = 's';
+// gParam.adjustType = 'i';
+// gParam.adjustType = '2';
+// gParam.adjustType = 'f';
+// gParam.adjustType = 'o';
+// ("Kein Eintrag");
+// ("Nüchtern");
+// ("Sport 1");
+// ("Stress");
+// ("Krankheit");
+// ("Sport 2");
+// ("Menstruation");
+// ("Andere");
+
                     }
                     break;
                 case 'l':
@@ -363,6 +387,9 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                 case 'G':
                     pParam->qGlobals = true;
                     break;
+                case 'B':
+                    pParam->qBlocks = true;
+                    break;
 
                 case -1:
                     break;
@@ -408,4 +435,76 @@ int main( int argc, char *argv[] )
     return( retVal );
 }
 
+#ifdef NODEF
+QString str = "a,,b,c";
+
+QStringList list1 = str.split(',');
+// list1: [ "a", "", "b", "c" ]
+
+QStringList list2 = str.split(',', QString::SkipEmptyParts);
+// list2: [ "a", "b", "c" ]
+
+#include <QList>
+#include <QStringList>
+#include <QDir>
+#include <QDebug>
+
+#include "qtcsv/stringdata.h"
+#include "qtcsv/reader.h"
+#include "qtcsv/writer.h"
+
+int main()
+{
+    // prepare data that you want to save to csv-file
+    QStringList strList;
+    strList << "one" << "two" << "three";
+
+    QtCSV::StringData strData;
+    strData.addRow(strList);
+    strData.addEmptyRow();
+    strData << strList << "this is the last row";
+
+    // write to file
+    QString filePath = QDir::currentPath() + "/test.csv";
+    QtCSV::Writer::write(filePath, strData);
+
+    // read data from file
+    QList<QStringList> readData = QtCSV::Reader::readToList(filePath);
+    for ( int i = 0; i < readData.size(); ++i )
+    {
+        qDebug() << readData.at(i).join(",");
+    }
+
+    return 0;
+}
+
+
+
+
+
+// -m b --meal=b(efore)
+// -m B --meal=B(efore)
+// -m a --meal=a(fter)
+// -m A --meal=A(fter)
+// -m n --meal=n(one)
+// -m N --meal=N(one)
+// -m s --meal=s(leeptime)
+// -m s --meal=s(leeptime)
+// -m x --meal=x(tra)
+// -m S --meal=X(tra)
+
+// -t a --type=(a)cucheck
+// -t f --type=(f)reestyle
+
+// -a 1  sport 1
+// -a 2  sport 2
+// -a s  stress
+// -a S  stress
+// -a i  krank
+// -a I  krank
+// -a f   mens
+// -a F   mens
+
+
+#endif // NODEF
 

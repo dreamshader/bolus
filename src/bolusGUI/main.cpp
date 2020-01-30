@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include "bolus.h"
 #include <QTime>
+
+#define IS_FRONTEND // set by the GUI source
+#include "bolus.h"
 
 struct _bolus_param gParam;
 int currSelTimeBlock;

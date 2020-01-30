@@ -40,7 +40,8 @@ void bolus::dumpArgs( void )
     fprintf(stderr, "bread ..: %.2f\n", callerArgs.bread );
     fprintf(stderr, "meal ...: %c\n", callerArgs.mealType );
     fprintf(stderr, "measure.: %c\n", callerArgs.measType );
-    fprintf(stderr, "adjust .: %c\n", callerArgs.adjust );
+    fprintf(stderr, "adjustT.: %c\n", callerArgs.adjustType );
+    fprintf(stderr, "adjust .: %d\n", callerArgs.adjust );
     fprintf(stderr, "last ...: %s\n", 
             callerArgs.last == true ? "true" : "false" );
     fprintf(stderr, "edit ...: %c\n", callerArgs.editType );
@@ -72,6 +73,7 @@ void bolus::resetArgs( void )
     callerArgs.bread       = 0.0;
     callerArgs.mealType    = '\0';
     callerArgs.measType    = '\0';
+    callerArgs.adjustType  = '\0';
     callerArgs.adjust      = 0;
     callerArgs.last        = false;
     callerArgs.editType    = '\0';
@@ -88,6 +90,7 @@ void bolus::resetArgs( void )
     callerArgs.freestyleValue   = -1;
     callerArgs.qFactors = false;
     callerArgs.qGlobals = false;
+    callerArgs.qBlocks = false;
 
 
 }
@@ -203,6 +206,7 @@ void bolus::setArgs( struct _bolus_param *pParam )
         callerArgs.bread       = pParam->bread;
         callerArgs.mealType    = pParam->mealType;
         callerArgs.measType    = pParam->measType;
+        callerArgs.adjustType  = pParam->adjustType;
         callerArgs.adjust      = pParam->adjust;
         callerArgs.last        = pParam->last;
         callerArgs.editType    = pParam->editType;
@@ -225,6 +229,7 @@ void bolus::setArgs( struct _bolus_param *pParam )
 
         callerArgs.qFactors = pParam->qFactors;
         callerArgs.qGlobals = pParam->qGlobals;
+        callerArgs.qBlocks = pParam->qBlocks;
 
         callerArgs.glucose     += pParam->offset;
         if( callerArgs.glucose < 0 )
@@ -489,6 +494,22 @@ fprintf( stderr, "UNKNOWN query, yet!\n");
 
 #ifdef NEVERDEF
 
+// gParam.adjustType = '-';
+// gParam.adjustType = 'n';
+// gParam.adjustType = '1';
+// gParam.adjustType = 's';
+// gParam.adjustType = 'i';
+// gParam.adjustType = '2';
+// gParam.adjustType = 'f';
+// gParam.adjustType = 'o';
+// ("Kein Eintrag");
+// ("Nüchtern");
+// ("Sport 1");
+// ("Stress");
+// ("Krankheit");
+// ("Sport 2");
+// ("Menstruation");
+// ("Andere");
 
 struct _adjust {
     int sports1;
@@ -545,6 +566,18 @@ fprintf( stderr, "real value of %d is equivalent to freestyle value %d\n",
 int bolus::runImport( void )
 {
     int retVal = E_BOLUS_OK;
+
+    if( callerArgs.importFile != NULL )
+    {
+fprintf(stderr, "Import file -> %s\n", callerArgs.importFile );
+// case 'B':
+// callerArgs.qBlocks
+// case 'G':
+// callerArgs.qGlobals
+// case 'f':
+// callerArgs.qFactors
+
+    }
 
     return( retVal );
 }

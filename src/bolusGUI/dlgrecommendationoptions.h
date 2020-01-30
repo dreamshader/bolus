@@ -25,6 +25,9 @@ public:
     int varBasalDelayTime;
 
 
+private slots:
+    void on_dlgRecommendationOptions_finished(int result);
+
 private:
     Ui::dlgRecommendationOptions *ui;
     QWidget *pParent;

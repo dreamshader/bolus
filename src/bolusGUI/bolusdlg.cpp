@@ -1,7 +1,9 @@
 #include "bolusdlg.h"
 #include "ui_bolusdlg.h"
-#include "bolus.h"
 #include <QTime>
+
+#define IS_FRONTEND // set by the GUI source
+#include "bolus.h"
 
 bolusDlg::bolusDlg(QWidget *parent) :
     QDialog(parent),
@@ -40,7 +42,7 @@ bolusDlg::bolusDlg(QWidget *parent) :
 //    gParam.glucose
 //    gParam.measType = 'f';
 
-    sprintf(cmdLine, "~/bolus/bolus-cli -q -g%d", gParam.glucose);
+    sprintf(cmdLine, "~/bolus/bolus-cli -q -t%c -g%d", gParam.measType, gParam.glucose);
 
     int retVal = system(cmdLine);
     if( retVal > 128 )
@@ -77,13 +79,63 @@ void bolusDlg::on_btnBolusCalc_clicked()
 
     int bolus;
     char cmdBuffer[40];
+    char options[20];
 
     // Daten übernehmen
-    int x = ui->mealTimeSelect->currentIndex();
-    int y = ui->healthSelect->currentIndex();
-    double broteinheiten = ui->breadUnits->value();
+    switch( ui->healthSelect->currentIndex() )
+    {
+        case 0:
+            gParam.adjustType = '-';
+            break;
+        case 1:
+            gParam.adjustType = 'n';
+            break;
+        case 2:
+            gParam.adjustType = '1';
+            break;
+        case 3:
+            gParam.adjustType = 's';
+            break;
+        case 4:
+            gParam.adjustType = 'i';
+            break;
+        case 5:
+            gParam.adjustType = '2';
+            break;
+        case 6:
+            gParam.adjustType = 'f';
+            break;
+        case 7:
+            gParam.adjustType = 'o';
+            break;
+    }
 
-    sprintf(cmdBuffer,"~/bolus/bolus-cli -g%d -c%d -n", gParam.glucose, (int) (broteinheiten*12) );
+    switch(ui->mealTimeSelect->currentIndex())
+    {
+        case 0:
+            gParam.mealType = 'n';
+            break;
+        case 1:
+            gParam.mealType = 'b';
+            break;
+        case 2:
+            gParam.mealType = 'a';
+            break;
+        case 3:
+            gParam.mealType = 's';
+            break;
+        case 4:
+            gParam.mealType = 'x';
+            break;
+    }
+
+
+    gParam.bread = ui->breadUnits->value();
+    gParam.noStore = ui->chkNoStore->isChecked();
+
+//     sprintf(cmdLine, "~/bolus/bolus-cli -q -t%c -g%d", gParam.measType, gParam.glucose);
+
+    sprintf(cmdBuffer,"~/bolus/bolus-cli -g%d -c%d -n", gParam.glucose, (int) (gParam.bread*12) );
     bolus = system(cmdBuffer);
 
     if( bolus > 0 )

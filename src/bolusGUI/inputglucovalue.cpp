@@ -1,5 +1,7 @@
 #include "inputglucovalue.h"
 #include "ui_inputglucovalue.h"
+
+#define IS_FRONTEND // set by the GUI source
 #include "bolus.h"
 
 inputGlucoValue::inputGlucoValue(QWidget *parent) :

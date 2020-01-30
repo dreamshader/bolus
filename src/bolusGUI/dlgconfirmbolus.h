@@ -15,6 +15,9 @@ public:
     explicit dlgConfirmBolus(QWidget *parent = nullptr);
     ~dlgConfirmBolus();
 
+private slots:
+    void on_dlgConfirmBolus_finished(int result);
+
 private:
     Ui::dlgConfirmBolus *ui;
     QWidget *pParent;

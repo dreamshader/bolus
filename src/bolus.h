@@ -23,6 +23,8 @@
 #ifndef _BOLUS_H_
 #define _BOLUS_H_
 
+#ifndef IS_FRONTEND // set by the GUI source
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -36,11 +38,15 @@
 #include "settings.h"
 #include "datafile.h"
 
+#endif // IS_FRONTEND
+
 #ifdef __cplusplus
 extern "C" {
 #endif
  
 using namespace std;
+
+#ifndef IS_FRONTEND // set by the GUI source
 
 #define W_BOLUS_IDLE            1
 #define E_BOLUS_OK              0
@@ -109,6 +115,8 @@ using namespace std;
 #define BOLUS_COMMAND_BUFSIZE 128
 #define BOLUS_DIALOG_BUFSIZE  128
 
+#endif // IS_FRONTEND
+
 struct _bolus_param {
     bool fail;
     int  glucose;
@@ -116,6 +124,7 @@ struct _bolus_param {
     double  bread;
     char mealType;
     char measType;
+    char adjustType;
     int adjust;
     bool last;
     char editType;
@@ -132,8 +141,10 @@ struct _bolus_param {
     int acucheckValue;
     bool qFactors;
     bool qGlobals;
+    bool qBlocks;
 };
 
+#ifndef IS_FRONTEND // set by the GUI source
 
 class bolus {
 
@@ -198,6 +209,7 @@ class bolus {
 
 };
 
+#endif // IS_FRONTEND
 
 #ifdef __cplusplus
 }

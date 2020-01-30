@@ -26,7 +26,7 @@ dlgRecommendationOptions::dlgRecommendationOptions(QWidget *parent) :
         varVersion = atoi(&dataBuff[0]);
         varTimeBlocksActive = atoi(&dataBuff[9]);
         varIncreaseLevel = atoi(&dataBuff[14]);
-        varSnacksize10BE = atoi(&dataBuff[19]);
+        varSnacksize10BE = atoi(&dataBuff[19]) / 10;
         varActTime = atoi(&dataBuff[24]);
         varDelayTime = atoi(&dataBuff[29]);
         varBasalActTime = atoi(&dataBuff[34]);
@@ -45,4 +45,16 @@ dlgRecommendationOptions::dlgRecommendationOptions(QWidget *parent) :
 dlgRecommendationOptions::~dlgRecommendationOptions()
 {
     delete ui;
+}
+
+void dlgRecommendationOptions::on_dlgRecommendationOptions_finished(int result)
+{
+    if( result == QDialog::Accepted )
+    {
+        varIncreaseLevel = ui->spnGlucoRaise->value();
+        varSnacksize10BE = ui->spnSnackSize->value() * 10;
+
+        varActTime = ui->tmDuration->time().hour() * 60 + ui->tmDuration->time().minute();
+        varDelayTime = ui->tmDelay->time().hour() * 60 + ui->tmDelay->time().minute();
+    }
 }

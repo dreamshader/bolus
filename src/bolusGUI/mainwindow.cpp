@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#define IS_FRONTEND // set by the GUI source
 #include "bolus.h"
 
 MainWindow::MainWindow(QWidget *parent) :

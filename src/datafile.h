@@ -110,7 +110,7 @@ struct _record {
     unsigned int recnum;
     int glucose;
     char meal;
-    int carbon10; 
+    int carboHydrate; 
     int adjust;
     int units;
     int basalUnits;

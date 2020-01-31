@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  bolus-cli.cpp - a command line interface to my bolus engine
+ *  bolus-cli.cpp - command line Bolus-Rechner
  *
  ***********************************************************************
  *
@@ -21,53 +21,55 @@
  *
  ***********************************************************************
  *
- * Options:
+ * Kommandozeilen-Argumente:
  *
- * -------------- communication port for connection --------------------
+ * ---------------------- Korrektur-Faktor -----------------------------
  *
- * --com devicename (same as --com=devicename resp. -c devicename)
+ * --adjustType <Korrektur-Faktor> (oder -a <Korrektur-Faktor>)
  *
- *   Default is --com=/dev/ttyUSB0
+ * default: 0
  *
- * ---------------- baudrate for serial connection ---------------------
+ * ----------------------- Blutzucker-Wert -----------------------------
  *
- * --baud baudrate (same as --baud=baudrate resp. -b baudrate)
+ * --glucose <BZ-Wert>    (oder -g <BZ-Wert>)
  *
- *   Default is --baud=38400
+ * default: --
  *
- * ---------------- databit for serial connection ----------------------
- *
- * --data bits (same as --data=bits resp. -d bits)
- *            may be 5 up to 8
- *
- *   Default is --data=8
- *
- * ---------------- parity for serial connection -----------------------
- *
- * --parity parity (same as --parity=parity resp. -p parity)
- *            may be e/E (even), o/O (odd), n/N (none)
- *
- *   Default is --parity=n
- *
- * --------------- stoppbits for serial connection ---------------------
- *
- * --stop stoppbits (same as --stop=stoppbits resp. -s stoppbits)
- *            may be 1 or 2
- *
- *   Default is --stop=1
- *
- * --------------- handshake for serial connection ---------------------
- *
- * --handshake handshake (same as --handshake=handshake resp. -h handshake)
- *            may be n/N (no handshake), x/X (XON/XOFF)
- *
- *   Default is --handshake=n
- *
- * ----------------------------- help ----------------------------------
- *
- * --help     (same as -? )
- *
- *   Show options and exit
+
+--carb <Kohlenhydrate>       (oder -c <Kohlenhydrate>)
+--bread <Broteinheiten>      (oder -b <Broteinheiten>)
+--meal <Essenszeit>       (oder -m <Essenszeit>)
+--type <Messgerät>       (oder -t <Messgerät>)
+--last (oder -l)
+--edit (oder -e)
+--offset <Wert> (oder -o <Wert>)
+--timeblock <# oder Nummer> (oder -T <# oder Nummer>)
+
+--calibrate (oder -C)
+--acucheck <Messwert> (oder -A <Messwert>)
+--freestyle <Messwert> (oder -F <Messwert>)
+
+--interactive (oder -i  no func
+--nostore (oder -n)
+--help (oder -h)
+
+--export <Dateiname> (oder -X <Dateiname>)
+--import <Dateiname> (oder -I <Dateiname>)
+--query (oder -q)
+--globals (oder -G)
+--factors (oder -f)
+--blocks (oder -B)
+--device (oder -D)
+
+--xtra (oder -x)
+--delim <Begrenzer> (oder -d <Begrenzer>)
+
+--debug (oder -V)
+--verbose <Level> (oder -v <Level>)
+
+--record <Recordnummer> (oder -R <Recordnummer> )
+
+
  *
  ***********************************************************************
  */
@@ -108,41 +110,57 @@ void dumpArgs( struct _bolus_param *pParam )
 {
     if( pParam != NULL )
     {
-        fprintf(stderr, "fail ...: %s\n", 
+        fprintf(stderr, "fail ...............: %s\n", 
                 pParam->fail == true ? "true" : "false" );
-        fprintf(stderr, "glucose.: %d\n", pParam->glucose );
-        fprintf(stderr, "carb ...: %d\n", pParam->carb );
-        fprintf(stderr, "bread ..: %.2f\n", pParam->bread );
-        fprintf(stderr, "meal ...: %c\n", pParam->mealType );
-        fprintf(stderr, "measure.: %c\n", pParam->measType );
-        fprintf(stderr, "adjustT.: %c\n", pParam->adjustType );
-        fprintf(stderr, "adjust .: %d\n", pParam->adjust );
-        fprintf(stderr, "last ...: %s\n", 
+        fprintf(stderr, "glucose ............: %d\n", pParam->glucose );
+        fprintf(stderr, "carb ...............: %d\n", pParam->carb );
+        fprintf(stderr, "bread ..............: %.2f\n", pParam->bread );
+        fprintf(stderr, "meal ...............: %c\n", pParam->mealType );
+        fprintf(stderr, "measure ............: %c\n", pParam->measType );
+        fprintf(stderr, "adjustType .........: %c\n", pParam->adjustType );
+        fprintf(stderr, "adjust .............: %d\n", pParam->adjust );
+        fprintf(stderr, "last ...............: %s\n", 
                 pParam->last == true ? "true" : "false" );
-        fprintf(stderr, "edit ...: %c\n", pParam->editType );
-        fprintf(stderr, "export .: %c\n", pParam->exportType );
-        fprintf(stderr, "import .: %s\n", pParam->importFile );
-        fprintf(stderr, "interact: %s\n", 
+        fprintf(stderr, "edit ...............: %c\n", pParam->editType );
+        fprintf(stderr, "export .............: %s\n", pParam->exportFile );
+        fprintf(stderr, "import .............: %s\n", pParam->importFile );
+        fprintf(stderr, "interact ...........: %s\n", 
                 pParam->interactive == true ? "true" : "false" );
-        fprintf(stderr, "nostore : %s\n", 
+        fprintf(stderr, "nostore ............: %s\n", 
                 pParam->noStore == true ? "true" : "false" );
-        fprintf(stderr, "query only : %s\n", 
+        fprintf(stderr, "offset .............: %d\n", pParam->offset );
+
+        fprintf(stderr, "query only .........: %s\n", 
                 pParam->query == true ? "true" : "false" );
-        fprintf(stderr, "timeblock count : %s\n", 
+        fprintf(stderr, "timeblock count ....: %s\n", 
                 pParam->timeBlockCount == true ? "true" : "false" );
-        fprintf(stderr, "tmblk ..: %d\n", pParam->timeBlockNumber);
+        fprintf(stderr, "tmblk ..............: %d\n", pParam->timeBlockNumber);
 
-        fprintf(stderr, "calibrate : %s\n", 
+        fprintf(stderr, "calibrate ..........: %s\n", 
                 pParam->calibrate == true ? "true" : "false" );
-        fprintf(stderr, "acucheck ..: %d\n", pParam->acucheckValue );
-        fprintf(stderr, "freestyle ..: %d\n", pParam->freestyleValue );
+        fprintf(stderr, "acucheck ...........: %d\n", pParam->acucheckValue );
+        fprintf(stderr, "freestyle ..........: %d\n", pParam->freestyleValue );
 
-        fprintf(stderr, "query factors : %s\n", 
+        fprintf(stderr, "query factors ......: %s\n", 
                 pParam->qFactors == true ? "true" : "false" );
-        fprintf(stderr, "query globals : %s\n", 
+        fprintf(stderr, "query globals ......: %s\n", 
                 pParam->qGlobals == true ? "true" : "false" );
-        fprintf(stderr, "blocks flag : %s\n", 
+        fprintf(stderr, "blocks flag ........: %s\n", 
                 pParam->qBlocks == true ? "true" : "false" );
+        fprintf(stderr, "device flag ........: %s\n", 
+                pParam->device == true ? "true" : "false" );
+
+        fprintf(stderr, "delimiter ..........: %c\n", pParam->importDelimiter );
+        fprintf(stderr, "1st line extra data : %s\n", 
+                pParam->import1stLineXtraData == true ? "true" : "false" );
+
+        fprintf(stderr, "debug mode .........: %s\n", 
+                pParam->debugMode == true ? "true" : "false" );
+        fprintf(stderr, "verbose level ......: %d\n", pParam->verboseLevel );
+
+        fprintf(stderr, "dump record ........: %d\n", pParam->dataRecord );
+
+        fprintf(stderr, "datafile ...........: %s\n", pParam->dataFile );
     }
 }
 
@@ -162,7 +180,7 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->adjust      = 0;
         pParam->last        = false;
         pParam->editType    = '\0';
-        pParam->exportType  = '\0';
+        pParam->exportFile  = NULL;
         pParam->importFile  = NULL;
         pParam->interactive = false;
         pParam->noStore = false;
@@ -175,6 +193,14 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->qFactors = false;
         pParam->qGlobals = false;
         pParam->qBlocks = false;
+        pParam->device = false;
+        pParam->importDelimiter = ';';
+        pParam->import1stLineXtraData = false;
+        pParam->debugMode = false;
+        pParam->verboseLevel = 0;
+        pParam->dataFile  = NULL;
+        pParam->dataRecord = -1;
+
     }
 }
 
@@ -193,7 +219,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
     int failed = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "a:g:c:b:m:t:le:X:I:o:T:F:A:BGfCinhq?";
+    const char* const short_options = "a:g:c:b:m:t:le:X:I:o:T:F:A:d:v:R:rVxDBGfCinhq?";
 
     if( pParam != NULL )
     {
@@ -225,6 +251,16 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
              { "globals",     0, NULL, 'G' },
              { "factors",     0, NULL, 'f' },
              { "blocks",      0, NULL, 'B' },
+             { "device",      0, NULL, 'D' },
+
+             { "xtra",        0, NULL, 'x' },
+             { "delim",       1, NULL, 'd' },
+
+             { "debug",       0, NULL, 'V' },
+             { "verbose",     1, NULL, 'v' },
+
+             { "datafile",    1, NULL, 'R' },
+             { "record",      1, NULL, 'r' },
 
             { NULL,           0, NULL,  0  }
         };
@@ -324,17 +360,9 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     }
                     break;
                 case 'X':
-                    switch( optarg[0] )
+                    if( strlen( optarg ) )
                     {
-                        case DATA_EXPORT_TIMEBLOCKS:
-                        case DATA_EXPORT_GLOBALS:
-                        case DATA_EXPORT_ADJUSTMENTS:
-                        case DATA_EXPORT_ALL_JSON:
-                            pParam->exportType = optarg[0];
-                            break;
-                        default:
-                            pParam->exportType = DATA_EXPORT_NOTHING;
-                            break;
+                        pParam->exportFile = strdup(optarg);
                     }
                     break;
                 case 'I':
@@ -390,6 +418,32 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                 case 'B':
                     pParam->qBlocks = true;
                     break;
+                case 'D':
+                    pParam->device = true;
+                    break;
+
+                case 'd':
+                    pParam->importDelimiter = optarg[0];
+                    break;
+                case 'x':
+                    pParam->import1stLineXtraData = true;
+                    break;
+                case 'V':
+                    pParam->debugMode = true;
+                    break;
+                case 'v':
+                    pParam->verboseLevel = atoi(optarg);
+                    break;
+
+                case 'r':
+                    pParam->dataRecord = atoi(optarg);
+                    break;
+                case 'R':
+                    if( strlen( optarg ) )
+                    {
+                        pParam->dataFile = strdup(optarg);
+                    }
+                    break;
 
                 case -1:
                     break;
@@ -417,7 +471,11 @@ int main( int argc, char *argv[] )
         pActual = localtime(&now);
 
         get_arguments ( argc, argv, &bParam );
-//	dumpArgs( &bParam );
+
+        if( bParam.debugMode )
+        {
+  	    dumpArgs( &bParam );
+        }
 
         if( (retVal = pNewBolus->init( &bParam )) == E_BOLUS_OK )
         {

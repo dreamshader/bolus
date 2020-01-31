@@ -33,26 +33,57 @@
 */
 void bolus::dumpArgs( void )
 {
-    fprintf(stderr, "fail ...: %s\n", 
-            callerArgs.fail == true ? "true" : "false" );
-    fprintf(stderr, "glucose.: %d\n", callerArgs.glucose );
-    fprintf(stderr, "carb ...: %d\n", callerArgs.carb );
-    fprintf(stderr, "bread ..: %.2f\n", callerArgs.bread );
-    fprintf(stderr, "meal ...: %c\n", callerArgs.mealType );
-    fprintf(stderr, "measure.: %c\n", callerArgs.measType );
-    fprintf(stderr, "adjustT.: %c\n", callerArgs.adjustType );
-    fprintf(stderr, "adjust .: %d\n", callerArgs.adjust );
-    fprintf(stderr, "last ...: %s\n", 
-            callerArgs.last == true ? "true" : "false" );
-    fprintf(stderr, "edit ...: %c\n", callerArgs.editType );
-    fprintf(stderr, "export .: %c\n", callerArgs.exportType );
-    fprintf(stderr, "import .: %s\n", 
-         callerArgs.importFile == NULL ? "NULL" : callerArgs.importFile );
-    fprintf(stderr, "interact: %s\n", 
-            callerArgs.interactive == true ? "true" : "false" );
-    fprintf(stderr, "noStore : %s\n", 
-            callerArgs.noStore == true ? "true" : "false" );
-    fprintf(stderr, "offset .: %d\n", callerArgs.offset);
+        fprintf(stderr, "fail ...............: %s\n", 
+                callerArgs.fail == true ? "true" : "false" );
+        fprintf(stderr, "glucose ............: %d\n", callerArgs.glucose );
+        fprintf(stderr, "carb ...............: %d\n", callerArgs.carb );
+        fprintf(stderr, "bread ..............: %.2f\n", callerArgs.bread );
+        fprintf(stderr, "meal ...............: %c\n", callerArgs.mealType );
+        fprintf(stderr, "measure ............: %c\n", callerArgs.measType );
+        fprintf(stderr, "adjustType .........: %c\n", callerArgs.adjustType );
+        fprintf(stderr, "adjust .............: %d\n", callerArgs.adjust );
+        fprintf(stderr, "last ...............: %s\n", 
+                callerArgs.last == true ? "true" : "false" );
+        fprintf(stderr, "edit ...............: %c\n", callerArgs.editType );
+        fprintf(stderr, "export .............: %s\n", callerArgs.exportFile );
+        fprintf(stderr, "import .............: %s\n", callerArgs.importFile );
+        fprintf(stderr, "interact ...........: %s\n", 
+                callerArgs.interactive == true ? "true" : "false" );
+        fprintf(stderr, "nostore ............: %s\n", 
+                callerArgs.noStore == true ? "true" : "false" );
+        fprintf(stderr, "offset .............: %d\n", callerArgs.offset );
+        fprintf(stderr, "query only .........: %s\n", 
+                callerArgs.query == true ? "true" : "false" );
+        fprintf(stderr, "timeblock count ....: %s\n", 
+                callerArgs.timeBlockCount == true ? "true" : "false" );
+        fprintf(stderr, "tmblk ..............: %d\n", 
+                callerArgs.timeBlockNumber);
+        fprintf(stderr, "calibrate ..........: %s\n", 
+                callerArgs.calibrate == true ? "true" : "false" );
+        fprintf(stderr, "acucheck ...........: %d\n", 
+                callerArgs.acucheckValue );
+        fprintf(stderr, "freestyle ..........: %d\n", 
+                callerArgs.freestyleValue );
+        fprintf(stderr, "query factors ......: %s\n", 
+                callerArgs.qFactors == true ? "true" : "false" );
+        fprintf(stderr, "query globals ......: %s\n", 
+                callerArgs.qGlobals == true ? "true" : "false" );
+        fprintf(stderr, "blocks flag ........: %s\n", 
+                callerArgs.qBlocks == true ? "true" : "false" );
+        fprintf(stderr, "device flag ........: %s\n", 
+                callerArgs.device == true ? "true" : "false" );
+        fprintf(stderr, "delimiter ..........: %c\n", 
+                callerArgs.importDelimiter );
+        fprintf(stderr, "1st line extra data : %s\n", 
+                callerArgs.import1stLineXtraData == true ? "true" : "false" );
+
+        fprintf(stderr, "debug mode .........: %s\n", 
+                callerArgs.debugMode == true ? "true" : "false" );
+        fprintf(stderr, "verbose level ......: %d\n", callerArgs.verboseLevel );
+
+        fprintf(stderr, "dump record ........: %d\n", callerArgs.dataRecord );
+        fprintf(stderr, "datafile ...........: %s\n", callerArgs.dataFile );
+
 }
 
 
@@ -77,7 +108,7 @@ void bolus::resetArgs( void )
     callerArgs.adjust      = 0;
     callerArgs.last        = false;
     callerArgs.editType    = '\0';
-    callerArgs.exportType  = '\0';
+    callerArgs.exportFile  = NULL;
     callerArgs.importFile  = NULL;
     callerArgs.interactive = false;
     callerArgs.noStore     = false;
@@ -91,7 +122,13 @@ void bolus::resetArgs( void )
     callerArgs.qFactors = false;
     callerArgs.qGlobals = false;
     callerArgs.qBlocks = false;
-
+    callerArgs.device = false;
+    callerArgs.importDelimiter = ';';
+    callerArgs.import1stLineXtraData = false;
+    callerArgs.debugMode = false;
+    callerArgs.verboseLevel = 0;
+    callerArgs.dataRecord = -1;
+    callerArgs.dataFile  = NULL;
 
 }
 
@@ -157,7 +194,7 @@ int bolus::checkArgs( )
             mode = BOLUS_EDIT_MODE;
         }
 
-        if( callerArgs.exportType != '\0' )
+        if( callerArgs.exportFile != NULL )
         {
             mode = BOLUS_EXPORT_MODE;
         }
@@ -175,6 +212,11 @@ int bolus::checkArgs( )
         if( callerArgs.query )
         {
             mode = BOLUS_QUERY_MODE;
+        }
+
+        if( callerArgs.dataFile != 0 )
+        {
+            mode = BOLUS_DUMP_MODE;
         }
 
         if( callerArgs.calibrate )
@@ -210,11 +252,15 @@ void bolus::setArgs( struct _bolus_param *pParam )
         callerArgs.adjust      = pParam->adjust;
         callerArgs.last        = pParam->last;
         callerArgs.editType    = pParam->editType;
-        callerArgs.exportType  = pParam->exportType;
 
         if( pParam->importFile != NULL )
         {
             callerArgs.importFile  = strdup(pParam->importFile);
+        }
+
+        if( pParam->exportFile != NULL )
+        {
+            callerArgs.exportFile  = strdup(pParam->exportFile);
         }
 
         callerArgs.interactive = pParam->interactive;
@@ -230,6 +276,14 @@ void bolus::setArgs( struct _bolus_param *pParam )
         callerArgs.qFactors = pParam->qFactors;
         callerArgs.qGlobals = pParam->qGlobals;
         callerArgs.qBlocks = pParam->qBlocks;
+        callerArgs.device = pParam->device;
+        callerArgs.importDelimiter = pParam->importDelimiter;
+        callerArgs.import1stLineXtraData = pParam->import1stLineXtraData;
+        callerArgs.debugMode = pParam->debugMode;
+        callerArgs.verboseLevel = pParam->verboseLevel;
+
+        callerArgs.dataRecord = pParam->dataRecord;
+        callerArgs.dataFile  = pParam->dataFile;
 
         callerArgs.glucose     += pParam->offset;
         if( callerArgs.glucose < 0 )
@@ -277,7 +331,13 @@ int bolus::init( struct _bolus_param *pParam )
                     if( (retVal = checkArgs()) == E_BOLUS_OK )
                     {
                         initialized = true;
-//                        dumpArgs();
+                    }
+                    else
+                    {
+                        if( pParam->debugMode )
+                        {
+                            dumpArgs();
+                        }
                     }
                 }
             }
@@ -326,6 +386,17 @@ int bolus::countTimeBlocks( void )
 
     return( retVal );
 }
+
+int bolus::runDumpData( void )
+{
+    int retVal = E_BOLUS_OK;
+
+//    callerArgs.dataRecord = -1;
+//    callerArgs.dataFile  = NULL;
+
+    return( retVal );
+}
+
 
 int bolus::runQuery( void )
 {
@@ -483,8 +554,23 @@ fprintf( stderr, "query global settings.\n" );
                     }
                     else
                     {
+                        if( callerArgs.qBlocks )
+                        {
+fprintf( stderr, "query timeblocks.\n" );
+
+                        }
+                        else
+                        {
+                            if( callerArgs.device )
+                            {
+fprintf( stderr, "query device settings.\n" );
+                            }
+                            else
+                            {
 fprintf( stderr, "UNKNOWN query, yet!\n");
-                        retVal = -1;
+                                retVal = -1;
+                            }
+                        }
                     }
                 }
             }
@@ -569,7 +655,35 @@ int bolus::runImport( void )
 
     if( callerArgs.importFile != NULL )
     {
-fprintf(stderr, "Import file -> %s\n", callerArgs.importFile );
+        if( callerArgs.qBlocks )
+        {
+fprintf(stderr, "Import timeblocks, file is -> %s\n", callerArgs.importFile );
+        }
+        else
+        {
+            if( callerArgs.qGlobals )
+            {
+fprintf(stderr, "Import globals, file is -> %s\n", callerArgs.importFile );
+            }
+            else
+            {
+                if( callerArgs.qFactors )
+                {
+fprintf(stderr, "Import adjustments, file is -> %s\n", callerArgs.importFile );
+                }
+                else
+                {
+                    if( callerArgs.device )
+                    {
+fprintf(stderr, "Import device settings, file is -> %s\n", callerArgs.importFile );
+//        callerArgs.importDelimiter = pParam->importDelimiter;
+//        callerArgs.import1stLineXtraData = pParam->import1stLineXtraData;
+
+                    }
+                }
+            }
+        }
+
 // case 'B':
 // callerArgs.qBlocks
 // case 'G':
@@ -648,7 +762,7 @@ int bolus::runInteractive( FILE *pIn, FILE *pOut )
                               DATA_MEAL_EXTRA, DATA_MEAL_U_EXTRA );
                     break;
                 case BOLUS_FIELD_CARBON:
-                    fprintf(pOut, "carbon10 ( %d to %d ): ",
+                    fprintf(pOut, "carboHydrate ( %d to %d ): ",
                               DATA_CARBON10_MIN, DATA_CARBON10_MAX );
                     break;
                 case BOLUS_FIELD_ADJUST:
@@ -744,7 +858,7 @@ int bolus::runInteractive( FILE *pIn, FILE *pOut )
                         break;
                     case BOLUS_FIELD_CARBON:
                         intInput = atoi(inputBuffer);
-                        newData.carbon10 = intInput;
+                        newData.carboHydrate = intInput;
                         currFieldNo++;
                         break;
                     case BOLUS_FIELD_BASALUNITS:
@@ -839,7 +953,10 @@ int bolus::calcBolus( int timeBlk, struct _record *pLastData, struct _record *pN
     float insFactor;
     float basFactor;
 
+    if( callerArgs.debugMode )
+    {
 fprintf(stderr, "(%s[%d]) timeBlk is %d\n", __FILE__, __LINE__, timeBlk);
+    }
 
     if( pNewData != NULL )
     {
@@ -859,11 +976,17 @@ fprintf(stderr, "(%s[%d]) timeBlk is %d\n", __FILE__, __LINE__, timeBlk);
                          pSettings->timeblock[timeBlk].rangeFrom ) / 2);
         }
 
+        if( callerArgs.debugMode )
+        {
 fprintf(stderr, "(%s[%d]) gOffset is %d\n", __FILE__, __LINE__, gOffset);
+        }
 
-        insUnits = (pNewData->carbon10 / 12.0) * (pSettings->timeblock[timeBlk].uTo10BE / 10.0);
+        insUnits = (pNewData->carboHydrate / 12.0) * (pSettings->timeblock[timeBlk].uTo10BE / 10.0);
 
+        if( callerArgs.debugMode )
+        {
 fprintf(stderr, "(%s[%d]) insUnits is %f\n", __FILE__, __LINE__, insUnits);
+        }
 
         if( pSettings->timeblock[timeBlk].sens > 0 )
         {
@@ -874,11 +997,17 @@ fprintf(stderr, "(%s[%d]) insUnits is %f\n", __FILE__, __LINE__, insUnits);
             offUnits = 0;
         }
 
+        if( callerArgs.debugMode )
+        {
 fprintf(stderr, "(%s[%d]) offUnits is %f\n", __FILE__, __LINE__, offUnits);
+        }
 
         adjustment = ( (float) pNewData->adjust / 100.0) * insUnits;
 
+        if( callerArgs.debugMode )
+        {
 fprintf(stderr, "(%s[%d]) adjustment is %f\n", __FILE__, __LINE__, adjustment);
+        }
 
         insUnits += offUnits;
         insUnits += adjustment;
@@ -889,21 +1018,30 @@ fprintf(stderr, "(%s[%d]) adjustment is %f\n", __FILE__, __LINE__, adjustment);
         pNewData->basalUnits = 0;
         pNewData->actBasunits = pNewData->basalUnits;
 
+        if( callerArgs.debugMode )
+        {
 fprintf(stderr, "(%s[%d]) pNewData->units is %d\n", __FILE__, __LINE__, pNewData->units);
+        }
 
         if( pLastData != NULL )
         {
+            if( callerArgs.debugMode )
+            {
 fprintf( stderr, "PREVIOUS RECORD:\n" );
 fprintf( stderr, "----------------\n" );
             pDatafile->dumpRec( pLastData );
 fprintf( stderr, "----------------\n" );
+            }
 
             differenceSeconds = pNewData->timestamp - pLastData->timestamp;
             differenceMinutes = differenceSeconds / SECONDS_A_MINUTE;
             differenceHours = differenceSeconds / SECONDS_A_HOUR;
             differenceDays = differenceSeconds / SECONDS_A_DAY;
 
+            if( callerArgs.debugMode )
+            {
 fprintf(stderr, "(%s[%d]) differenceMinutes is %ld\n", __FILE__, __LINE__, differenceMinutes);
+            }
 
             if( pNewData->units > 0 || pLastData->units > 0 )
             {
@@ -921,7 +1059,10 @@ fprintf(stderr, "(%s[%d]) differenceMinutes is %ld\n", __FILE__, __LINE__, diffe
                     // diffUnits = insFactor * pLastData active units
                     diffUnits = insFactor * pLastData->actUnits;
 
+                    if( callerArgs.debugMode )
+                    {
 fprintf(stderr, "(%s[%d]) diffUnits is %f\n", __FILE__, __LINE__, diffUnits);
+                    }
 
                     pLastData->actUnits -= diffUnits;
 
@@ -1057,7 +1198,7 @@ int bolus::runCalcBread( void )
 
                     if( callerArgs.carb == 0 )
                     {
-                        newData.carbon10 = callerArgs.bread * 
+                        newData.carboHydrate = callerArgs.bread * 
                                         BOLUS_FACTOR_CARB2BREAD;
                     }
 
@@ -1065,21 +1206,21 @@ int bolus::runCalcBread( void )
                     {
                         if( callerArgs.carb < DATA_CARBON10_MIN )
                         {
-                            newData.carbon10 = DATA_CARBON10_MIN;
+                            newData.carboHydrate = DATA_CARBON10_MIN;
                         }
                         else
                         {
                             if( callerArgs.carb > DATA_CARBON10_MAX )
                             {
-                                newData.carbon10 = DATA_CARBON10_MAX;
+                                newData.carboHydrate = DATA_CARBON10_MAX;
                             }
                             else
                             {
-                                newData.carbon10 = callerArgs.carb;
+                                newData.carboHydrate = callerArgs.carb;
                             }
                         }
                     }
-                    callerArgs.carb = newData.carbon10;
+                    callerArgs.carb = newData.carboHydrate;
 
                     if( callerArgs.bread == 0.0 )
                     {
@@ -1108,7 +1249,7 @@ int bolus::runCalcBread( void )
 
                     if( callerArgs.carb == 0 )
                     {
-                        newData.carbon10 = callerArgs.bread * 
+                        newData.carboHydrate = callerArgs.bread * 
                                  BOLUS_FACTOR_CARB2BREAD;
                     }
 
@@ -1116,21 +1257,21 @@ int bolus::runCalcBread( void )
                     {
                         if( callerArgs.carb < DATA_CARBON10_MIN )
                         {
-                            newData.carbon10 = DATA_CARBON10_MIN;
+                            newData.carboHydrate = DATA_CARBON10_MIN;
                         }
                         else
                         {
                             if( callerArgs.carb > DATA_CARBON10_MAX )
                             {
-                                newData.carbon10 = DATA_CARBON10_MAX;
+                                newData.carboHydrate = DATA_CARBON10_MAX;
                             }
                             else
                             {
-                                newData.carbon10 = callerArgs.carb;
+                                newData.carboHydrate = callerArgs.carb;
                             }
                         }
                     }
-                    callerArgs.carb = newData.carbon10;
+                    callerArgs.carb = newData.carboHydrate;
 
                     if( callerArgs.measType != '\0' )
                     {
@@ -1152,17 +1293,27 @@ int bolus::runCalcBread( void )
                     if( (retVal = calcBolus( tmblk4now, &lastData, 
                          &newData )) == E_BOLUS_OK )
                     {
+                        if( callerArgs.debugMode )
+                        {
 fprintf( stderr, "NEW RECORD:\n" );
 fprintf( stderr, "-----------\n" );
                         pDatafile->dumpRec( &newData );
 fprintf( stderr, "-----------\n" );
+                        }
+
                         if( callerArgs.noStore )
                         {
+                            if( callerArgs.verboseLevel >= 1 )
+                            {
 fprintf( stderr, "WARN: data will not be save becaus of argument!\n");
+                            }
                             retVal = newData.units;
                             // pNewData.units
                             // retVal = 0;
+                            if( callerArgs.debugMode )
+                            {
 fprintf( stderr, "setting retVal to: %d!\n", retVal);
+                            }
                         }
                         else
                         {
@@ -1302,6 +1453,9 @@ int bolus::run( void )
                 break;
             case BOLUS_QUERY_MODE:
                 retVal = runQuery();
+                break;
+            case BOLUS_DUMP_MODE:
+                retVal = runDumpData();
                 break;
             case BOLUS_CALIBRATE_MODE:
                 retVal = runCalibrate();

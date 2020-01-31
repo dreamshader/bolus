@@ -140,7 +140,7 @@ void datafile::resetRec( struct _record *pData )
         pData->recnum = 0;
         pData->glucose = 0;
         pData->meal = 0;
-        pData->carbon10  = 0;
+        pData->carboHydrate  = 0;
         pData->adjust = 0;
         pData->units = 0;
         pData->basalUnits = 0;
@@ -159,7 +159,7 @@ void datafile::dumpRec( struct _record *pData )
         fprintf(stderr, "recno ....: %d\n", pData->recnum );
         fprintf(stderr, "glucose ..: %d\n", pData->glucose );
         fprintf(stderr, "meal .....: %d\n", pData->meal );
-        fprintf(stderr, "carbon10 .: %d\n", pData->carbon10 );
+        fprintf(stderr, "carboHydr.: %d\n", pData->carboHydrate );
         fprintf(stderr, "adjust ...: %d\n", pData->adjust );
         fprintf(stderr, "units ....: %d\n", pData->units );
         fprintf(stderr, "basalUnits: %d\n", pData->basalUnits );
@@ -203,8 +203,8 @@ int datafile::performRead( struct _record *pData )
                     rdlen = read( dataFd, &pData->meal, fieldlen );
                     break;
                 case 4:
-                    fieldlen = sizeof(pData->carbon10);
-                    rdlen = read( dataFd, &pData->carbon10, fieldlen );
+                    fieldlen = sizeof(pData->carboHydrate);
+                    rdlen = read( dataFd, &pData->carboHydrate, fieldlen );
                     break;
                 case 5:
                     fieldlen = sizeof(pData->adjust);
@@ -282,8 +282,8 @@ int datafile::performWrite( struct _record *pData )
                     wrlen = write( dataFd, &pData->meal, fieldlen );
                     break;
                 case 4:
-                    fieldlen = sizeof(pData->carbon10);
-                    wrlen = write( dataFd, &pData->carbon10, fieldlen );
+                    fieldlen = sizeof(pData->carboHydrate);
+                    wrlen = write( dataFd, &pData->carboHydrate, fieldlen );
                     break;
                 case 5:
                     fieldlen = sizeof(pData->adjust);

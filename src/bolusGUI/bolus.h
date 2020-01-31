@@ -8,9 +8,9 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *
+ *  
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ *  
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+ 
 using namespace std;
 
 #ifndef IS_FRONTEND // set by the GUI source
@@ -69,6 +69,7 @@ using namespace std;
 #define BOLUS_EDIT_MODE         7
 #define BOLUS_QUERY_MODE        8
 #define BOLUS_CALIBRATE_MODE    9
+#define BOLUS_DUMP_MODE        10
 
 #define SECONDS_A_MINUTE       60
 #define SECONDS_A_HOUR         (60 * SECONDS_A_MINUTE)
@@ -128,11 +129,11 @@ struct _bolus_param {
     int adjust;
     bool last;
     char editType;
-    char exportType;
+    char *exportFile;
     char *importFile;
     bool interactive;
     bool noStore;
-    bool offset;
+    int offset;
     bool query;
     int timeBlockNumber;
     bool timeBlockCount;
@@ -142,6 +143,13 @@ struct _bolus_param {
     bool qFactors;
     bool qGlobals;
     bool qBlocks;
+    bool device;
+    char importDelimiter;
+    bool import1stLineXtraData;
+    bool debugMode;
+    int verboseLevel;
+    int dataRecord;
+    char *dataFile;
 };
 
 #ifndef IS_FRONTEND // set by the GUI source
@@ -170,17 +178,18 @@ class bolus {
       int runCalcCarb( void );
       int runEditor( void );
       int runQuery( void );
+      int runDumpData( void );
       int runCalibrate( void );
 
       int calcBolus( int timeBlk, struct _record *pLastData, struct _record *pNewData );
 
   public:
-      bolus( void ) {
+      bolus( void ) { 
              callerArgs.importFile = NULL;
              mode = BOLUS_NO_MODE;
        };
 
-      ~bolus( void ) {
+      ~bolus( void ) { 
              if( pSettings != NULL )
              {
                  pSettings->end();
@@ -216,3 +225,4 @@ class bolus {
 #endif
 
 #endif // _BOLUS_H_
+

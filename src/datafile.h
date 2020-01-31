@@ -139,6 +139,7 @@ class datafile {
       datafile( void ) { };
       int init( void );
       int use( int year, int month );
+      int directUse( char *pFilePath );
       void resetRec( struct _record *pData );
       void dumpRec( struct _record *pData );
       int readLastRecord( unsigned int *recno, struct _record *pData );

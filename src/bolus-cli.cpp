@@ -174,7 +174,7 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->glucose     = 0;
         pParam->carb        = 0;
         pParam->bread       = 0.0;
-        pParam->mealType    = '\0';
+        pParam->mealType    = DATA_MEAL_NONE;
         pParam->measType    = '\0';
         pParam->adjustType  = '\0';
         pParam->adjust      = 0;
@@ -219,7 +219,7 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
     int failed = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "a:g:c:b:m:t:le:X:I:o:T:F:A:d:v:R:rVxDBGfCinhq?";
+    const char* const short_options = "a:g:c:b:m:t:le:X:I:o:T:F:A:d:v:R:r:VxDBGfCinhq?";
 
     if( pParam != NULL )
     {

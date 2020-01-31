@@ -102,7 +102,7 @@ void bolus::resetArgs( void )
     callerArgs.glucose     = 0;
     callerArgs.carb        = 0;
     callerArgs.bread       = 0.0;
-    callerArgs.mealType    = '\0';
+    callerArgs.mealType    = DATA_MEAL_NONE;
     callerArgs.measType    = '\0';
     callerArgs.adjustType  = '\0';
     callerArgs.adjust      = 0;
@@ -390,9 +390,41 @@ int bolus::countTimeBlocks( void )
 int bolus::runDumpData( void )
 {
     int retVal = E_BOLUS_OK;
+    datafile *pData;
+    struct _record dumpData;
 
-//    callerArgs.dataRecord = -1;
-//    callerArgs.dataFile  = NULL;
+    if( callerArgs.dataFile  != NULL )
+    {
+        if( (pData = new datafile()) != NULL )
+        {
+            if( (retVal = pData->init()) == E_DATAFILE_OK )
+            {
+                if( (retVal = pData->directUse( callerArgs.dataFile )) 
+                       == E_DATAFILE_OK )
+                {
+                    if( ( retVal = pData->readRecord(callerArgs.dataRecord, 
+                          &dumpData )) == E_DATAFILE_OK )
+                    {
+fprintf(stdout, "%04d:%c:%04d:%04d:%04d:%04d",
+    dumpData.glucose,
+    dumpData.meal == '\0' ? 'n' : dumpData.meal,
+    dumpData.carboHydrate,
+    dumpData.adjust,
+    dumpData.units,
+    dumpData.basalUnits );
+                    }
+                }
+            }
+        }
+        else
+        {
+            retVal = E_BOLUS_NULL;
+        }
+    }
+    else
+    {
+        retVal = E_BOLUS_NULL;
+    }
 
     return( retVal );
 }

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>334</width>
-    <height>286</height>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -147,12 +147,12 @@
     <rect>
      <x>170</x>
      <y>80</y>
-     <width>74</width>
+     <width>111</width>
      <height>18</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Kein Eintrag</string>
    </property>
   </widget>
   <widget class="QLabel" name="lblCarbValue">
@@ -244,6 +244,19 @@
    </property>
    <property name="text">
     <string>Nächster</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextEOF">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>290</y>
+     <width>181</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Datei-Anfang erreicht!</string>
    </property>
   </widget>
  </widget>

@@ -39,10 +39,12 @@ int datafile::init( void )
     return( retVal );
 }
 
+
+
 /* ----------------------------------------------------------------------------
  * int datafile::use( void )
  *
- * close settings file
+ * open data file
  ------------------------------------------------------------------------------
 */
 int datafile::use( int year, int month )
@@ -131,6 +133,103 @@ int datafile::use( int year, int month )
     return( retVal );
 }
 
+/* ----------------------------------------------------------------------------
+ * int datafile::directUse( void )
+ *
+ * open data file
+ ------------------------------------------------------------------------------
+*/
+int datafile::directUse( char *pFilePath )
+{
+    int retVal = E_DATAFILE_OK;
+    int flags = O_RDWR; // |O_SYNC;
+    int mode = S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH;
+
+    if( initialized )
+    {
+        if( dataFd > 0 )
+        {
+            close( dataFd );
+            dataFd = -1;
+        }
+
+        if( pFilePath != NULL )
+        {
+            sprintf(dataFileName, "%s", pFilePath);
+
+            if( (retVal = access( dataFileName , R_OK | W_OK )) < 0 )
+            {
+                switch( errno )
+                {
+                    case EACCES:
+                        retVal = E_DATAFILE_ACCESS;
+                        break;
+                    case ENOENT:
+                        flags = O_RDWR|O_CREAT|O_TRUNC; // |O_SYNC;
+                        retVal = E_DATAFILE_OK;
+                        break;
+                    case EROFS:
+                        retVal = E_DATAFILE_ROFS;
+                        break;
+                    case ENOTDIR:
+                        retVal = E_DATAFILE_PATH;
+                        break;
+                    case EINVAL:
+                        retVal = E_DATAFILE_FLAGS;
+                        break;
+                    default:
+                        retVal = E_DATAFILE_UNKNOWN;
+                        break;
+                }
+            }
+            else
+            {
+                flags = O_RDWR; // |O_SYNC;
+                retVal = E_DATAFILE_OK;
+            }
+        }
+        else
+        {
+            retVal = E_DATAFILE_NULL;
+        }
+
+        if( retVal == E_DATAFILE_OK )
+        {
+            if( flags & O_CREAT )
+            {
+                if( (dataFd = open(dataFileName, flags, mode)) < 0 )
+                {
+                    retVal = E_DATAFILE_UNKNOWN;
+                }
+            }
+            else
+            {
+                if( (dataFd = open(dataFileName, flags)) < 0 )
+                {
+                    retVal = E_DATAFILE_UNKNOWN;
+                }
+            }
+        }
+    }
+    else
+    {
+        retVal = E_DATAFILE_INIT;
+    }
+
+    return( retVal );
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 void datafile::resetRec( struct _record *pData )
 {
@@ -139,7 +238,7 @@ void datafile::resetRec( struct _record *pData )
         pData->timestamp = (time_t) 0;
         pData->recnum = 0;
         pData->glucose = 0;
-        pData->meal = 0;
+        pData->meal = DATA_MEAL_NONE;
         pData->carboHydrate  = 0;
         pData->adjust = 0;
         pData->units = 0;

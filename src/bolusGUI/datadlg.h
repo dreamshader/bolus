@@ -2,6 +2,7 @@
 #define DATADLG_H
 
 #include <QDialog>
+#include "dlgshowdata.h"
 
 namespace Ui {
 class dataDlg;
@@ -14,6 +15,10 @@ class dataDlg : public QDialog
 public:
     explicit dataDlg(QWidget *parent = nullptr);
     ~dataDlg();
+    dlgShowData *pShowDataDlg;
+
+private slots:
+    void on_btnDataEdit_clicked();
 
 private:
     Ui::dataDlg *ui;

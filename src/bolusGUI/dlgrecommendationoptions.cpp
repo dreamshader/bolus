@@ -14,7 +14,7 @@ dlgRecommendationOptions::dlgRecommendationOptions(QWidget *parent) :
     ui->setupUi(this);
 
 
-    if((sysFP = popen("~/bolus/bolus-cli -q -G", "r")) != nullptr )
+    if((sysFP = popen("~/bolus/bolus-cli -qG", "r")) != nullptr )
     {
         fgets(dataBuff, 79, sysFP);
         fclose(sysFP);

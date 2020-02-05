@@ -22,11 +22,6 @@ dlgConfirmBolus::~dlgConfirmBolus()
 
 void dlgConfirmBolus::on_dlgConfirmBolus_finished(int result)
 {
-//    sprintf(cmdBuffer,"~/bolus/bolus-cli -g%d -c%d -n", gParam.glucose, (int) (gParam.bread*12) );
-//    sprintf(cmdLine, "~/bolus/bolus-cli -q -t%c -g%d", gParam.measType, gParam.glucose);
-//    gParam.adjustType = 'o';
-//    gParam.mealType = 'a';
-//    gParam.noStore = ui->chkNoStore->isChecked();
 
     extern struct _bolus_param gParam;
 

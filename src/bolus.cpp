@@ -53,7 +53,7 @@ void bolus::dumpArgs( void )
             callerArgs.noStore == true ? "true" : "false" );
     fprintf(stderr, "query only .........: %s\n", 
             callerArgs.query == true ? "true" : "false" );
-    fprintf(stderr, "queryType ..-.......: %c\n", callerArgs.queryType );
+    fprintf(stderr, "queryType ..........: %c\n", callerArgs.queryType );
     fprintf(stderr, "tmblk ..............: %d\n", callerArgs.timeBlockNumber);
     fprintf(stderr, "timeblock count ....: %s\n", 
             callerArgs.timeBlockCount == true ? "true" : "false" );
@@ -156,6 +156,7 @@ int bolus::checkArgs( )
         }
     }
 
+
     if( !callerArgs.fail )
     {
         if( callerArgs.last )
@@ -181,7 +182,7 @@ int bolus::checkArgs( )
         }
 
         if( callerArgs.dataFile != NULL &&
-            callerArgs.dataRecord >= 0 )
+             callerArgs.dataRecord >= 0 )
         {
             mode = BOLUS_DUMP_MODE;
         }
@@ -236,7 +237,7 @@ void bolus::setArgs( struct _bolus_param *pParam )
         callerArgs.debugMode = pParam->debugMode;
         callerArgs.verboseLevel = pParam->verboseLevel;
 
-        if( callerArgs.dataFile  != NULL )
+        if( pParam->dataFile  != NULL )
         {
             callerArgs.dataFile  = strdup(pParam->dataFile);
         }
@@ -385,13 +386,13 @@ int bolus::runDumpData( void )
                     if( ( retVal = pData->readRecord(callerArgs.dataRecord, 
                           &dumpData )) == E_DATAFILE_OK )
                     {
-fprintf(stdout, "%04d:%c:%04d:%04d:%04d:%04d",
-    dumpData.glucose,
-    dumpData.meal == '\0' ? 'n' : dumpData.meal,
-    dumpData.carboHydrate,
-    dumpData.adjust,
-    dumpData.units,
-    dumpData.basalUnits );
+                        fprintf(stdout, "%04d:%c:%04d:%04d:%04d:%04d\n",
+                            dumpData.glucose,
+                            dumpData.meal == '\0' ? 'n' : dumpData.meal,
+                            dumpData.carboHydrate,
+                            dumpData.adjust,
+                            dumpData.units,
+                            dumpData.basalUnits );
                     }
                 }
             }

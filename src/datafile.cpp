@@ -357,6 +357,7 @@ int datafile::performRead( struct _record *pData )
             {
                 retVal = E_DATAFILE_READ;
             }
+fprintf(stderr, "FSIZE is %d\n", fsize);
         }
     }
     else

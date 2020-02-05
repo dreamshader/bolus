@@ -15,26 +15,27 @@ dlgHealthOptions::dlgHealthOptions(QWidget *parent) :
 
     ui->setupUi(this);
 
-    if((sysFP = popen("~/bolus/bolus-cli -q -f", "r")) != nullptr )
+    if((sysFP = popen("~/bolus/bolus-cli -qA", "r")) != nullptr )
     {
         fgets(dataBuff, 79, sysFP);
         fclose(sysFP);
 
-//           11111111112222
-// 012345678901234567890123
-// -010:-030:0025:0010:0000
-
-        varSports1 = atoi(&dataBuff[0]);
-        varSports2 = atoi(&dataBuff[5]);
+        varSober = atoi(&dataBuff[0]);
+        varSport1 = atoi(&dataBuff[5]);
         varStress = atoi(&dataBuff[10]);
-        varIll = atoi(&dataBuff[15]);
-        varFemale = atoi(&dataBuff[20]);
+        varIllness = atoi(&dataBuff[15]);
+        varSport2 = atoi(&dataBuff[20]);
+        varMenstruation = atoi(&dataBuff[25]);
+        varOther = atoi(&dataBuff[30]);
 
-        ui->spnSport1Factor->setValue(varSports1);
-        ui->spnSport2Factor->setValue(varSports2);
+        ui->spnSoberFactor->setValue(varSober);
+        ui->spnSport1Factor->setValue(varSport1);
         ui->spnStressFactor->setValue(varStress);
-        ui->spnIllnessFactor->setValue(varIll);
-        ui->spnFemaleFactor->setValue(varFemale);
+        ui->spnIllnessFactor->setValue(varIllness);
+        ui->spnSport2Factor->setValue(varSport2);
+        ui->spnFemaleFactor->setValue(varMenstruation);
+        ui->spnOtherFactor->setValue(varOther);
+
     }
 }
 
@@ -47,11 +48,13 @@ void dlgHealthOptions::on_dlgHealthOptions_finished(int result)
 {
     if( result == QDialog::Accepted )
     {
-        varSports1 = ui->spnSport1Factor->value();
-        varSports2 = ui->spnSport2Factor->value();
+        varSober = ui->spnSoberFactor->value();
+        varSport1 = ui->spnSport1Factor->value();
         varStress = ui->spnStressFactor->value();
-        varIll = ui->spnIllnessFactor->value();
-        varIll = ui->spnFemaleFactor->value();
+        varIllness = ui->spnIllnessFactor->value();
+        varSport2 = ui->spnSport2Factor->value();
+        varMenstruation = ui->spnFemaleFactor->value();
+        varOther = ui->spnOtherFactor->value();
 
         QDir dir;
         QString path("/home/dirk/tmp/");
@@ -70,13 +73,13 @@ void dlgHealthOptions::on_dlgHealthOptions_finished(int result)
         {
             char dataBuffer[80];
             int retVal;
-            sprintf(dataBuffer, "%s;%s;%s;%s;%s\n","sports1","sports1","stress","ill","female");
+            sprintf(dataBuffer, "%s;%s;%s;%s;%s;%s;%s\n","sober","sports1","stress","illness","sport2","menstruation","other");
             file.write(dataBuffer, qstrlen(dataBuffer));
-            sprintf(dataBuffer, "%d;%d;%d;%d;%d\n",varSports1,varSports2,varStress,varIll,varIll);
+            sprintf(dataBuffer, "%d;%d;%d;%d;%d;%d;%d\n", varSober, varSport1, varStress, varIllness, varSport2, varMenstruation, varOther );
             file.write(dataBuffer, qstrlen(dataBuffer));
             file.close();
             path.append("bolus-export.csv");
-            sprintf(dataBuffer, "~/bolus/bolus-cli -I%s",path.toStdString().c_str() );
+            sprintf(dataBuffer, "~/bolus/bolus-cli -x -I%s",path.toStdString().c_str() );
             retVal = system(dataBuffer);
 
         }

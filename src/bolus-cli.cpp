@@ -167,7 +167,7 @@ void dumpArgs( struct _bolus_param *pParam )
                 pParam->noStore == true ? "true" : "false" );
         fprintf(stderr, "query only .........: %s\n", 
                 pParam->query == true ? "true" : "false" );
-        fprintf(stderr, "queryType ..-.......: %c\n", pParam->queryType );
+        fprintf(stderr, "queryType ..........: %c\n", pParam->queryType );
         fprintf(stderr, "tmblk ..............: %d\n", pParam->timeBlockNumber);
         fprintf(stderr, "timeblock count ....: %s\n", 
                 pParam->timeBlockCount == true ? "true" : "false" );

@@ -21,7 +21,7 @@ dlgTimeBlockEdit::dlgTimeBlockEdit(QWidget *parent) :
 
     ui->setupUi(this);
 
-    sprintf(cmdBuff, "~/bolus/bolus-cli -q -T%d", currSelTimeBlock);
+    sprintf(cmdBuff, "~/bolus/bolus-cli -qT -T%d", currSelTimeBlock);
     if((sysFP = popen(cmdBuff, "r")) != nullptr )
     {
         fgets(dataBuff, 79, sysFP);

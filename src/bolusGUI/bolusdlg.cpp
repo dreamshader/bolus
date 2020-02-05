@@ -42,7 +42,7 @@ bolusDlg::bolusDlg(QWidget *parent) :
 //    gParam.glucose
 //    gParam.measType = 'f';
 
-    sprintf(cmdLine, "~/bolus/bolus-cli -q -t%c -g%d", gParam.measType, gParam.glucose);
+    sprintf(cmdLine, "~/bolus/bolus-cli -qs -t%c -g%d", gParam.measType, gParam.glucose);
 
     int retVal = system(cmdLine);
     if( retVal > 128 )

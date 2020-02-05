@@ -15,11 +15,14 @@ public:
     explicit dlgHealthOptions(QWidget *parent = nullptr);
     ~dlgHealthOptions();
 
-    int varSports1;
-    int varSports2;
+    int varSober;
+    int varSport1;
     int varStress;
-    int varIll;
-    int varFemale;
+    int varIllness;
+    int varSport2;
+    int varMenstruation;
+    int varOther;
+
 
 private slots:
     void on_dlgHealthOptions_finished(int result);

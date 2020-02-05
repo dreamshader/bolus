@@ -24,7 +24,7 @@ void dlgShowData::displayDataRecord()
     char cmdBuff[80];
     char dataBuff[80];
 
-    sprintf(cmdBuff, "~/bolus/bolus-cli -V -v2 -R%s -r%d", fileName.toStdString().c_str(), currRecno);
+    sprintf(cmdBuff, "~/bolus/bolus-cli -D -v2 -R%s -r%d", fileName.toStdString().c_str(), currRecno);
     if((sysFP = popen(cmdBuff, "r")) != nullptr )
     {
         if( fgets(dataBuff, 79, sysFP) )
@@ -100,7 +100,7 @@ void dlgShowData::on_btnNextRec_clicked()
     if( !eofReached )
     {
         ui->lblTextEOF->setText("");
-        currRecno--;
+        currRecno++;
         displayDataRecord();
     }
     else

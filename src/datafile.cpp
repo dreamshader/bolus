@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  datafile.cpp - class for re/store settings
+ *  datafile.cpp - class implementation
  *
  *  Copyright (C) 2018 Dreamshader (aka Dirk Schanz)
  *
@@ -22,12 +22,13 @@
 
 #include "datafile.h"
 
-// char *getenv(const char *name);
-
 /* ----------------------------------------------------------------------------
- * int datafile::init( void )
- *
- * open settings file
+ * function:
+ *     int datafile::init( void )
+ * does:
+ *     perform first data initialisation
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int datafile::init( void )
@@ -39,12 +40,13 @@ int datafile::init( void )
     return( retVal );
 }
 
-
-
 /* ----------------------------------------------------------------------------
- * int datafile::use( void )
- *
- * open data file
+ * function:
+ *     int datafile::use( int year, int month )
+ * does:
+ *     open the current data file depending on month and year
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int datafile::use( int year, int month )
@@ -134,9 +136,12 @@ int datafile::use( int year, int month )
 }
 
 /* ----------------------------------------------------------------------------
- * int datafile::directUse( void )
- *
- * open data file
+ * function:
+ *     int datafile::directUse( char *pFilePath )
+ * does:
+ *     open any datafile pointed by pFilePath
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int datafile::directUse( char *pFilePath )
@@ -219,18 +224,15 @@ int datafile::directUse( char *pFilePath )
     return( retVal );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void datafile::resetRec( struct _record *pData )
+ * does:
+ *     set record fields to their defaults
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void datafile::resetRec( struct _record *pData )
 {
     if( pData != NULL )
@@ -250,6 +252,15 @@ void datafile::resetRec( struct _record *pData )
     }
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void datafile::dumpRec( struct _record *pData )
+ * does:
+ *     shows content of a data record
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void datafile::dumpRec( struct _record *pData )
 {
     if( pData != NULL )
@@ -268,8 +279,15 @@ void datafile::dumpRec( struct _record *pData )
     }
 }
 
-
-
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int datafile::performRead( struct _record *pData )
+ * does:
+ *     read a data record
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
+ ------------------------------------------------------------------------------
+*/
 int datafile::performRead( struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
@@ -349,6 +367,15 @@ int datafile::performRead( struct _record *pData )
     return( retVal );
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int datafile::performWrite( struct _record *pData )
+ * does:
+ *     write a data record
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
+ ------------------------------------------------------------------------------
+*/
 int datafile::performWrite( struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
@@ -428,7 +455,15 @@ int datafile::performWrite( struct _record *pData )
     return( retVal );
 }
 
-
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int datafile::readLastRecord(unsigned int *pRecno,struct _record *pData)
+ * does:
+ *     go to last data record and read it in
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
+ ------------------------------------------------------------------------------
+*/
 int datafile::readLastRecord( unsigned int *pRecno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
@@ -492,8 +527,15 @@ int datafile::readLastRecord( unsigned int *pRecno, struct _record *pData )
     return( retVal );
 }
 
-
-
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int datafile::readRecord( unsigned int recno, struct _record *pData )
+ * does:
+ *     read a specific data record
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
+ ------------------------------------------------------------------------------
+*/
 int datafile::readRecord( unsigned int recno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
@@ -529,6 +571,15 @@ int datafile::readRecord( unsigned int recno, struct _record *pData )
     return( retVal );
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int datafile::writeRecord( unsigned int recno, struct _record *pData )
+ * does:
+ *     write a specific data record
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
+ ------------------------------------------------------------------------------
+*/
 int datafile::writeRecord( unsigned int recno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;
@@ -565,6 +616,15 @@ int datafile::writeRecord( unsigned int recno, struct _record *pData )
 
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int datafile::appendRecord( unsigned int *pRecno, struct _record *pData )
+ * does:
+ *     append a data record
+ * returns:
+ *     E_DATAFILE_OK or an error code if failed
+ ------------------------------------------------------------------------------
+*/
 int datafile::appendRecord( unsigned int *pRecno, struct _record *pData )
 {
     int retVal = E_DATAFILE_OK;

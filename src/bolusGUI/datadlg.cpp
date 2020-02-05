@@ -28,10 +28,7 @@ void dataDlg::on_btnDataEdit_clicked()
         tr( "Bolus Datendateien (bolus.data.*);; Alle Dateien (*.*)" ),
         &selectedFilter, QFileDialog::DontUseNativeDialog );
 
-
-// "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
-
-    if( fileName.length() )
+    if( !fileName.isEmpty() )
     {
         if( pShowDataDlg == nullptr )
         {
@@ -43,4 +40,74 @@ void dataDlg::on_btnDataEdit_clicked()
         }
     }
 
+}
+
+void dataDlg::on_btnDataExport_clicked()
+{
+    QString selectedFilter;
+
+    fileName = QFileDialog::getSaveFileName(pParent,
+        tr( "Export nach" ), nullptr,
+        tr( "csv-Datei (*.csv);; Alle Dateien (*.*)" ),
+        &selectedFilter, QFileDialog::DontUseNativeDialog );
+
+    if( !fileName.isEmpty() )
+    {
+    }
+}
+
+void dataDlg::on_btnDataImport_clicked()
+{
+    QString selectedFilter;
+
+    fileName = QFileDialog::getOpenFileName(pParent,
+        tr( "Datendatei auswählen" ), nullptr,
+        tr( "csv-Dateien (*.csv);; Alle Dateien (*.*)" ),
+        &selectedFilter, QFileDialog::DontUseNativeDialog );
+
+    if( !fileName.isEmpty() )
+    {
+    }
+}
+
+void dataDlg::on_btnDataAnalyze_clicked()
+{
+    QString selectedFilter;
+
+    fileName = QFileDialog::getOpenFileName(pParent,
+        tr( "Datendatei auswählen" ), nullptr,
+        tr( "csv-Dateien (*.csv);; Alle Dateien (*.*)" ),
+        &selectedFilter, QFileDialog::DontUseNativeDialog );
+
+    if( !fileName.isEmpty() )
+    {
+    }
+}
+
+void dataDlg::on_btnSettingsExport_clicked()
+{
+    QString selectedFilter;
+
+    fileName = QFileDialog::getSaveFileName(pParent,
+        tr( "Export nach" ), nullptr,
+        tr( "csv-Datei (*.csv);; Alle Dateien (*.*)" ),
+        &selectedFilter, QFileDialog::DontUseNativeDialog );
+
+    if( !fileName.isEmpty() )
+    {
+    }
+}
+
+void dataDlg::on_btnSettingsImport_clicked()
+{
+    QString selectedFilter;
+
+    fileName = QFileDialog::getOpenFileName(pParent,
+        tr( "Datendatei auswählen" ), nullptr,
+        tr( "csv-Dateien (*.csv);; Alle Dateien (*.*)" ),
+        &selectedFilter, QFileDialog::DontUseNativeDialog );
+
+    if( !fileName.isEmpty() )
+    {
+    }
 }

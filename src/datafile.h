@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  datafile.h - class for re/store settings
+ *  datafile.h - class definition bolus data
  *
  *  Copyright (C) 2018 Dreamshader (aka Dirk Schanz)
  *
@@ -60,10 +60,11 @@ using namespace std;
 #define E_DATAFILE_WRITE         -15
 #define E_DATAFILE_FIELDS        -16
 
-
 #define DATA_RECORD_LENGTH        42
-
 #define DATA_RECORD_NUM_FIELDS    11
+
+#define DATA_NOTHING              '\0'
+#define DATA_DEFAULT_DELIMITER    ';'
 
 #define DATA_MEAL_BEFORE           'b'
 #define DATA_MEAL_U_BEFORE         'B'
@@ -75,23 +76,27 @@ using namespace std;
 #define DATA_MEAL_U_SLEEPTIME      'S'
 #define DATA_MEAL_EXTRA            'x'
 #define DATA_MEAL_U_EXTRA          'X'
-
-#define DATA_MEASURE_NONE          '\0'
+//
+#define DATA_ADJUST_NO_ENTRY       '-'
+#define DATA_ADJUST_SOBER          'n'
+#define DATA_ADJUST_U_SOBER        'N'
+#define DATA_ADJUST_SPORT1         '1'
+#define DATA_ADJUST_STRESS         's'
+#define DATA_ADJUST_U_STRESS       'S'
+#define DATA_ADJUST_ILLNESS        'k'
+#define DATA_ADJUST_U_ILLNESS      'K'
+#define DATA_ADJUST_SPORT2         '2'
+#define DATA_ADJUST_MENSTRUATION   'm'
+#define DATA_ADJUST_U_MENSTRUATION 'M'
+#define DATA_ADJUST_OTHER          'a'
+#define DATA_ADJUST_U_OTHER        'A'
+//
+//
+#define DATA_MEASURE_NONE          DATA_NOTHING
 #define DATA_MEASURE_ACUCHECK      'a'
 #define DATA_MEASURE_U_ACUCHECK    'A'
 #define DATA_MEASURE_FREESTYLE     'f'
 #define DATA_MEASURE_U_FREESTYLE   'F'
-
-#define DATA_EDIT_TYPE_NO_TYPE     '\0'
-#define DATA_EDIT_TYPE_TIMEBLOCKS  'T'
-#define DATA_EDIT_TYPE_GLOBALS     'G'
-#define DATA_EDIT_TYPE_ADJUSTMENTS 'A'
-
-#define DATA_EXPORT_NOTHING        '\0'
-#define DATA_EXPORT_TIMEBLOCKS     'T'
-#define DATA_EXPORT_GLOBALS        'G'
-#define DATA_EXPORT_ADJUSTMENTS    'A'
-#define DATA_EXPORT_ALL_JSON       'J'
 
 #define DATA_BASAL_UNITS_MIN       0
 #define DATA_BASAL_UNITS_MAX       30

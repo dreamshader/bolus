@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  settings.cpp - class for re/store settings
+ *  settings.cpp - class implementation
  *
  *  Copyright (C) 2018 Dreamshader (aka Dirk Schanz)
  *
@@ -23,9 +23,12 @@
 #include "settings.h"
 
 /* ----------------------------------------------------------------------------
- * int settings::open( void )
- *
- * open settings file
+ * function:
+ *     int settings::open( void )
+ * does:
+ *     opens the settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::open( void )
@@ -93,9 +96,12 @@ int settings::open( void )
 }
 
 /* ----------------------------------------------------------------------------
- * void settings::close( void )
- *
- * close settings file
+ * function:
+ *     void settings::close( void )
+ * does:
+ *     close the settings file
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::close( void )
@@ -108,9 +114,12 @@ void settings::close( void )
 }
 
 /* ----------------------------------------------------------------------------
- * void settings::defaults( void )
- *
- * reset all settings to their defaults
+ * function:
+ *     void settings::defaults( void )
+ * does:
+ *     set all values to their defaults
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::defaults( void )
@@ -169,18 +178,22 @@ void settings::defaults( void )
     globals.basalActTime = BASAL_ACT_TIME;
     globals.basalDelayTime = BASAL_DELAY_TIME;
 
-    adjustments.sports1 = ADJUST_SPORTS_1;
-    adjustments.sports2 = ADJUST_SPORTS_2;
-    adjustments.stress = ADJUST_STRESS;
-    adjustments.ill = ADJUST_ILL;
-    adjustments.female = ADJUST_FEMALE;
-
+    adjustments.sober = DEFAULT_ADJUST_SOBER;
+    adjustments.sport1 = DEFAULT_ADJUST_SPORT1;
+    adjustments.stress = DEFAULT_ADJUST_STRESS;
+    adjustments.illness = DEFAULT_ADJUST_ILLNESS;
+    adjustments.sport2 = DEFAULT_ADJUST_SPORT2;
+    adjustments.menstruation = DEFAULT_ADJUST_MENSTRUATION;
+    adjustments.other = DEFAULT_ADJUST_OTHER;
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::writeTimeblocks( void )
- *
- * store settings to file
+ * function:
+ *     int settings::writeTimeblocks( void )
+ * does:
+ *     write timeblocks to the settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::writeTimeblocks( void )
@@ -220,9 +233,12 @@ int settings::writeTimeblocks( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::readTimeblocks( void )
- *
- * read stored settings from file
+ * function:
+ *     int settings::readTimeblocks( void )
+ * does:
+ *     read timeblocks from settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::readTimeblocks( void )
@@ -283,9 +299,12 @@ int settings::readTimeblocks( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::writeGlobals( void )
- *
- * store settings to file
+ * function:
+ *     int settings::writeGlobals( void )
+ * does:
+ *     write all global settings to settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::writeGlobals( void )
@@ -326,9 +345,12 @@ int settings::writeGlobals( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::readGlobals( void )
- *
- * read stored settings from file
+ * function:
+ *     int settings::readGlobals( void )
+ * does:
+ *     read global settings from settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::readGlobals( void )
@@ -391,9 +413,12 @@ int settings::readGlobals( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::writeAdjustments( void )
- *
- * store settings to file
+ * function:
+ *     int settings::writeAdjustments( void )
+ * does:
+ *     write adjustments to settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::writeAdjustments( void )
@@ -405,22 +430,26 @@ int settings::writeAdjustments( void )
     {
         recCrc = 0;
         sprintf( settingsBuffer, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
-                 adjustments.sports1,
-                 adjustments.sports2,
+                 adjustments.sober,
+                 adjustments.sport1,
                  adjustments.stress,
-                 adjustments.ill,
-                 adjustments.female,
+                 adjustments.illness,
+                 adjustments.sport2,
+                 adjustments.menstruation,
+                 adjustments.other,
                  recCrc );
 
         // calc crc with crc field = 0
         recCrc = this->crc( settingsBuffer, strlen(settingsBuffer) );
 
         fprintf( settingsFile, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
-                 adjustments.sports1,
-                 adjustments.sports2,
+                 adjustments.sober,
+                 adjustments.sport1,
                  adjustments.stress,
-                 adjustments.ill,
-                 adjustments.female,
+                 adjustments.illness,
+                 adjustments.sport2,
+                 adjustments.menstruation,
+                 adjustments.other,
                  recCrc );
     }
 
@@ -428,9 +457,12 @@ int settings::writeAdjustments( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::readAdjustments( void )
- *
- * read stored settings from file
+ * function:
+ *     int settings::readAdjustments( void )
+ * does:
+ *     read adjustments from settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::readAdjustments( void )
@@ -447,21 +479,25 @@ int settings::readAdjustments( void )
             fgets(settingsBuffer, MAX_SETTINGS_RECLEN-1, settingsFile );
         //retVal = fscanf( settingsFile, ADJUSTMENTS_REC_FMT, &recId,
             retVal = sscanf( settingsBuffer, ADJUSTMENTS_REC_FMT, &recId,
-                    &adjustments.sports1,
-                    &adjustments.sports2,
+                    &adjustments.sober,
+                    &adjustments.sport1,
                     &adjustments.stress,
-                    &adjustments.ill,
-                    &adjustments.female,
+                    &adjustments.illness,
+                    &adjustments.sport2,
+                    &adjustments.menstruation,
+                    &adjustments.other,
                     &recCrc );
 
             if( retVal == ADJUSTMENTS_REC_ITEMS )
             {
-                sprintf( settingsBuffer, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
-                     adjustments.sports1,
-                     adjustments.sports2,
-                     adjustments.stress,
-                     adjustments.ill,
-                     adjustments.female,
+                sprintf(settingsBuffer, ADJUSTMENTS_REC_FMT, ADJUSTMENTS_REC_ID,
+                    adjustments.sober,
+                    adjustments.sport1,
+                    adjustments.stress,
+                    adjustments.illness,
+                    adjustments.sport2,
+                    adjustments.menstruation,
+                    adjustments.other,
                      (unsigned int) 0 );
     
                 // calc crc with crc field = 0
@@ -487,9 +523,12 @@ int settings::readAdjustments( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::writeDeviceId( void )
- *
- * store settings to file
+ * function:
+ *     int settings::writeDeviceId( void )
+ * does:
+ *     write the device id to settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::writeDeviceId( void )
@@ -546,9 +585,12 @@ int settings::writeDeviceId( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::readDeviceId( void )
- *
- * read stored settings from file
+ * function:
+ *     int settings::readDeviceId( void )
+ * does:
+ *     read the device is from settings file
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::readDeviceId( void )
@@ -626,9 +668,12 @@ int settings::readDeviceId( void )
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::end( void )
- *
- * store settings to file
+ * function:
+ *     int settings::end( void )
+ * does:
+ *     do final cleanup
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::end( void )
@@ -639,9 +684,12 @@ this->write();
 }
 
 /* ----------------------------------------------------------------------------
- * int settings::init( void )
- *
- * store settings to file
+ * function:
+ *     int settings::init( void )
+ * does:
+ *     perform initial setup
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::init( void )
@@ -651,12 +699,13 @@ this-read();
     return( retVal );
 }
 
-
-
 /* ----------------------------------------------------------------------------
- * int settings::write( void )
- *
- * store settings to file
+ * function:
+ *     int settings::write( void )
+ * does:
+ *     write the settings
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::write( void )
@@ -706,9 +755,12 @@ int settings::write( void )
  }
 
 /* ----------------------------------------------------------------------------
- * int settings::write( void )
- *
- * store settings to file
+ * function:
+ *     int settings::read( void )
+ * does:
+ *     read the settings
+ * returns:
+ *     E_SETTINGS_OK or an error code if failed
  ------------------------------------------------------------------------------
 */
 int settings::read( void )
@@ -751,12 +803,13 @@ fprintf(stderr, "read dev Id failed with code %d\n", retVal );
     return( retVal );
  }
 
-
-
 /* ----------------------------------------------------------------------------
- * void settings::dumpDeviceId( void )
- *
- * reset all settings to their defaults
+ * function:
+ *     void settings::dumpDeviceId( void )
+ * does:
+ *     print the device id
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::dumpDeviceId( void )
@@ -769,24 +822,32 @@ void settings::dumpDeviceId( void )
 }
 
 /* ----------------------------------------------------------------------------
- * void settings::dumpAdjustments( void )
- *
- * reset all settings to their defaults
+ * function:
+ *     void settings::dumpAdjustments( void )
+ * does:
+ *     print the adjustment values
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::dumpAdjustments( void )
 {
-    fprintf(stderr, "Adjustment sports 1: %d\n", adjustments.sports1);
-    fprintf(stderr, "Adjustment sports 2: %d\n", adjustments.sports2);
-    fprintf(stderr, "Adjustment stress .: %d\n", adjustments.stress);
-    fprintf(stderr, "Adjustment illness : %d\n", adjustments.ill);
-    fprintf(stderr, "Adjustment female .: %d\n", adjustments.female);
+    fprintf(stderr, "Adjustment nuechtern 1 .: %d\n", adjustments.sober );
+    fprintf(stderr, "Adjustment Sport 1 .....: %d\n", adjustments.sport1 );
+    fprintf(stderr, "Adjustment Stress ......: %d\n", adjustments.stress );
+    fprintf(stderr, "Adjustment Krankheit ...: %d\n", adjustments.illness );
+    fprintf(stderr, "Adjustment Sport 2 .....: %d\n", adjustments.sport2 );
+    fprintf(stderr, "Adjustment Menstruation : %d\n", adjustments.menstruation);
+    fprintf(stderr, "Adjustment Andere ,,,,,.: %d\n", adjustments.other );
 }
 
 /* ----------------------------------------------------------------------------
- * void settings::dumpGlobals( void )
- *
- * reset all settings to their defaults
+ * function:
+ *     void settings::dumpGlobals( void )
+ * does:
+ *     print the global values
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::dumpGlobals( void )
@@ -802,9 +863,12 @@ void settings::dumpGlobals( void )
 }
 
 /* ----------------------------------------------------------------------------
- * void settings::dumpTimeblocks( void )
- *
- * reset all settings to their defaults
+ * function:
+ *     void settings::dumpTimeblocks( void )
+ * does:
+ *     print the timeblocks
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::dumpTimeblocks( void )
@@ -822,9 +886,12 @@ void settings::dumpTimeblocks( void )
 }
 
 /* ----------------------------------------------------------------------------
- * void settings::dump( void )
- *
- * reset all settings to their defaults
+ * function:
+ *     void settings::dump( void )
+ * does:
+ *     show all settings
+ * returns:
+ *     nothing
  ------------------------------------------------------------------------------
 */
 void settings::dump( void )

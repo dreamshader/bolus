@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  bolus.h - class for re/store settings
+ *  bolus.h - class for bolus calculator
  *
  *  Copyright (C) 2018 Dreamshader (aka Dirk Schanz)
  *
@@ -58,18 +58,45 @@ using namespace std;
 #define E_BOLUS_NULL           -6
 #define E_BOLUS_TIMEBLK        -7
 
+#define E_UNKNOWN_ADJUSTMENT  -10
+#define E_UNKNOWN_IMPORT_TYPE -11
+#define E_UNKNOWN_EXPORT_TYPE -12
+#define E_UNKNOWN_QUERY_TYPE  -13
+
 
 #define BOLUS_NO_MODE           0
 #define BOLUS_IMPORT_MODE       1
 #define BOLUS_EXPORT_MODE       2
-#define BOLUS_INTERACTIVE_MODE  3
-#define BOLUS_LIST_MODE         4
-#define BOLUS_CALC_BREAD_MODE   5
-#define BOLUS_CALC_CARB_MODE    6
-#define BOLUS_EDIT_MODE         7
-#define BOLUS_QUERY_MODE        8
-#define BOLUS_CALIBRATE_MODE    9
-#define BOLUS_DUMP_MODE        10
+#define BOLUS_LIST_MODE         3
+#define BOLUS_CALC_BREAD_MODE   4
+#define BOLUS_CALC_CARB_MODE    5
+#define BOLUS_QUERY_MODE        6
+#define BOLUS_DUMP_MODE         7
+
+#define DATA_TIMEBLOCKS     'T'
+#define DATA_GLOBALS        'G'
+#define DATA_ADJUSTMENTS    'A'
+#define DATA_RECORDS        'R'
+#define DATA_DEVICE         'D'
+
+#define IMPORT_TIMEBLOCKS    DATA_TIMEBLOCKS
+#define IMPORT_GLOBALS       DATA_GLOBALS
+#define IMPORT_ADJUSTMENTS   DATA_ADJUSTMENTS
+#define IMPORT_RECORDS       DATA_RECORDS
+#define IMPORT_DEVICE        DATA_DEVICE
+
+#define EXPORT_TIMEBLOCKS    DATA_TIMEBLOCKS
+#define EXPORT_GLOBALS       DATA_GLOBALS
+#define EXPORT_ADJUSTMENTS   DATA_ADJUSTMENTS
+#define EXPORT_RECORDS       DATA_RECORDS
+#define EXPORT_DEVICE        DATA_DEVICE
+
+#define QUERY_TIMEBLOCKS     DATA_TIMEBLOCKS
+#define QUERY_GLOBALS        DATA_GLOBALS
+#define QUERY_ADJUSTMENTS    DATA_ADJUSTMENTS
+#define QUERY_RECORDS        DATA_RECORDS
+#define QUERY_DEVICE         DATA_DEVICE
+#define QUERY_GLUCOSE_STATUS 's'
 
 #define SECONDS_A_MINUTE       60
 #define SECONDS_A_HOUR         (60 * SECONDS_A_MINUTE)
@@ -77,49 +104,11 @@ using namespace std;
 
 #define BOLUS_FACTOR_CARB2BREAD 12
 
-#define BOLUS_EDIT_CMD_AA       'a'
-#define BOLUS_EDIT_CMD_BB       'b'
-#define BOLUS_EDIT_CMD_ENDEDIT  'x'
-#define BOLUS_EDIT_CMD_WRITE    'w'
-#define BOLUS_EDIT_CMD_READ     'r'
-#define BOLUS_EDIT_CMD_REJECT   'c'
-#define BOLUS_EDIT_CMD_INVAL    '!'
-#define BOLUS_EDIT_CMD_HELP     '?'
-
-#define BOLUS_INTERACT_NONE     '\0'
-#define BOLUS_INTERACT_SKIP     's'
-#define BOLUS_INTERACT_BACK     'b'
-#define BOLUS_INTERACT_REJECT   'c'
-#define BOLUS_INTERACT_INVAL    '!'
-#define BOLUS_INTERACT_HELP     '?'
-#define BOLUS_INTERACT_YES_DE   'j'
-#define BOLUS_INTERACT_NO       'n'
-#define BOLUS_INTERACT_YES_EN   'y'
-
-#define BOLUS_INTERACT_U_YES_DE 'J'
-#define BOLUS_INTERACT_U_NO     'N'
-#define BOLUS_INTERACT_U_YES_EN 'Y'
-
-#define BOLUS_FIELD_TIMESTAMP   0
-#define BOLUS_FIELD_RECNUM      1
-#define BOLUS_FIELD_GLUCOSE     2
-#define BOLUS_FIELD_MEAL        3
-#define BOLUS_FIELD_CARBON      4
-#define BOLUS_FIELD_ADJUST      5
-#define BOLUS_FIELD_UNITS       6
-#define BOLUS_FIELD_BASALUNITS  7
-#define BOLUS_FIELD_TYPE        8
-#define BOLUS_FIELD_ACTUNITS    9
-#define BOLUS_FIELD_ACTBASUNITS 10
-#define BOLUS_FIELD_ASK_YESNO   11
-
-#define BOLUS_COMMAND_BUFSIZE 128
-#define BOLUS_DIALOG_BUFSIZE  128
-
 #endif // IS_FRONTEND
 
 struct _bolus_param {
     bool fail;
+    int offset;
     int  glucose;
     int  carb;
     double  bread;
@@ -128,28 +117,21 @@ struct _bolus_param {
     char adjustType;
     int adjust;
     bool last;
-    char editType;
+    char exportType;
     char *exportFile;
+    char importType;
     char *importFile;
-    bool interactive;
     bool noStore;
-    int offset;
     bool query;
+    char queryType;
     int timeBlockNumber;
     bool timeBlockCount;
-    bool calibrate;
-    int freestyleValue;
-    int acucheckValue;
-    bool qFactors;
-    bool qGlobals;
-    bool qBlocks;
-    bool device;
     char importDelimiter;
     bool import1stLineXtraData;
     bool debugMode;
     int verboseLevel;
-    int dataRecord;
     char *dataFile;
+    int dataRecord;
 };
 
 #ifndef IS_FRONTEND // set by the GUI source

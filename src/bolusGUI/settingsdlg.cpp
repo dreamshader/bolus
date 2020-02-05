@@ -6,12 +6,9 @@ settingsDlg::settingsDlg(QWidget *parent) :
     ui(new Ui::settingsDlg)
 {
     pSettingsBolus = nullptr;
-    pTimeDate = nullptr;
     pDeviceSettings = nullptr;
 
     pParent = parent;
-
-
     ui->setupUi(this);
 }
 
@@ -30,13 +27,6 @@ void settingsDlg::on_btnBolus_clicked()
         pSettingsBolus->exec();
         pSettingsBolus = nullptr;
     }
-#ifdef NEVERDEF
-    else
-    {
-        pSettingsBolus->done(0);
-        pSettingsBolus = nullptr;
-    }
-#endif //NEVERDEF
 }
 
 void settingsDlg::on_btnDevice_clicked()
@@ -51,14 +41,3 @@ void settingsDlg::on_btnDevice_clicked()
     }
 }
 
-void settingsDlg::on_btnDateTime_clicked()
-{
-    if( pTimeDate == nullptr )
-    {
-        pTimeDate = new dlgTimeDate(pParent);
-        pTimeDate->show();
-
-        pTimeDate->exec();
-        pTimeDate = nullptr;
-    }
-}

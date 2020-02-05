@@ -55,19 +55,6 @@
     <string>Gerät</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnDateTime">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>150</y>
-     <width>261</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Datum/Uhrzeit</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections>

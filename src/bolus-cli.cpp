@@ -41,33 +41,59 @@
 --meal <Essenszeit>       (oder -m <Essenszeit>)
 --type <Messgerät>       (oder -t <Messgerät>)
 --last (oder -l)
---edit (oder -e)
 --offset <Wert> (oder -o <Wert>)
---timeblock <# oder Nummer> (oder -T <# oder Nummer>)
 
---calibrate (oder -C)
---acucheck <Messwert> (oder -A <Messwert>)
---freestyle <Messwert> (oder -F <Messwert>)
+--adjustType <wert> (oder -a <wert>)
+#define DATA_MEAL_BEFORE           'b'
+#define DATA_MEAL_U_BEFORE         'B'
+#define DATA_MEAL_AFTER            'a'
+#define DATA_MEAL_U_AFTER          'A'
+#define DATA_MEAL_NONE             'n'
+#define DATA_MEAL_U_NONE           'N'
+#define DATA_MEAL_SLEEPTIME        's'
+#define DATA_MEAL_U_SLEEPTIME      'S'
+#define DATA_MEAL_EXTRA            'x'
+#define DATA_MEAL_U_EXTRA          'X'
 
---interactive (oder -i  no func
---nostore (oder -n)
---help (oder -h)
+--export <Dateiname> (oder -E <Dateiname>)
+--exporttype <type> (oder -e <type> )
+#define DATA_TIMEBLOCKS     'T'
+#define DATA_GLOBALS        'G'
+#define DATA_ADJUSTMENTS    'A'
+#define DATA_RECORDS        'R'
+#define DATA_DEVICE         'D'
 
---export <Dateiname> (oder -X <Dateiname>)
 --import <Dateiname> (oder -I <Dateiname>)
---query (oder -q)
---globals (oder -G)
---factors (oder -f)
---blocks (oder -B)
---device (oder -D)
+--importtype <type> (oder -i <type>)
+#define DATA_TIMEBLOCKS     'T'
+#define DATA_GLOBALS        'G'
+#define DATA_ADJUSTMENTS    'A'
+#define DATA_RECORDS        'R'
+#define DATA_DEVICE         'D'
+
+
+
+--query <type> (oder -q <type> )
+type is
+#define DATA_TIMEBLOCKS     'T'
+#define DATA_GLOBALS        'G'
+#define DATA_ADJUSTMENTS    'A'
+#define DATA_RECORDS        'R'
+#define DATA_DEVICE         'D'
+#define QUERY_GLUCOSE_STATUS 'g'
+
+--timeblock <# oder Nummer> (oder -T <# oder Nummer>)
+--recordfile <filename> (oder -R <filename> )
+--record <Recordnummer> (oder -r <Recordnummer> )
 
 --xtra (oder -x)
 --delim <Begrenzer> (oder -d <Begrenzer>)
 
---debug (oder -V)
+--nostore (oder -n)
+--help (oder -h)
+--debug (oder -D)
 --verbose <Level> (oder -v <Level>)
 
---record <Recordnummer> (oder -R <Recordnummer> )
 
 
  *
@@ -93,78 +119,79 @@
 
 #include "bolus.h"
 
-/* ---------------------------------------------------------------------------------
- | void help( struct serial_param_t *ctl_param, short failed )
- |
- | show options. If failed, print an error message, too
- -----------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void help( void )
+ * does:
+ *     display a help screen
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
 */
-
 void help( void )
 {
     fprintf(stderr, "HELP!\n");
     exit(0);
 }
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void dumpArgs( struct _bolus_param *pParam )
+ * does:
+ *     display options given in pointer
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void dumpArgs( struct _bolus_param *pParam )
 {
     if( pParam != NULL )
     {
         fprintf(stderr, "fail ...............: %s\n", 
                 pParam->fail == true ? "true" : "false" );
+        fprintf(stderr, "offset .............: %d\n", pParam->offset );
         fprintf(stderr, "glucose ............: %d\n", pParam->glucose );
         fprintf(stderr, "carb ...............: %d\n", pParam->carb );
         fprintf(stderr, "bread ..............: %.2f\n", pParam->bread );
-        fprintf(stderr, "meal ...............: %c\n", pParam->mealType );
-        fprintf(stderr, "measure ............: %c\n", pParam->measType );
+        fprintf(stderr, "mealType ...........: %c\n", pParam->mealType );
+        fprintf(stderr, "measureType ........: %c\n", pParam->measType );
         fprintf(stderr, "adjustType .........: %c\n", pParam->adjustType );
         fprintf(stderr, "adjust .............: %d\n", pParam->adjust );
         fprintf(stderr, "last ...............: %s\n", 
                 pParam->last == true ? "true" : "false" );
-        fprintf(stderr, "edit ...............: %c\n", pParam->editType );
-        fprintf(stderr, "export .............: %s\n", pParam->exportFile );
-        fprintf(stderr, "import .............: %s\n", pParam->importFile );
-        fprintf(stderr, "interact ...........: %s\n", 
-                pParam->interactive == true ? "true" : "false" );
+        fprintf(stderr, "exportType .........: %c\n", pParam->exportType );
+        fprintf(stderr, "exportFile .........: %s\n", pParam->exportFile );
+        fprintf(stderr, "importType .........: %c\n", pParam->importType );
+        fprintf(stderr, "importFile .........: %s\n", pParam->importFile );
         fprintf(stderr, "nostore ............: %s\n", 
                 pParam->noStore == true ? "true" : "false" );
-        fprintf(stderr, "offset .............: %d\n", pParam->offset );
-
         fprintf(stderr, "query only .........: %s\n", 
                 pParam->query == true ? "true" : "false" );
+        fprintf(stderr, "queryType ..-.......: %c\n", pParam->queryType );
+        fprintf(stderr, "tmblk ..............: %d\n", pParam->timeBlockNumber);
         fprintf(stderr, "timeblock count ....: %s\n", 
                 pParam->timeBlockCount == true ? "true" : "false" );
-        fprintf(stderr, "tmblk ..............: %d\n", pParam->timeBlockNumber);
-
-        fprintf(stderr, "calibrate ..........: %s\n", 
-                pParam->calibrate == true ? "true" : "false" );
-        fprintf(stderr, "acucheck ...........: %d\n", pParam->acucheckValue );
-        fprintf(stderr, "freestyle ..........: %d\n", pParam->freestyleValue );
-
-        fprintf(stderr, "query factors ......: %s\n", 
-                pParam->qFactors == true ? "true" : "false" );
-        fprintf(stderr, "query globals ......: %s\n", 
-                pParam->qGlobals == true ? "true" : "false" );
-        fprintf(stderr, "blocks flag ........: %s\n", 
-                pParam->qBlocks == true ? "true" : "false" );
-        fprintf(stderr, "device flag ........: %s\n", 
-                pParam->device == true ? "true" : "false" );
-
         fprintf(stderr, "delimiter ..........: %c\n", pParam->importDelimiter );
         fprintf(stderr, "1st line extra data : %s\n", 
                 pParam->import1stLineXtraData == true ? "true" : "false" );
-
         fprintf(stderr, "debug mode .........: %s\n", 
                 pParam->debugMode == true ? "true" : "false" );
         fprintf(stderr, "verbose level ......: %d\n", pParam->verboseLevel );
-
-        fprintf(stderr, "dump record ........: %d\n", pParam->dataRecord );
-
         fprintf(stderr, "datafile ...........: %s\n", pParam->dataFile );
+        fprintf(stderr, "dump record ........: %d\n", pParam->dataRecord );
     }
 }
 
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void resetArgs( struct _bolus_param *pParam )
+ * does:
+ *     set param pointed by pParm to their defaults
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
 void resetArgs( struct _bolus_param *pParam )
 {
     if( pParam != NULL )
@@ -175,26 +202,20 @@ void resetArgs( struct _bolus_param *pParam )
         pParam->carb        = 0;
         pParam->bread       = 0.0;
         pParam->mealType    = DATA_MEAL_NONE;
-        pParam->measType    = '\0';
-        pParam->adjustType  = '\0';
+        pParam->measType    = DATA_NOTHING;
+        pParam->adjustType  = '-';
         pParam->adjust      = 0;
         pParam->last        = false;
-        pParam->editType    = '\0';
+        pParam->exportType    = DATA_NOTHING;
         pParam->exportFile  = NULL;
+        pParam->importType    = DATA_NOTHING;
         pParam->importFile  = NULL;
-        pParam->interactive = false;
         pParam->noStore = false;
         pParam->query = false;
+        pParam->queryType = DATA_NOTHING;
         pParam->timeBlockNumber = -1;
         pParam->timeBlockCount = false;
-        pParam->calibrate = false;
-        pParam->acucheckValue = -1;
-        pParam->freestyleValue = -1;
-        pParam->qFactors = false;
-        pParam->qGlobals = false;
-        pParam->qBlocks = false;
-        pParam->device = false;
-        pParam->importDelimiter = ';';
+        pParam->importDelimiter = DATA_DEFAULT_DELIMITER;
         pParam->import1stLineXtraData = false;
         pParam->debugMode = false;
         pParam->verboseLevel = 0;
@@ -204,65 +225,51 @@ void resetArgs( struct _bolus_param *pParam )
     }
 }
 
-/* ---------------------------------------------------------------------------------
- | void get_arguments ( int argc, char **argv, struct serial_param_t *ctl_param, 
- |                      short *myst)
- |
- | scan commandline for arguments an set the corresponding value
- | myst is a short pointer to a secret flag
- -----------------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
+ * does:
+ *     scan command line arguments an set corresponding parameters pointed
+ *     by pParam
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
 */
-
 void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
 {
 
-    int failed = 0;
+    int fail = 0;
     int next_option;
     /* valid short options letters */
-    const char* const short_options = "a:g:c:b:m:t:le:X:I:o:T:F:A:d:v:R:r:VxDBGfCinhq?";
+    const char* const short_options = "g:c:b:m:t:lo:E:e:I:i:q:T:R:r:a:xd:nhDv:";
 
     if( pParam != NULL )
     {
-
         /* valid long options */
         const struct option long_options[] = {
-             { "adjustType",  1, NULL, 'a' },
              { "glucose",     1, NULL, 'g' },
              { "carb",        1, NULL, 'c' },
              { "bread",       1, NULL, 'b' },
              { "meal",        1, NULL, 'm' },
              { "type",        1, NULL, 't' },
+             { "adjustType",  1, NULL, 'a' },
              { "last",        0, NULL, 'l' },
-             { "edit",        1, NULL, 'e' },
-             { "export",      1, NULL, 'X' },
-             { "import",      1, NULL, 'I' },
              { "offset",      1, NULL, 'o' },
+             { "export",      1, NULL, 'E' },
+             { "exporttype",  1, NULL, 'e' },
+             { "import",      1, NULL, 'I' },
+             { "importtype",  1, NULL, 'i' },
+             { "query",       1, NULL, 'q' },
              { "timeblock",   1, NULL, 'T' },
-
-             { "calibrate",   1, NULL, 'C' },
-             { "acucheck",    1, NULL, 'A' },
-             { "freestyle",   1, NULL, 'F' },
-
-             { "interactive", 0, NULL, 'i' },
-             { "nostore",     0, NULL, 'n' },
-             { "help",        0, NULL, 'h' },
-             { "query",       0, NULL, 'q' },
-
-             { "globals",     0, NULL, 'G' },
-             { "factors",     0, NULL, 'f' },
-             { "blocks",      0, NULL, 'B' },
-             { "device",      0, NULL, 'D' },
-
+             { "recordfile",  1, NULL, 'R' },
+             { "record",      1, NULL, 'r' },
              { "xtra",        0, NULL, 'x' },
              { "delim",       1, NULL, 'd' },
-
-             { "debug",       0, NULL, 'V' },
+             { "nostore",     0, NULL, 'n' },
+             { "help",        0, NULL, 'h' },
+             { "debug",       0, NULL, 'D' },
              { "verbose",     1, NULL, 'v' },
-
-             { "datafile",    1, NULL, 'R' },
-             { "record",      1, NULL, 'r' },
-
-            { NULL,           0, NULL,  0  }
+             { NULL,          0, NULL,  0  }
         };
     
         resetArgs( pParam );
@@ -284,85 +291,60 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                     break;
                 case 'm':
                     pParam->mealType = optarg[0];
-                    // -m b --meal=b(efore)
-                    // -m B --meal=B(efore)
-                    // -m a --meal=a(fter)
-                    // -m A --meal=A(fter)
-                    // -m n --meal=n(one)
-                    // -m N --meal=N(one)
-                    // -m s --meal=s(leeptime)
-                    // -m s --meal=s(leeptime)
-                    // -m x --meal=x(tra)
-                    // -m S --meal=X(tra)
                     break;
                 case 't':
                     pParam->measType = optarg[0];
-                    // -t a --type=(a)cucheck
-                    // -t f --type=(f)reestyle
                     break;
                 case 'a':
-                    switch( pParam->adjustType = optarg[0] )
+                    switch( optarg[0] )
                     {
-                        case '1':
-                            pParam->adjust = ADJUST_SPORTS_1;
-                            break;
-                        case '2':
-                            pParam->adjust = ADJUST_SPORTS_2;
-                            break;
-                        case 's':
-                        case 'S':
-                            pParam->adjust = ADJUST_STRESS;
-                            break;
-                        case 'i':
-                        case 'I':
-                            pParam->adjust = ADJUST_ILL;
-                            break;
-                        case 'f':
-                        case 'F':
-                            pParam->adjust = ADJUST_FEMALE;
+                        case DATA_ADJUST_NO_ENTRY:
+                        case DATA_ADJUST_SOBER:
+                        case DATA_ADJUST_U_SOBER:
+                        case DATA_ADJUST_SPORT1:
+                        case DATA_ADJUST_STRESS:
+                        case DATA_ADJUST_U_STRESS:
+                        case DATA_ADJUST_ILLNESS:
+                        case DATA_ADJUST_U_ILLNESS:
+                        case DATA_ADJUST_SPORT2:
+                        case DATA_ADJUST_MENSTRUATION:
+                        case DATA_ADJUST_U_MENSTRUATION:
+                        case DATA_ADJUST_OTHER:
+                        case DATA_ADJUST_U_OTHER:
+                            pParam->adjustType = optarg[0];
                             break;
                         default:
-                            pParam->adjust = 0;
+                            fail = E_UNKNOWN_ADJUSTMENT;
+                            fprintf(stderr, "Unknown adjustment %c!\n", optarg[0] );
                             break;
-// gParam.adjustType = '-';
-// gParam.adjustType = 'n';
-// gParam.adjustType = '1';
-// gParam.adjustType = 's';
-// gParam.adjustType = 'i';
-// gParam.adjustType = '2';
-// gParam.adjustType = 'f';
-// gParam.adjustType = 'o';
-// ("Kein Eintrag");
-// ("Nüchtern");
-// ("Sport 1");
-// ("Stress");
-// ("Krankheit");
-// ("Sport 2");
-// ("Menstruation");
-// ("Andere");
-
                     }
                     break;
                 case 'l':
                     pParam->last = true;
                     break;
-                case 'e':
-                    switch( optarg[0] )
-                    {
-                        case DATA_EDIT_TYPE_TIMEBLOCKS:
-                        case DATA_EDIT_TYPE_GLOBALS:
-                        case DATA_EDIT_TYPE_ADJUSTMENTS:
-                            pParam->editType = optarg[0];
-                            break;
-                        default:
-                            pParam->editType = DATA_EDIT_TYPE_NO_TYPE;
-                            break;
-                    }
+                case 'o':
+                    pParam->offset = atoi(optarg);
                     break;
-                case 'X':
+                case 'E':
                     if( strlen( optarg ) )
                     {
                         pParam->exportFile = strdup(optarg);
+                    }
+                    break;
+                case 'e':
+                    switch( optarg[0] )
+                    {
+                        case EXPORT_TIMEBLOCKS:
+                        case EXPORT_GLOBALS:
+                        case EXPORT_ADJUSTMENTS:
+                        case EXPORT_RECORDS:
+                        case EXPORT_DEVICE:
+                            pParam->exportType = optarg[0];
+                            break;
+                        default:
+                            fail = E_UNKNOWN_EXPORT_TYPE;
+                            fprintf(stderr, "Unknown export %c!\n", optarg[0] );
+                            break;
                     }
                     break;
                 case 'I':
@@ -371,8 +353,39 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                         pParam->importFile = strdup(optarg);
                     }
                     break;
-                case 'o':
-                    pParam->offset = atoi(optarg);
+                case 'i':
+                    switch( optarg[0] )
+                    {
+                        case IMPORT_TIMEBLOCKS:
+                        case IMPORT_GLOBALS:
+                        case IMPORT_ADJUSTMENTS:
+                        case IMPORT_RECORDS:
+                        case IMPORT_DEVICE:
+                            pParam->importType = optarg[0];
+                            break;
+                        default:
+                            fail = E_UNKNOWN_IMPORT_TYPE;
+                            fprintf(stderr, "Unknown import %c!\n", optarg[0] );
+                            break;
+                    }
+                    break;
+                case 'q':
+                    switch( optarg[0] )
+                    {
+                        case QUERY_TIMEBLOCKS:
+                        case QUERY_GLOBALS:
+                        case QUERY_ADJUSTMENTS:
+                        case QUERY_RECORDS:
+                        case QUERY_DEVICE:
+                        case QUERY_GLUCOSE_STATUS:
+                            pParam->query = true;
+                            pParam->queryType = optarg[0];
+                            break;
+                        default:
+                            fail = E_UNKNOWN_QUERY_TYPE;
+                            fprintf(stderr, "Unknown query %c!\n", optarg[0] );
+                            break;
+                    }
                     break;
                 case 'T':
                     if( optarg[0] == '#' )
@@ -386,77 +399,55 @@ void get_arguments ( int argc, char **argv, struct _bolus_param *pParam )
                         pParam->timeBlockNumber = atoi(optarg);
                     }
                     break;
-                case 'i':
-                    pParam->interactive = true;
-                    break;
-                case 'n':
-                    pParam->noStore = true;
-                    break;
-                case '?':
-                    help();
-                    break;
-                case 'q':
-                    pParam->query = true;
-                    break;
-
-                case 'C':
-                    pParam->calibrate = true;
-                    break;
-                case 'A':
-                    pParam->acucheckValue = atoi(optarg);
-                    break;
-                case 'F':
-                    pParam->freestyleValue = atoi(optarg);
-                    break;
-
-                case 'f':
-                    pParam->qFactors = true;
-                    break;
-                case 'G':
-                    pParam->qGlobals = true;
-                    break;
-                case 'B':
-                    pParam->qBlocks = true;
-                    break;
-                case 'D':
-                    pParam->device = true;
-                    break;
-
-                case 'd':
-                    pParam->importDelimiter = optarg[0];
-                    break;
-                case 'x':
-                    pParam->import1stLineXtraData = true;
-                    break;
-                case 'V':
-                    pParam->debugMode = true;
-                    break;
-                case 'v':
-                    pParam->verboseLevel = atoi(optarg);
-                    break;
-
-                case 'r':
-                    pParam->dataRecord = atoi(optarg);
-                    break;
                 case 'R':
                     if( strlen( optarg ) )
                     {
                         pParam->dataFile = strdup(optarg);
                     }
                     break;
-
+                case 'r':
+                    pParam->dataRecord = atoi(optarg);
+                    break;
+                case 'x':
+                    pParam->import1stLineXtraData = true;
+                    break;
+                case 'd':
+                    pParam->importDelimiter = optarg[0];
+                    break;
+                case 'n':
+                    pParam->noStore = true;
+                    break;
+                case 'h':
+                    help();
+                    break;
+                case 'D':
+                    pParam->debugMode = true;
+                    break;
+                case 'v':
+                    pParam->verboseLevel = atoi(optarg);
+                    break;
                 case -1:
                     break;
                 default:
                     fprintf(stderr, "Invalid option %c! \n", next_option);
                     help();
             }
-        } while (next_option != -1);
+        } while( !fail && next_option != -1);
     }
 
 }
 
 
+/* ----------------------------------------------------------------------------
+ * function:
+ *     int main( int argc, char *argv[] )
+ * does:
+ *     main function of the CLI
+ * returns:
+ *     an error code if an error occured, otherwise, depending on the
+ *     executed function, 0 or an appropriate value
+ ------------------------------------------------------------------------------
+*/
 int main( int argc, char *argv[] )
 {
     int retVal = 0;
@@ -504,64 +495,6 @@ QStringList list2 = str.split(',', QString::SkipEmptyParts);
 
 #include <QList>
 #include <QStringList>
-#include <QDir>
-#include <QDebug>
-
-#include "qtcsv/stringdata.h"
-#include "qtcsv/reader.h"
-#include "qtcsv/writer.h"
-
-int main()
-{
-    // prepare data that you want to save to csv-file
-    QStringList strList;
-    strList << "one" << "two" << "three";
-
-    QtCSV::StringData strData;
-    strData.addRow(strList);
-    strData.addEmptyRow();
-    strData << strList << "this is the last row";
-
-    // write to file
-    QString filePath = QDir::currentPath() + "/test.csv";
-    QtCSV::Writer::write(filePath, strData);
-
-    // read data from file
-    QList<QStringList> readData = QtCSV::Reader::readToList(filePath);
-    for ( int i = 0; i < readData.size(); ++i )
-    {
-        qDebug() << readData.at(i).join(",");
-    }
-
-    return 0;
-}
-
-
-
-
-
-// -m b --meal=b(efore)
-// -m B --meal=B(efore)
-// -m a --meal=a(fter)
-// -m A --meal=A(fter)
-// -m n --meal=n(one)
-// -m N --meal=N(one)
-// -m s --meal=s(leeptime)
-// -m s --meal=s(leeptime)
-// -m x --meal=x(tra)
-// -m S --meal=X(tra)
-
-// -t a --type=(a)cucheck
-// -t f --type=(f)reestyle
-
-// -a 1  sport 1
-// -a 2  sport 2
-// -a s  stress
-// -a S  stress
-// -a i  krank
-// -a I  krank
-// -a f   mens
-// -a F   mens
 
 
 #endif // NODEF

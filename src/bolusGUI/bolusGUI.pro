@@ -36,7 +36,6 @@ SOURCES += \
     dlghealthoptions.cpp \
     dlgrecommendationoptions.cpp \
     dlgdevicesettings.cpp \
-    dlgtimedate.cpp \
     dlgtimeblockedit.cpp \
     dlgshowdata.cpp \
     dlgconfirmbolus.cpp
@@ -53,7 +52,6 @@ HEADERS += \
     dlghealthoptions.h \
     dlgrecommendationoptions.h \
     dlgdevicesettings.h \
-    dlgtimedate.h \
     dlgtimeblockedit.h \
     dlgshowdata.h \
     dlgconfirmbolus.h
@@ -69,7 +67,6 @@ FORMS += \
     dlghealthoptions.ui \
     dlgrecommendationoptions.ui \
     dlgdevicesettings.ui \
-    dlgtimedate.ui \
     dlgtimeblockedit.ui \
     dlgshowdata.ui \
     dlgconfirmbolus.ui

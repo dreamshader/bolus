@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include "dlgsettingsbolus.h"
-#include "dlgtimedate.h"
 #include "dlgdevicesettings.h"
 
 
@@ -19,15 +18,12 @@ public:
     explicit settingsDlg(QWidget *parent = nullptr);
     ~settingsDlg();
     dlgSettingsBolus *pSettingsBolus;
-    dlgTimeDate *pTimeDate;
     dlgDeviceSettings *pDeviceSettings;
 
 private slots:
     void on_btnBolus_clicked();
 
     void on_btnDevice_clicked();
-
-    void on_btnDateTime_clicked();
 
 private:
     Ui::settingsDlg *ui;

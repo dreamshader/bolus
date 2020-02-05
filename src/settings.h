@@ -1,7 +1,7 @@
 /*
  ***********************************************************************
  *
- *  settings.h - class for re/store settings
+ *  settings.h - class definition
  *
  *  Copyright (C) 2018 Dreamshader (aka Dirk Schanz)
  *
@@ -53,9 +53,9 @@ using namespace std;
 #define TIME_BLOCK_REC_LEN     24
 #define TIME_BLOCK_REC_ITEMS    8
 
-#define ADJUSTMENTS_REC_FMT     "%c:%d:%d:%d:%d:%d:%u\n"
+#define ADJUSTMENTS_REC_FMT     "%c:%d:%d:%d:%d:%d:%d:%d:%u\n"
 #define ADJUSTMENTS_REC_ID      'a'
-#define ADJUSTMENTS_REC_ITEMS   7
+#define ADJUSTMENTS_REC_ITEMS   9
 
 #define GLOBALS_REC_FMT         "%c:%u:%d:%d:%d:%d:%d:%d:%d:%u\n"
 #define GLOBALS_REC_ID          'g'
@@ -97,6 +97,15 @@ using namespace std;
 #define TMBLCK4_U210BE         14
 #define TMBLCK4_SENSITIVITY    75
 //
+#define DEFAULT_ADJUST_NO_ENTRY      0
+#define DEFAULT_ADJUST_SOBER         0
+#define DEFAULT_ADJUST_SPORT1       -10
+#define DEFAULT_ADJUST_STRESS        25
+#define DEFAULT_ADJUST_ILLNESS       10
+#define DEFAULT_ADJUST_SPORT2       -30
+#define DEFAULT_ADJUST_MENSTRUATION  0
+#define DEFAULT_ADJUST_OTHER         0
+//
 #define MAJOR_VERSION           0
 #define MINOR_VERSION           0
 #define PATCHLEVEL              0
@@ -108,13 +117,6 @@ using namespace std;
 #define DELAY_TIME             90
 #define BASAL_ACT_TIME       1380
 #define BASAL_DELAY_TIME       30
-//
-#define ADJUST_SPORTS_1       -10
-#define ADJUST_SPORTS_2       -30
-#define ADJUST_STRESS          25
-#define ADJUST_ILL             10
-#define ADJUST_FEMALE           0
-
 
 #define E_SETTINGS_OK           0
 #define E_SETTINGS_ENV         -1
@@ -140,11 +142,13 @@ struct _timeblk {
 };
 
 struct _adjust {
-    int sports1;
-    int sports2;
+    int sober;
+    int sport1;
     int stress;
-    int ill;
-    int female;
+    int illness;
+    int sport2;
+    int menstruation;
+    int other;
 };
 
 

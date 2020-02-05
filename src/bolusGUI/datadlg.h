@@ -20,6 +20,16 @@ public:
 private slots:
     void on_btnDataEdit_clicked();
 
+    void on_btnDataExport_clicked();
+
+    void on_btnDataImport_clicked();
+
+    void on_btnDataAnalyze_clicked();
+
+    void on_btnSettingsExport_clicked();
+
+    void on_btnSettingsImport_clicked();
+
 private:
     Ui::dataDlg *ui;
     QWidget *pParent;

@@ -69,7 +69,6 @@ void dlgShowData::displayDataRecord()
         }
         fclose(sysFP);
     }
-
 }
 
 

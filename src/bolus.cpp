@@ -386,7 +386,8 @@ int bolus::runDumpData( void )
                     if( ( retVal = pData->readRecord(callerArgs.dataRecord, 
                           &dumpData )) == E_DATAFILE_OK )
                     {
-                        fprintf(stdout, "%04d:%c:%04d:%04d:%04d:%04d\n",
+                        fprintf(stdout, "%lu:%04d:%c:%04d:%04d:%04d:%04d\n",
+                            dumpData.timestamp,
                             dumpData.glucose,
                             dumpData.meal == '\0' ? 'n' : dumpData.meal,
                             dumpData.carboHydrate,
@@ -508,7 +509,12 @@ fprintf( stderr, "query glucose status for %d.\n", callerArgs.glucose);
                         }
                     }
                 }
-        
+
+                if( tmblk4now < 0 )
+                {
+                    tmblk4now = MAX_TIME_BLOCKS-1;
+                }
+
                 if( tmblk4now >= 0 )
                 {
                     if( callerArgs.glucose >= 
@@ -579,7 +585,7 @@ fprintf( stderr, "query adjustment settings.\n" );
             break;
         case QUERY_RECORDS:
 fprintf( stderr, "query data records.\n" );
-                retVal = 0;
+                retVal = runDumpData();
             break;
         case QUERY_DEVICE:
 fprintf( stderr, "query device settings.\n" );
@@ -610,7 +616,116 @@ int bolus::runImport( void )
 
     if( callerArgs.importFile != NULL )
     {
+        struct _globals newGlobals;
+        struct _adjust  newAdjustments;
+        FILE *csvFile;
+        int csvFields;
 
+#define IMPORT_GLOBALS_NUM_CSV_FIELDS    7
+#define IMPORT_ADJUSTMENTS_NUM_CSV_FIELDS    7
+
+        switch( callerArgs.importType )
+        {
+            case IMPORT_TIMEBLOCKS:
+                break;
+            case IMPORT_GLOBALS:
+                if( pSettings !=  NULL )
+                {
+                    if( (csvFile = 
+                         fopen(callerArgs.importFile, "r")) != (FILE*) NULL )
+                    {
+                        csvFields = fscanf(csvFile, "%d;%d;%d;%d;%d;%d;%d",
+                                           &newGlobals.timeBlocksActive,
+                                           &newGlobals.increaseLevel,
+                                           &newGlobals.snacksize10BE,
+                                           &newGlobals.actTime,
+                                           &newGlobals.delayTime,
+                                           &newGlobals.basalActTime,
+                                           &newGlobals.basalDelayTime );
+
+                        if( csvFields == IMPORT_GLOBALS_NUM_CSV_FIELDS )
+                        {
+                            if( (retVal=pSettings->backup()) == E_SETTINGS_OK )
+                            {
+                                if( (retVal = pSettings->setNewGlobals(
+                                     &newGlobals)) == E_SETTINGS_OK )
+                                {
+                                    retVal = pSettings->write();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            retVal = E_BOLUS_IMPORT_FIELDS;
+                        }
+                        fclose(csvFile);
+                    }
+                    else
+                    {
+                        retVal = E_BOLUS_IMPORT_OPEN;
+                    }
+                }
+                else
+                {
+                    retVal = E_BOLUS_SETTINGS;
+                }
+fprintf(stderr, "IMPORT ends with retVal of %d!\n", retVal);
+                break;
+            case IMPORT_ADJUSTMENTS:
+                if( pSettings !=  NULL )
+                {
+                    if( (csvFile = 
+                         fopen(callerArgs.importFile, "r")) != (FILE*) NULL )
+                    {
+                        csvFields = fscanf(csvFile, "%d;%d;%d;%d;%d;%d;%d",
+                                           &newAdjustments.sober,
+                                           &newAdjustments.sport1,
+                                           &newAdjustments.stress,
+                                           &newAdjustments.illness,
+                                           &newAdjustments.sport2,
+                                           &newAdjustments.menstruation,
+                                           &newAdjustments.other );
+
+                        if( csvFields == IMPORT_ADJUSTMENTS_NUM_CSV_FIELDS )
+                        {
+                            if( (retVal=pSettings->backup()) == E_SETTINGS_OK )
+                            {
+                                if( (retVal = pSettings->setNewAdjustments( 
+                                     &newAdjustments )) == E_SETTINGS_OK )
+                                {
+                                    retVal = pSettings->write();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            retVal = E_BOLUS_IMPORT_FIELDS;
+                        }
+                        fclose(csvFile);
+                    }
+                    else
+                    {
+                        retVal = E_BOLUS_IMPORT_OPEN;
+                    }
+                }
+                else
+                {
+                    retVal = E_BOLUS_SETTINGS;
+                }
+fprintf(stderr, "IMPORT ends with retVal of %d!\n", retVal);
+                break;
+            // both obsolete
+            case IMPORT_RECORDS:
+            case IMPORT_DEVICE:
+                break;
+            default:
+                retVal = E_UNKNOWN_IMPORT_TYPE;
+                break;
+        }
+    }
+    else
+    {
+        retVal = E_BOLUS_NULL;
     }
 
     return( retVal );
@@ -897,6 +1012,12 @@ int bolus::runCalcBread( void )
                 }
             }
         }
+
+        if( tmblk4now < 0 )
+        {
+            tmblk4now = MAX_TIME_BLOCKS-1;
+        }
+
 
 // fprintf(stderr, "(%s[%d]) timeblk4now is %d\n", __FILE__, __LINE__, tmblk4now);
 

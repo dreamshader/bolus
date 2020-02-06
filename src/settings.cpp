@@ -228,6 +228,10 @@ int settings::writeTimeblocks( void )
                  recCrc );
         }
     }
+    else
+    {
+        retVal = E_SETTINGS_FILE;
+    }
 
     return( retVal );
 }
@@ -340,6 +344,11 @@ int settings::writeGlobals( void )
                  globals.basalDelayTime,
                  recCrc );
     }
+    else
+    {
+        retVal = E_SETTINGS_FILE;
+    }
+
 
     return( retVal );
 }
@@ -452,6 +461,11 @@ int settings::writeAdjustments( void )
                  adjustments.other,
                  recCrc );
     }
+    else
+    {
+        retVal = E_SETTINGS_FILE;
+    }
+
 
     return( retVal );
 }
@@ -901,4 +915,115 @@ void settings::dump( void )
     dumpGlobals();
     dumpTimeblocks();
 }
+
+/* ----------------------------------------------------------------------------
+ * function:
+ *     void settings::backup( void )
+ * does:
+ *     make a backup copy of the settings file
+ * returns:
+ *     nothing
+ ------------------------------------------------------------------------------
+*/
+int settings::backup( void )
+{
+    int retVal = E_SETTINGS_OK;
+    char *pHome;
+    char cmdLine[PATH_MAX];
+
+    if( (pHome = getenv("HOME")) != NULL )
+    {
+        sprintf(cmdLine, "%s/%s/%s", pHome, BOLUS_BASE_DIR, SETTINGS_FILE_NAME);
+
+        if( access( cmdLine , R_OK | W_OK ) >= 0 )
+        {
+            sprintf(cmdLine, "cp %s/%s/%s %s/%s/%s", 
+                    pHome, BOLUS_BASE_DIR, SETTINGS_FILE_NAME,
+                    pHome, BOLUS_BASE_DIR, SETTINGS_BACKUP_NAME );
+            if( (retVal = system( cmdLine )) != 0 )
+            {
+fprintf(stderr, "backup failed with exitcode %d!\n", retVal);
+            }
+            else
+            {
+fprintf(stderr, "backup success!\n");
+            }
+        }
+        else
+        {
+            retVal = E_SETTINGS_ACCESS;
+        }
+    }
+    else
+    {
+        retVal = E_SETTINGS_GETENV;
+    }
+
+    return( retVal );
+}
+
+bool settings::newAdjustmentsValid( struct _adjust *pNewAdjustments )
+{
+    bool retVal = true;
+
+    return( retVal );
+}
+
+bool settings::newGlobalsValid( struct _globals *pNewGlobals )
+{
+    bool retVal = true;
+
+    return( retVal );
+}
+
+int settings::setNewAdjustments( struct _adjust *pNewAdjustments )
+{
+    int retVal = E_SETTINGS_OK;
+
+    if(pNewAdjustments != NULL )
+    {
+        if( newAdjustmentsValid( pNewAdjustments ) )
+        {
+            adjustments.sober = pNewAdjustments->sober;
+            adjustments.sport1 = pNewAdjustments->sport1;
+            adjustments.stress = pNewAdjustments->stress;
+            adjustments.illness = pNewAdjustments->illness;
+            adjustments.sport2 = pNewAdjustments->sport2;
+            adjustments.menstruation = pNewAdjustments->menstruation;
+            adjustments.other = pNewAdjustments->other;
+        }
+        else
+        {
+            retVal = E_SETTINGS_INVAL;
+        }
+    }
+
+    return( retVal );
+}
+
+int settings::setNewGlobals( struct _globals *pNewGlobals )
+{
+    int retVal = E_SETTINGS_OK;
+
+    if(pNewGlobals != NULL )
+    {
+        if( newGlobalsValid( pNewGlobals ) )
+        {
+            globals.timeBlocksActive = pNewGlobals->timeBlocksActive;
+            globals.increaseLevel = pNewGlobals->increaseLevel;
+            globals.snacksize10BE = pNewGlobals->snacksize10BE;
+            globals.actTime = pNewGlobals->actTime;
+            globals.delayTime = pNewGlobals->delayTime;
+            globals.basalActTime = pNewGlobals->basalActTime;
+            globals.basalDelayTime = pNewGlobals->basalDelayTime;
+        }
+        else
+        {
+            retVal = E_SETTINGS_INVAL;
+        }
+    }
+
+    return( retVal );
+}
+
 

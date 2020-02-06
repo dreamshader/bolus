@@ -1,5 +1,6 @@
 #include "dlgshowdata.h"
 #include "ui_dlgshowdata.h"
+#include <time.h>
 
 dlgShowData::dlgShowData(QWidget *parent) :
     QDialog(parent),
@@ -29,9 +30,30 @@ void dlgShowData::displayDataRecord()
     {
         if( fgets(dataBuff, 79, sysFP) )
         {
-            ui->lblGlucoValue->setNum(atoi(&dataBuff[0]));
+            char timeBuffer[20];
+            char dateBuffer[20];
 
-            switch(dataBuff[5] )
+            eofReached = false;
+
+//            1549916355:0234:n:0000:0000:0001:0000
+            time_t timestamp = static_cast <time_t> (atol(dataBuff));
+            struct tm *pDataTime = localtime(&timestamp);
+
+            // int tm_sec;         /* seconds */
+            // int tm_min;         /* minutes */
+            // int tm_hour;        /* hours */
+            sprintf(timeBuffer, "%02d:%02d.%02d",pDataTime->tm_hour, pDataTime->tm_min, pDataTime->tm_sec );
+            sprintf(dateBuffer, "%02d.%02d. %d", pDataTime->tm_mday, pDataTime->tm_mon+1, pDataTime->tm_year+1900);
+
+            ui->lblTime->setText(timeBuffer);
+            ui->lblDate->setText(dateBuffer);
+            // int tm_mday;        /* day of the month */
+            // int tm_mon;         /* month */
+            // int tm_year;        /* year */
+
+            ui->lblGlucoValue->setNum(atoi(&dataBuff[11]));
+
+            switch(dataBuff[16] )
             {
                 case 'b':
                 case 'B':
@@ -58,14 +80,19 @@ void dlgShowData::displayDataRecord()
                     break;
             }
 
-            ui->lblCarbValue->setNum(atoi(&dataBuff[7]));
-            ui->lblHealthnessValue->setNum(atoi(&dataBuff[12]));
-            ui->lblBolusValue->setNum(atoi(&dataBuff[17]));
-            ui->lblBasalValue->setNum(atoi(&dataBuff[22]));
+            ui->lblCarbValue->setNum(atoi(&dataBuff[18]));
+            ui->lblHealthnessValue->setNum(atoi(&dataBuff[23]));
+            ui->lblBolusValue->setNum(atoi(&dataBuff[28]));
+            ui->lblBasalValue->setNum(atoi(&dataBuff[33]));
         }
         else
         {
             eofReached = true;
+            if( currRecno > 1 )
+            {
+                ui->lblTextEOF->setText("Datei-Ende erreicht!");
+                currRecno--;
+            }
         }
         fclose(sysFP);
     }
@@ -102,9 +129,5 @@ void dlgShowData::on_btnNextRec_clicked()
         ui->lblTextEOF->setText("");
         currRecno++;
         displayDataRecord();
-    }
-    else
-    {
-        ui->lblTextEOF->setText("Datei-Ende erreicht!");
     }
 }

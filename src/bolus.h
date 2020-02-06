@@ -63,6 +63,8 @@ using namespace std;
 #define E_UNKNOWN_EXPORT_TYPE -12
 #define E_UNKNOWN_QUERY_TYPE  -13
 
+#define E_BOLUS_IMPORT_OPEN   -14
+#define E_BOLUS_IMPORT_FIELDS -15
 
 #define BOLUS_NO_MODE           0
 #define BOLUS_IMPORT_MODE       1

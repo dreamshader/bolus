@@ -29,13 +29,11 @@ SOURCES += \
         mainwindow.cpp \
     bolusdlg.cpp \
     datadlg.cpp \
-    settingsdlg.cpp \
     dlgsettingsbolus.cpp \
     inputglucovalue.cpp \
     dlgtimeblocks.cpp \
     dlghealthoptions.cpp \
     dlgrecommendationoptions.cpp \
-    dlgdevicesettings.cpp \
     dlgtimeblockedit.cpp \
     dlgshowdata.cpp \
     dlgconfirmbolus.cpp
@@ -44,14 +42,12 @@ HEADERS += \
         mainwindow.h \
     bolusdlg.h \
     datadlg.h \
-    settingsdlg.h \
     dlgsettingsbolus.h \
     inputglucovalue.h \
     bolus.h \
     dlgtimeblocks.h \
     dlghealthoptions.h \
     dlgrecommendationoptions.h \
-    dlgdevicesettings.h \
     dlgtimeblockedit.h \
     dlgshowdata.h \
     dlgconfirmbolus.h
@@ -60,13 +56,11 @@ FORMS += \
         mainwindow.ui \
     bolusdlg.ui \
     datadlg.ui \
-    settingsdlg.ui \
     dlgsettingsbolus.ui \
     inputglucovalue.ui \
     dlgtimeblocks.ui \
     dlghealthoptions.ui \
     dlgrecommendationoptions.ui \
-    dlgdevicesettings.ui \
     dlgtimeblockedit.ui \
     dlgshowdata.ui \
     dlgconfirmbolus.ui

@@ -10,9 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     pBolusDialog = nullptr;
     pDataDialog = nullptr;
-    pSettingsDialog = nullptr;
     pInputGlucoValue = nullptr;
-
+    pSettingsBolus = nullptr;
 
     ui->setupUi(this);
 }
@@ -93,22 +92,14 @@ void MainWindow::on_btnData_clicked()
 
 void MainWindow::on_btnSettings_clicked()
 {
-    if( pSettingsDialog == nullptr )
+    if( pSettingsBolus == nullptr )
     {
-        pSettingsDialog = new settingsDlg(ui->centralWidget);
-        pSettingsDialog->show();
+        pSettingsBolus = new dlgSettingsBolus(ui->centralWidget);
+        pSettingsBolus->show();
 
-        pSettingsDialog->exec();
-        pSettingsDialog = nullptr;
+        pSettingsBolus->exec();
+        pSettingsBolus = nullptr;
     }
-#ifdef NEVERDEF
-    else
-    {
-        pSettingsDialog->done(0);
-        pSettingsDialog = nullptr;
-    }
-#endif //NEVERDEF
-
 }
 
 void MainWindow::on_action_Beenden_triggered()

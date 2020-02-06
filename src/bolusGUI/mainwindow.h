@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include "bolusdlg.h"
 #include "datadlg.h"
-#include "settingsdlg.h"
 #include "inputglucovalue.h"
+#include <QDialog>
+#include "dlgsettingsbolus.h"
 
 namespace Ui {
 class MainWindow;
@@ -20,7 +21,7 @@ public:
     ~MainWindow();
     bolusDlg *pBolusDialog;
     dataDlg *pDataDialog;
-    settingsDlg *pSettingsDialog;
+    dlgSettingsBolus *pSettingsBolus;
     inputGlucoValue *pInputGlucoValue;
 
 private slots:

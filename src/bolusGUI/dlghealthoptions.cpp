@@ -64,7 +64,7 @@ void dlgHealthOptions::on_dlgHealthOptions_finished(int result)
             dir.mkpath(path); // You can check the success if needed
 
         // Werte speichern
-        QFile file(path + "bolus-export.csv");
+        QFile file(path + "bolus-export-health.csv");
         if( !file.open(QIODevice::ReadWrite | QIODevice::Text) )
         {
             qDebug() << "FAIL TO CREATE FILE / FILE NOT EXIT***";
@@ -73,13 +73,11 @@ void dlgHealthOptions::on_dlgHealthOptions_finished(int result)
         {
             char dataBuffer[80];
             int retVal;
-            sprintf(dataBuffer, "%s;%s;%s;%s;%s;%s;%s\n","sober","sports1","stress","illness","sport2","menstruation","other");
-            file.write(dataBuffer, qstrlen(dataBuffer));
             sprintf(dataBuffer, "%d;%d;%d;%d;%d;%d;%d\n", varSober, varSport1, varStress, varIllness, varSport2, varMenstruation, varOther );
             file.write(dataBuffer, qstrlen(dataBuffer));
             file.close();
-            path.append("bolus-export.csv");
-            sprintf(dataBuffer, "~/bolus/bolus-cli -x -I%s",path.toStdString().c_str() );
+            path.append("bolus-export-health.csv");
+            sprintf(dataBuffer, "~/bolus/bolus-cli -D -v2 -I%s -iA",path.toStdString().c_str() );
             retVal = system(dataBuffer);
 
         }

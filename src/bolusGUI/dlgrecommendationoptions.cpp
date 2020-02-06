@@ -1,5 +1,8 @@
 #include "dlgrecommendationoptions.h"
 #include "ui_dlgrecommendationoptions.h"
+#include <QFile>
+#include <QDir>
+#include <QDebug>
 
 dlgRecommendationOptions::dlgRecommendationOptions(QWidget *parent) :
     QDialog(parent),
@@ -14,7 +17,7 @@ dlgRecommendationOptions::dlgRecommendationOptions(QWidget *parent) :
     ui->setupUi(this);
 
 
-    if((sysFP = popen("~/bolus/bolus-cli -qG", "r")) != nullptr )
+    if((sysFP = popen("~/bolus/bolus-cli -D -v2 -qG", "r")) != nullptr )
     {
         fgets(dataBuff, 79, sysFP);
         fclose(sysFP);
@@ -56,5 +59,33 @@ void dlgRecommendationOptions::on_dlgRecommendationOptions_finished(int result)
 
         varActTime = ui->tmDuration->time().hour() * 60 + ui->tmDuration->time().minute();
         varDelayTime = ui->tmDelay->time().hour() * 60 + ui->tmDelay->time().minute();
+
+        QDir dir;
+        QString path("/home/dirk/tmp/");
+
+        // We create the directory if needed
+        if (!dir.exists(path))
+            dir.mkpath(path); // You can check the success if needed
+
+        // Werte speichern
+        QFile file(path + "bolus-export-globals.csv");
+        if( !file.open(QIODevice::ReadWrite | QIODevice::Text) )
+        {
+            qDebug() << "FAIL TO CREATE FILE / FILE NOT EXIT***";
+        }
+        else
+        {
+            char dataBuffer[80];
+            int retVal;
+            sprintf(dataBuffer, "%d;%d;%d;%d;%d;%d;%d\n",
+                    varTimeBlocksActive, varIncreaseLevel, varSnacksize10BE*10,
+                    varActTime, varDelayTime, varBasalActTime, varBasalDelayTime );
+            file.write(dataBuffer, qstrlen(dataBuffer));
+            file.close();
+            path.append("bolus-export-globals.csv");
+            sprintf(dataBuffer, "~/bolus/bolus-cli -D -v2 -I%s -iG",path.toStdString().c_str() );
+            retVal = system(dataBuffer);
+
+        }
     }
 }

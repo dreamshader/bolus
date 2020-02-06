@@ -42,6 +42,7 @@ extern "C" {
 using namespace std;
 
 #define SETTINGS_FILE_NAME     ".bolus.settings.bin"
+#define SETTINGS_BACKUP_NAME   "bolus.settings.backup"
 #define BOLUS_BASE_DIR         "bolus"
 
 #define MAX_TIME_BLOCKS         5
@@ -128,6 +129,9 @@ using namespace std;
 #define E_SETTINGS_CRC         -7
 #define E_SETTINGS_INV_REC     -8
 
+#define E_SETTINGS_GETENV     -10
+#define E_SETTINGS_INVAL      -11
+#define E_SETTINGS_FILE       -12
 
 #define MAX_SETTINGS_RECLEN   128
 #define DEV_ID_LEN             16
@@ -225,7 +229,6 @@ class settings {
       void dumpAdjustments( void );
       void dumpGlobals( void );
       void dumpTimeblocks( void );
-      int write( void );
       void dump( void );
       int read( void );
 
@@ -233,6 +236,13 @@ class settings {
       settings( void ) { settingsFile = (FILE*) NULL; };
       int init( void );
       int end( void );
+      int write( void );
+      int backup( void );
+      bool newAdjustmentsValid( struct _adjust *pNewAdjustments );
+      bool newGlobalsValid( struct _globals *pNewGlobals );
+      int setNewAdjustments( struct _adjust *pNewAdjustments );
+      int setNewGlobals( struct _globals *pNewGlobals );
+
 
 };
 

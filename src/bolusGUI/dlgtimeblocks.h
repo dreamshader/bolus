@@ -21,6 +21,8 @@ public:
 private slots:
     void on_lstTimeBlocks_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_dlgTimeBlocks_accepted();
+
 private:
     Ui::dlgTimeBlocks *ui;
     QWidget *pParent;

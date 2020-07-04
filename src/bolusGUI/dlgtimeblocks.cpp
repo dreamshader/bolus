@@ -97,15 +97,16 @@ void dlgTimeBlocks::on_lstTimeBlocks_itemDoubleClicked(QListWidgetItem *item)
         extern int currSelTimeBlock;
         currSelTimeBlock = x;
 
+
         pDlgTimeBlockEdit = new dlgTimeBlockEdit(pParent);
         pDlgTimeBlockEdit->show();
         pDlgTimeBlockEdit->update();
 
-//        if( pDlgTimeBlockEdit->isActiveWindow() )
-//        {
-//            pDlgTimeBlockEdit->setTimeBlockIndex(x);
-//            pDlgTimeBlockEdit->update();
-//        }
+        if( pDlgTimeBlockEdit->isActiveWindow() )
+        {
+            pDlgTimeBlockEdit->setTimeBlockIndex(x);
+            pDlgTimeBlockEdit->update();
+        }
 
         if( pDlgTimeBlockEdit->exec() == QDialog::Accepted )
         {
@@ -113,5 +114,11 @@ void dlgTimeBlocks::on_lstTimeBlocks_itemDoubleClicked(QListWidgetItem *item)
         }
 
         pDlgTimeBlockEdit = nullptr;
+
     }
+}
+
+void dlgTimeBlocks::on_dlgTimeBlocks_accepted()
+{
+
 }

@@ -33,13 +33,13 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>90</y>
+     <y>100</y>
      <width>281</width>
      <height>26</height>
     </rect>
    </property>
    <property name="text">
-    <string>Zeitblöcke</string>
+    <string>Zeitblöcke Optionen</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btnHealthEvents">
@@ -66,6 +66,19 @@
    </property>
    <property name="text">
     <string>Bolus-Optionen</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnTimeBlocksDefine">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>70</y>
+     <width>281</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Zeitblöcke festlegen</string>
    </property>
   </widget>
  </widget>

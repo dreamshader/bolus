@@ -1,5 +1,6 @@
 #include "dlgsettingsbolus.h"
 #include "ui_dlgsettingsbolus.h"
+#include "ui_dlgtimeblockperiods.h"
 
 dlgSettingsBolus::dlgSettingsBolus(QWidget *parent) :
     QDialog(parent),
@@ -10,6 +11,7 @@ dlgSettingsBolus::dlgSettingsBolus(QWidget *parent) :
     ptimeBlocks = nullptr;
     phealthOptions = nullptr;
     precommendationOptions = nullptr;
+    pDlgTimeBlockPeriods = nullptr;
 
     ui->setupUi(this);
 }
@@ -50,5 +52,22 @@ void dlgSettingsBolus::on_btnBolusOptions_clicked()
         precommendationOptions->show();
         precommendationOptions->exec();
         precommendationOptions = nullptr;
+    }
+}
+
+void dlgSettingsBolus::on_btnTimeBlocksDefine_clicked()
+{
+    if( pDlgTimeBlockPeriods == nullptr )
+    {
+        pDlgTimeBlockPeriods = new dlgTimeBlockPeriods();
+        pDlgTimeBlockPeriods->show();
+        pDlgTimeBlockPeriods->update();
+
+        if( pDlgTimeBlockPeriods->exec() == QDialog::Accepted )
+        {
+
+        }
+
+        pDlgTimeBlockPeriods = nullptr;
     }
 }

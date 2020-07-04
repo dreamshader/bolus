@@ -5,6 +5,7 @@
 #include "dlgtimeblocks.h"
 #include "dlghealthoptions.h"
 #include "dlgrecommendationoptions.h"
+#include "dlgtimeblockperiods.h"
 
 
 namespace Ui {
@@ -22,6 +23,7 @@ public:
     dlgHealthOptions *phealthOptions;
     dlgTimeBlocks *ptimeBlocks;
     dlgRecommendationOptions *precommendationOptions;
+    dlgTimeBlockPeriods *pDlgTimeBlockPeriods;
 
 private slots:
     void on_btnTimeBlocks_clicked();
@@ -29,6 +31,8 @@ private slots:
     void on_btnHealthEvents_clicked();
 
     void on_btnBolusOptions_clicked();
+
+    void on_btnTimeBlocksDefine_clicked();
 
 private:
     Ui::dlgSettingsBolus *ui;

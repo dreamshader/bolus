@@ -128,42 +128,42 @@ void settings::defaults( void )
 //    uuid_generate_time(uuid_t devId);
     uuid_generate_time(devId);
 
-    timeblock[0].num = 0;
-    timeblock[0].time = TMBLCK0_TIME;
-    timeblock[0].rangeFrom = TMBLCK0_TGT_FROM;
-    timeblock[0].rangeTo = TMBLCK0_TGT_TO;
-    timeblock[0].uTo10BE = TMBLCK0_U210BE;
-    timeblock[0].sens = TMBLCK0_SENSITIVITY;
+    globals.timeBlocksActive = NUM_TIME_BLOCKS;
 
-    timeblock[1].num = 1;
-    timeblock[1].time = TMBLCK1_TIME;
-    timeblock[1].rangeFrom = TMBLCK1_TGT_FROM;
-    timeblock[1].rangeTo = TMBLCK1_TGT_TO;
-    timeblock[1].uTo10BE = TMBLCK1_U210BE;
-    timeblock[1].sens = TMBLCK1_SENSITIVITY;
+    timeblock[0]->num = 0;
+    timeblock[0]->time = TMBLCK0_TIME;
+    timeblock[0]->rangeFrom = TMBLCK0_TGT_FROM;
+    timeblock[0]->rangeTo = TMBLCK0_TGT_TO;
+    timeblock[0]->uTo10BE = TMBLCK0_U210BE;
+    timeblock[0]->sens = TMBLCK0_SENSITIVITY;
 
-    timeblock[2].num = 2;
-    timeblock[2].time = TMBLCK2_TIME;
-    timeblock[2].rangeFrom = TMBLCK2_TGT_FROM;
-    timeblock[2].rangeTo = TMBLCK2_TGT_TO;
-    timeblock[2].uTo10BE = TMBLCK2_U210BE;
-    timeblock[2].sens = TMBLCK2_SENSITIVITY;
+    timeblock[1]->num = 1;
+    timeblock[1]->time = TMBLCK1_TIME;
+    timeblock[1]->rangeFrom = TMBLCK1_TGT_FROM;
+    timeblock[1]->rangeTo = TMBLCK1_TGT_TO;
+    timeblock[1]->uTo10BE = TMBLCK1_U210BE;
+    timeblock[1]->sens = TMBLCK1_SENSITIVITY;
 
-    timeblock[3].num = 3;
-    timeblock[3].time = TMBLCK3_TIME;
-    timeblock[3].rangeFrom = TMBLCK3_TGT_FROM;
-    timeblock[3].rangeTo = TMBLCK3_TGT_TO;
-    timeblock[3].uTo10BE = TMBLCK3_U210BE;
-    timeblock[3].sens = TMBLCK3_SENSITIVITY;
+    timeblock[2]->num = 2;
+    timeblock[2]->time = TMBLCK2_TIME;
+    timeblock[2]->rangeFrom = TMBLCK2_TGT_FROM;
+    timeblock[2]->rangeTo = TMBLCK2_TGT_TO;
+    timeblock[2]->uTo10BE = TMBLCK2_U210BE;
+    timeblock[2]->sens = TMBLCK2_SENSITIVITY;
 
-    timeblock[4].num = 4;
-    timeblock[4].time = TMBLCK4_TIME;
-    timeblock[4].rangeFrom = TMBLCK4_TGT_FROM;
-    timeblock[4].rangeTo = TMBLCK4_TGT_TO;
-    timeblock[4].uTo10BE = TMBLCK4_U210BE;
-    timeblock[4].sens = TMBLCK4_SENSITIVITY;
+    timeblock[3]->num = 3;
+    timeblock[3]->time = TMBLCK3_TIME;
+    timeblock[3]->rangeFrom = TMBLCK3_TGT_FROM;
+    timeblock[3]->rangeTo = TMBLCK3_TGT_TO;
+    timeblock[3]->uTo10BE = TMBLCK3_U210BE;
+    timeblock[3]->sens = TMBLCK3_SENSITIVITY;
 
-    timeBlocksUsed = 5;
+    timeblock[4]->num = 4;
+    timeblock[4]->time = TMBLCK4_TIME;
+    timeblock[4]->rangeFrom = TMBLCK4_TGT_FROM;
+    timeblock[4]->rangeTo = TMBLCK4_TGT_TO;
+    timeblock[4]->uTo10BE = TMBLCK4_U210BE;
+    timeblock[4]->sens = TMBLCK4_SENSITIVITY;
 
     globals.version = MAJOR_VERSION;
     globals.version = globals.version << 8;
@@ -171,7 +171,6 @@ void settings::defaults( void )
     globals.version = globals.version << 8;
     globals.version |= PATCHLEVEL;
 
-    globals.timeBlocksActive = ACTIVE_TIMEBLOCKS;
     globals.increaseLevel = INCREASE_LEVEL;
     globals.snacksize10BE = SNACKSIZE_10_BE;
     globals.actTime = ACT_TIME;
@@ -201,33 +200,34 @@ int settings::writeTimeblocks( void )
 {
     int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
-    int numRecs = (timeBlocksUsed <= MAX_TIME_BLOCKS-1 ?
-		   timeBlocksUsed : MAX_TIME_BLOCKS-1);
+    int numRecs = (globals.timeBlocksActive <= MAX_TIME_BLOCKS ?
+		   globals.timeBlocksActive : MAX_TIME_BLOCKS );
 
     if( settingsFile != (FILE*) NULL )
     {
         for( int i = 0; i < numRecs; i++ )
         {
             recCrc = 0;
+
             sprintf( settingsBuffer, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
-                 timeblock[i].num,
-                 timeblock[i].time,
-                 timeblock[i].rangeFrom,
-                 timeblock[i].rangeTo,
-                 timeblock[i].uTo10BE,
-                 timeblock[i].sens,
+                 timeblock[i]->num,
+                 timeblock[i]->time,
+                 timeblock[i]->rangeFrom,
+                 timeblock[i]->rangeTo,
+                 timeblock[i]->uTo10BE,
+                 timeblock[i]->sens,
                  recCrc );
 
             // calc crc with crc field = 0
             recCrc = this->crc( settingsBuffer, TIME_BLOCK_REC_LEN );
 
             fprintf( settingsFile, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
-                 timeblock[i].num,
-                 timeblock[i].time,
-                 timeblock[i].rangeFrom,
-                 timeblock[i].rangeTo,
-                 timeblock[i].uTo10BE,
-                 timeblock[i].sens,
+                 timeblock[i]->num,
+                 timeblock[i]->time,
+                 timeblock[i]->rangeFrom,
+                 timeblock[i]->rangeTo,
+                 timeblock[i]->uTo10BE,
+                 timeblock[i]->sens,
                  recCrc );
         }
     }
@@ -261,11 +261,10 @@ int settings::readTimeblocks( void )
         if( this->_new == false )
         {
             eofReached = false;
-	    timeBlocksUsed = 0;
 
             for( int i = 0; !eofReached && 
 			    retVal == E_SETTINGS_OK && 
-			    i < MAX_TIME_BLOCKS - 1; i++ )
+			    i < globals.timeBlocksActive; i++ )
             {
 	        memset(settingsBuffer, '\0', MAX_SETTINGS_RECLEN);
 
@@ -276,44 +275,32 @@ int settings::readTimeblocks( void )
 	        }
 	        else
 	        {
-fprintf(stderr, "Wir sind bei %d bei einer Laenge von %d\n", i, strlen(settingsBuffer));
-
                     retVal = sscanf( settingsBuffer, TIME_BLOCK_REC_FMT, &recId,
-                         &timeblock[i].num,
-                         &timeblock[i].time,
-                         &timeblock[i].rangeFrom,
-                         &timeblock[i].rangeTo,
-                         &timeblock[i].uTo10BE,
-                         &timeblock[i].sens,
-                         &recCrc );
-
-                    sscanf( settingsBuffer, TIME_BLOCK_REC_FMT, &recId,
-                         &newTimeblock[i]->num,
-                         &newTimeblock[i]->time,
-                         &newTimeblock[i]->rangeFrom,
-                         &newTimeblock[i]->rangeTo,
-                         &newTimeblock[i]->uTo10BE,
-                         &newTimeblock[i]->sens,
+                         &timeblock[i]->num,
+                         &timeblock[i]->time,
+                         &timeblock[i]->rangeFrom,
+                         &timeblock[i]->rangeTo,
+                         &timeblock[i]->uTo10BE,
+                         &timeblock[i]->sens,
                          &recCrc );
 
                     if( retVal == TIME_BLOCK_REC_ITEMS )
                     {
                         sprintf(settingsBuffer,
 				TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
-                                timeblock[i].num,
-                                timeblock[i].time,
-                                timeblock[i].rangeFrom,
-                                timeblock[i].rangeTo,
-                                timeblock[i].uTo10BE,
-                                timeblock[i].sens,
+                                timeblock[i]->num,
+                                timeblock[i]->time,
+                                timeblock[i]->rangeFrom,
+                                timeblock[i]->rangeTo,
+                                timeblock[i]->uTo10BE,
+                                timeblock[i]->sens,
                                 recCrc );
+
 
                         calcCrc = this->crc( settingsBuffer, TIME_BLOCK_REC_LEN );
 
                         if( calcCrc == recCrc )
                         {
-		            timeBlocksUsed++;
-
                             retVal = E_SETTINGS_OK;
                         }
                         else
@@ -329,7 +316,6 @@ fprintf(stderr, "Wir sind bei %d bei einer Laenge von %d\n", i, strlen(settingsB
             }
         }
     }
-fprintf(stderr, "Wir haben %d Timeblocks\n", timeBlocksUsed);
     return( retVal );
 }
 
@@ -740,15 +726,14 @@ this->write();
 int settings::init( void )
 {
     int retVal = E_SETTINGS_OK;
-    newTimeblock = (struct _timeblk**) malloc(MAX_TIME_BLOCKS * sizeof(struct _timeblk*));
-    if( newTimeblock != NULL )
+    timeblock = (struct _timeblk**) 
+	    malloc(MAX_TIME_BLOCKS * sizeof(struct _timeblk*));
+    if( timeblock != NULL )
     {
-	for( int i = 0; i < MAX_TIME_BLOCKS - 1; i++ )
+	for( int i = 0; i < MAX_TIME_BLOCKS; i++ )
 	{
-            newTimeblock[i]=(struct _timeblk*) malloc( sizeof(struct _timeblk));
+            timeblock[i]=(struct _timeblk*) malloc( sizeof(struct _timeblk));
         }
-
-        newTimeblock[MAX_TIME_BLOCKS - 1] = (struct _timeblk*) NULL;
     }
     
     this-read();
@@ -929,15 +914,15 @@ void settings::dumpGlobals( void )
 */
 void settings::dumpTimeblocks( void )
 {
-    for( int i = 0; i < MAX_TIME_BLOCKS; i++ )
+    for( int i = 0; i < globals.timeBlocksActive; i++ )
     {
-       fprintf( stderr, "timeblock ........: %d\n", timeblock[i].num );
-       fprintf( stderr, "Time .......: %02d:%02d\n", timeblock[i].time,
-                 timeblock[i].time );
-       fprintf( stderr, "Range ......: %02d-%02d\n", timeblock[i].rangeFrom,
-                 timeblock[i].rangeTo );
-       fprintf( stderr, "Factor .....: %02d\n", timeblock[i].uTo10BE );
-       fprintf( stderr, "Sensitivity : %02d\n", timeblock[i].sens );
+       fprintf( stderr, "timeblock ........: %d\n", timeblock[i]->num );
+       fprintf( stderr, "Time .......: %02d:%02d\n", timeblock[i]->time,
+                 timeblock[i]->time );
+       fprintf( stderr, "Range ......: %02d-%02d\n", timeblock[i]->rangeFrom,
+                 timeblock[i]->rangeTo );
+       fprintf( stderr, "Factor .....: %02d\n", timeblock[i]->uTo10BE );
+       fprintf( stderr, "Sensitivity : %02d\n", timeblock[i]->sens );
     }
 }
 

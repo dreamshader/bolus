@@ -110,7 +110,7 @@ using namespace std;
 #define MAJOR_VERSION           0
 #define MINOR_VERSION           0
 #define PATCHLEVEL              0
-#define ACTIVE_TIMEBLOCKS       NUM_TIME_BLOCKS
+// #define ACTIVE_TIMEBLOCKS       NUM_TIME_BLOCKS
 #define INCREASE_LEVEL         50
 #define SNACKSIZE_10_BE        10
 
@@ -167,8 +167,6 @@ struct _globals {
     int basalDelayTime;
 };
 
-#define NUM_VAR_TIMEBLOCKS     7
-
 class settings {
 
   protected:
@@ -193,9 +191,7 @@ class settings {
       bool _cancel = false;
 
   public:
-    struct _timeblk **newTimeblock;
-    int timeBlocksUsed;
-    struct _timeblk timeblock[MAX_TIME_BLOCKS];
+    struct _timeblk **timeblock;
 
     struct _adjust  adjustments;
     struct _globals globals;

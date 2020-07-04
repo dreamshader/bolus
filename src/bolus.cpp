@@ -453,26 +453,26 @@ fprintf( stderr, "query number of timeblocks.\n");
                     {
                         fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
 
-                             pSettings->timeblock[tmIndex].time / 60,
-                             pSettings->timeblock[tmIndex].time % 60,
-                             pSettings->timeblock[tmIndex + 1].time / 60,
-                             pSettings->timeblock[tmIndex + 1].time % 60,
-                             pSettings->timeblock[tmIndex].rangeFrom,
-                             pSettings->timeblock[tmIndex].rangeTo,
-                             pSettings->timeblock[tmIndex].uTo10BE,
-                             pSettings->timeblock[tmIndex].sens );
+                             pSettings->timeblock[tmIndex]->time / 60,
+                             pSettings->timeblock[tmIndex]->time % 60,
+                             pSettings->timeblock[tmIndex + 1]->time / 60,
+                             pSettings->timeblock[tmIndex + 1]->time % 60,
+                             pSettings->timeblock[tmIndex]->rangeFrom,
+                             pSettings->timeblock[tmIndex]->rangeTo,
+                             pSettings->timeblock[tmIndex]->uTo10BE,
+                             pSettings->timeblock[tmIndex]->sens );
                     }
                     else
                     {
                         fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
-                             pSettings->timeblock[tmIndex].time / 60,
-                             pSettings->timeblock[tmIndex].time % 60,
-                             pSettings->timeblock[0].time / 60,
-                             pSettings->timeblock[0].time % 60,
-                             pSettings->timeblock[tmIndex].rangeFrom,
-                             pSettings->timeblock[tmIndex].rangeTo,
-                             pSettings->timeblock[tmIndex].uTo10BE,
-                             pSettings->timeblock[tmIndex].sens );
+                             pSettings->timeblock[tmIndex]->time / 60,
+                             pSettings->timeblock[tmIndex]->time % 60,
+                             pSettings->timeblock[0]->time / 60,
+                             pSettings->timeblock[0]->time % 60,
+                             pSettings->timeblock[tmIndex]->rangeFrom,
+                             pSettings->timeblock[tmIndex]->rangeTo,
+                             pSettings->timeblock[tmIndex]->uTo10BE,
+                             pSettings->timeblock[tmIndex]->sens );
                     }
 
                     retVal = 0;
@@ -497,7 +497,7 @@ fprintf( stderr, "query glucose status for %d.\n", callerArgs.glucose);
                 for( int i = 0; tmblk4now < 0 && i < MAX_TIME_BLOCKS; i++ )
                 {
 
-                    if( timeTmblk <= pSettings->timeblock[i].time )
+                    if( timeTmblk <= pSettings->timeblock[i]->time )
                     {
                         if( i )
                         {
@@ -518,23 +518,23 @@ fprintf( stderr, "query glucose status for %d.\n", callerArgs.glucose);
                 if( tmblk4now >= 0 )
                 {
                     if( callerArgs.glucose >= 
-                        pSettings->timeblock[tmblk4now].rangeFrom &&
+                        pSettings->timeblock[tmblk4now]->rangeFrom &&
                         callerArgs.glucose <=
-                        pSettings->timeblock[tmblk4now].rangeTo )
+                        pSettings->timeblock[tmblk4now]->rangeTo )
                     {
                         retVal = 0;           // green - ok
                     }
                     else
                     {
                         if( callerArgs.glucose <
-                            pSettings->timeblock[tmblk4now].rangeFrom )
+                            pSettings->timeblock[tmblk4now]->rangeFrom )
                         {
                             retVal = 2;           // red - too low
                         }
                         else
                         {
                             if( callerArgs.glucose >
-                                pSettings->timeblock[tmblk4now].rangeTo )
+                                pSettings->timeblock[tmblk4now]->rangeTo )
                             {
                                 retVal = 1;           // yellow - too high
                             }
@@ -638,26 +638,26 @@ int bolus::runImport( void )
                     {
                         fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
 
-                             pSettings->timeblock[tmIndex].time / 60,
-                             pSettings->timeblock[tmIndex].time % 60,
-                             pSettings->timeblock[tmIndex + 1].time / 60,
-                             pSettings->timeblock[tmIndex + 1].time % 60,
-                             pSettings->timeblock[tmIndex].rangeFrom,
+                             pSettings->timeblock[tmIndex]->time / 60,
+                             pSettings->timeblock[tmIndex]->time % 60,
+                             pSettings->timeblock[tmIndex + 1]->time / 60,
+                             pSettings->timeblock[tmIndex + 1]->time % 60,
+                             pSettings->timeblock[tmIndex]->rangeFrom,
                              pSettings->timeblock[tmIndex].rangeTo,
-                             pSettings->timeblock[tmIndex].uTo10BE,
-                             pSettings->timeblock[tmIndex].sens );
+                             pSettings->timeblock[tmIndex]->uTo10BE,
+                             pSettings->timeblock[tmIndex]->sens );
                     }
                     else
                     {
                         fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
-                             pSettings->timeblock[tmIndex].time / 60,
-                             pSettings->timeblock[tmIndex].time % 60,
-                             pSettings->timeblock[0].time / 60,
-                             pSettings->timeblock[0].time % 60,
-                             pSettings->timeblock[tmIndex].rangeFrom,
-                             pSettings->timeblock[tmIndex].rangeTo,
-                             pSettings->timeblock[tmIndex].uTo10BE,
-                             pSettings->timeblock[tmIndex].sens );
+                             pSettings->timeblock[tmIndex]->time / 60,
+                             pSettings->timeblock[tmIndex]->time % 60,
+                             pSettings->timeblock[0]->time / 60,
+                             pSettings->timeblock[0]->time % 60,
+                             pSettings->timeblock[tmIndex]->rangeFrom,
+                             pSettings->timeblock[tmIndex]->rangeTo,
+                             pSettings->timeblock[tmIndex]->uTo10BE,
+                             pSettings->timeblock[tmIndex]->sens );
                     }
                 }
 #endif // NEVERDEF
@@ -864,17 +864,17 @@ fprintf(stderr, "(%s[%d]) timeBlk is %d\n", __FILE__, __LINE__, timeBlk);
 
         gOffset = 0;
 
-        if( pNewData->glucose > pSettings->timeblock[timeBlk].rangeTo )
+        if( pNewData->glucose > pSettings->timeblock[timeBlk]->rangeTo )
         {
-            gOffset = pNewData->glucose - ((pSettings->timeblock[timeBlk].rangeTo +
-                         pSettings->timeblock[timeBlk].rangeFrom ) / 2);
+            gOffset = pNewData->glucose - ((pSettings->timeblock[timeBlk]->rangeTo +
+                         pSettings->timeblock[timeBlk]->rangeFrom ) / 2);
 
         }
 
-        if( pNewData->glucose < pSettings->timeblock[timeBlk].rangeFrom )
+        if( pNewData->glucose < pSettings->timeblock[timeBlk]->rangeFrom )
         {
-            gOffset = pNewData->glucose - ((pSettings->timeblock[timeBlk].rangeTo +
-                         pSettings->timeblock[timeBlk].rangeFrom ) / 2);
+            gOffset = pNewData->glucose - ((pSettings->timeblock[timeBlk]->rangeTo +
+                         pSettings->timeblock[timeBlk]->rangeFrom ) / 2);
         }
 
         if( callerArgs.debugMode )
@@ -882,16 +882,16 @@ fprintf(stderr, "(%s[%d]) timeBlk is %d\n", __FILE__, __LINE__, timeBlk);
 fprintf(stderr, "(%s[%d]) gOffset is %d\n", __FILE__, __LINE__, gOffset);
         }
 
-        insUnits = (pNewData->carboHydrate / 12.0) * (pSettings->timeblock[timeBlk].uTo10BE / 10.0);
+        insUnits = (pNewData->carboHydrate / 12.0) * (pSettings->timeblock[timeBlk]->uTo10BE / 10.0);
 
         if( callerArgs.debugMode )
         {
 fprintf(stderr, "(%s[%d]) insUnits is %f\n", __FILE__, __LINE__, insUnits);
         }
 
-        if( pSettings->timeblock[timeBlk].sens > 0 )
+        if( pSettings->timeblock[timeBlk]->sens > 0 )
         {
-            offUnits = gOffset / pSettings->timeblock[timeBlk].sens;
+            offUnits = gOffset / pSettings->timeblock[timeBlk]->sens;
         }
         else
         {
@@ -1032,9 +1032,9 @@ int bolus::runCalcBread( void )
         {
 
 // fprintf(stderr, "(%s[%d]) now %d - setting %d\n",
-// __FILE__, __LINE__, timeTmblk, pSettings->timeblock[i].time );
+// __FILE__, __LINE__, timeTmblk, pSettings->timeblock[i]->time );
 
-            if( timeTmblk <= pSettings->timeblock[i].time )
+            if( timeTmblk <= pSettings->timeblock[i]->time )
             {
                 if( i )
                 {

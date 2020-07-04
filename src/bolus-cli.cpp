@@ -484,18 +484,4 @@ int main( int argc, char *argv[] )
     return( retVal );
 }
 
-#ifdef NODEF
-QString str = "a,,b,c";
-
-QStringList list1 = str.split(',');
-// list1: [ "a", "", "b", "c" ]
-
-QStringList list2 = str.split(',', QString::SkipEmptyParts);
-// list2: [ "a", "b", "c" ]
-
-#include <QList>
-#include <QStringList>
-
-
-#endif // NODEF
 

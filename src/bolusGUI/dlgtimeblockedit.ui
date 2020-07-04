@@ -37,38 +37,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>111</width>
+     <width>91</width>
      <height>18</height>
     </rect>
    </property>
    <property name="text">
     <string>Zeitblock von</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblTmBlkFrom">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>10</y>
-     <width>74</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblTmBlkTo">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>10</y>
-     <width>74</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>TextLabel</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
@@ -306,7 +280,7 @@
   <widget class="QLabel" name="lblTextTo">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>230</x>
      <y>10</y>
      <width>31</width>
      <height>18</height>
@@ -314,6 +288,64 @@
    </property>
    <property name="text">
     <string>bis</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextTo_5">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>10</y>
+     <width>31</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Uhr</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lblTextTo_6">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>10</y>
+     <width>31</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Uhr</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="tmLabelBlkFrom">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>10</y>
+     <width>62</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="tmLabelBlkTo">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>10</y>
+     <width>62</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

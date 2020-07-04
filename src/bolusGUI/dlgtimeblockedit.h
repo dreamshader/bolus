@@ -21,6 +21,9 @@ public:
 
 
 
+private slots:
+    void on_dlgTimeBlockEdit_accepted();
+
 private:
     Ui::dlgTimeBlockEdit *ui;
     QWidget *pParent;

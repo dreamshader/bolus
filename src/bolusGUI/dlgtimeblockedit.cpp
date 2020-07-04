@@ -1,4 +1,4 @@
-#include "dlgtimeblockedit.h"
+﻿#include "dlgtimeblockedit.h"
 #include "ui_dlgtimeblockedit.h"
 
 dlgTimeBlockEdit::dlgTimeBlockEdit(QWidget *parent) :
@@ -26,10 +26,13 @@ dlgTimeBlockEdit::dlgTimeBlockEdit(QWidget *parent) :
     {
         fgets(dataBuff, 79, sysFP);
         fclose(sysFP);
+
+
         sprintf(tmLblFrom, "%c%c%c%c%c",
                 dataBuff[0],dataBuff[1],dataBuff[2],dataBuff[3],dataBuff[4]);
         sprintf(tmLblTo, "%c%c%c%c%c",
                 dataBuff[6],dataBuff[7],dataBuff[8],dataBuff[9],dataBuff[10] );
+
 
 
         //                  1111111111222222222
@@ -42,8 +45,8 @@ dlgTimeBlockEdit::dlgTimeBlockEdit(QWidget *parent) :
         sensitivity = atoi(&dataBuff[27]);
 
 
-        ui->lblTmBlkFrom->setText(tmLblFrom);
-        ui->lblTmBlkTo->setText(tmLblTo);
+        ui->tmLabelBlkFrom->setText(tmLblFrom);
+        ui->tmLabelBlkTo->setText(tmLblTo);
 
         ui->spnTgtFrom->setValue(tgtGlucoFrom);
         ui->spnTgtTo->setValue(tgtGlucoTo);
@@ -61,4 +64,10 @@ dlgTimeBlockEdit::dlgTimeBlockEdit(QWidget *parent) :
 dlgTimeBlockEdit::~dlgTimeBlockEdit()
 {
     delete ui;
+}
+
+void dlgTimeBlockEdit::on_dlgTimeBlockEdit_accepted()
+{
+    int tmBlkFromHour = 22;
+    // ./bolus-cli -iT -Ihulle
 }

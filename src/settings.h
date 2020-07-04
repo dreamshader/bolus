@@ -45,7 +45,7 @@ using namespace std;
 #define SETTINGS_BACKUP_NAME   "bolus.settings.backup"
 #define BOLUS_BASE_DIR         "bolus"
 
-#define MAX_TIME_BLOCKS         5
+#define MAX_TIME_BLOCKS        10
 #define NUM_TIME_BLOCKS         5
 
 
@@ -167,6 +167,8 @@ struct _globals {
     int basalDelayTime;
 };
 
+#define NUM_VAR_TIMEBLOCKS     7
+
 class settings {
 
   protected:
@@ -191,7 +193,10 @@ class settings {
       bool _cancel = false;
 
   public:
+    struct _timeblk **newTimeblock;
+    int timeBlocksUsed;
     struct _timeblk timeblock[MAX_TIME_BLOCKS];
+
     struct _adjust  adjustments;
     struct _globals globals;
 

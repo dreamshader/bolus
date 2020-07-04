@@ -618,7 +618,7 @@ int bolus::runImport( void )
     {
         struct _globals newGlobals;
         struct _adjust  newAdjustments;
-        FILE *csvFile;
+        FILE *inFile;
         int csvFields;
 
 #define IMPORT_GLOBALS_NUM_CSV_FIELDS    7
@@ -627,14 +627,48 @@ int bolus::runImport( void )
         switch( callerArgs.importType )
         {
             case IMPORT_TIMEBLOCKS:
+		fprintf(stderr, "import timeblocks\n");
+#ifdef NEVERDEF
+                if( (inFile = 
+                         fopen(callerArgs.importFile, "r")) != (FILE*) NULL )
+                {
+
+                    int tmIndex = callerArgs.timeBlockNumber;
+                    if( tmIndex + 1 < numTimeBlocks )
+                    {
+                        fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
+
+                             pSettings->timeblock[tmIndex].time / 60,
+                             pSettings->timeblock[tmIndex].time % 60,
+                             pSettings->timeblock[tmIndex + 1].time / 60,
+                             pSettings->timeblock[tmIndex + 1].time % 60,
+                             pSettings->timeblock[tmIndex].rangeFrom,
+                             pSettings->timeblock[tmIndex].rangeTo,
+                             pSettings->timeblock[tmIndex].uTo10BE,
+                             pSettings->timeblock[tmIndex].sens );
+                    }
+                    else
+                    {
+                        fprintf( stdout, "%02d:%02d:%02d:%02d:%04d:%04d:%04d:%d\n",
+                             pSettings->timeblock[tmIndex].time / 60,
+                             pSettings->timeblock[tmIndex].time % 60,
+                             pSettings->timeblock[0].time / 60,
+                             pSettings->timeblock[0].time % 60,
+                             pSettings->timeblock[tmIndex].rangeFrom,
+                             pSettings->timeblock[tmIndex].rangeTo,
+                             pSettings->timeblock[tmIndex].uTo10BE,
+                             pSettings->timeblock[tmIndex].sens );
+                    }
+                }
+#endif // NEVERDEF
                 break;
             case IMPORT_GLOBALS:
                 if( pSettings !=  NULL )
                 {
-                    if( (csvFile = 
+                    if( (inFile = 
                          fopen(callerArgs.importFile, "r")) != (FILE*) NULL )
                     {
-                        csvFields = fscanf(csvFile, "%d;%d;%d;%d;%d;%d;%d",
+                        csvFields = fscanf(inFile, "%d;%d;%d;%d;%d;%d;%d",
                                            &newGlobals.timeBlocksActive,
                                            &newGlobals.increaseLevel,
                                            &newGlobals.snacksize10BE,
@@ -658,7 +692,7 @@ int bolus::runImport( void )
                         {
                             retVal = E_BOLUS_IMPORT_FIELDS;
                         }
-                        fclose(csvFile);
+                        fclose(inFile);
                     }
                     else
                     {
@@ -674,10 +708,10 @@ fprintf(stderr, "IMPORT ends with retVal of %d!\n", retVal);
             case IMPORT_ADJUSTMENTS:
                 if( pSettings !=  NULL )
                 {
-                    if( (csvFile = 
+                    if( (inFile = 
                          fopen(callerArgs.importFile, "r")) != (FILE*) NULL )
                     {
-                        csvFields = fscanf(csvFile, "%d;%d;%d;%d;%d;%d;%d",
+                        csvFields = fscanf(inFile, "%d;%d;%d;%d;%d;%d;%d",
                                            &newAdjustments.sober,
                                            &newAdjustments.sport1,
                                            &newAdjustments.stress,
@@ -701,7 +735,7 @@ fprintf(stderr, "IMPORT ends with retVal of %d!\n", retVal);
                         {
                             retVal = E_BOLUS_IMPORT_FIELDS;
                         }
-                        fclose(csvFile);
+                        fclose(inFile);
                     }
                     else
                     {

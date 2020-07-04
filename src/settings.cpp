@@ -163,6 +163,7 @@ void settings::defaults( void )
     timeblock[4].uTo10BE = TMBLCK4_U210BE;
     timeblock[4].sens = TMBLCK4_SENSITIVITY;
 
+    timeBlocksUsed = 5;
 
     globals.version = MAJOR_VERSION;
     globals.version = globals.version << 8;
@@ -200,10 +201,12 @@ int settings::writeTimeblocks( void )
 {
     int retVal = E_SETTINGS_OK;
     uint32_t recCrc = 0;
+    int numRecs = (timeBlocksUsed <= MAX_TIME_BLOCKS-1 ?
+		   timeBlocksUsed : MAX_TIME_BLOCKS-1);
 
     if( settingsFile != (FILE*) NULL )
     {
-        for( int i = 0; i < MAX_TIME_BLOCKS; i++ )
+        for( int i = 0; i < numRecs; i++ )
         {
             recCrc = 0;
             sprintf( settingsBuffer, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
@@ -251,54 +254,82 @@ int settings::readTimeblocks( void )
     char recId;
     uint32_t recCrc = 0;
     uint32_t calcCrc = 0;
+    bool eofReached;
 
     if( settingsFile != (FILE*) NULL )
     {
         if( this->_new == false )
         {
-            for( int i = 0; retVal == E_SETTINGS_OK && i < MAX_TIME_BLOCKS; i++ )
+            eofReached = false;
+	    timeBlocksUsed = 0;
+
+            for( int i = 0; !eofReached && 
+			    retVal == E_SETTINGS_OK && 
+			    i < MAX_TIME_BLOCKS - 1; i++ )
             {
-               fgets(settingsBuffer, MAX_SETTINGS_RECLEN-1, settingsFile );
-//            retVal = fscanf( settingsFile, TIME_BLOCK_REC_FMT, &recId,
-                retVal = sscanf( settingsBuffer, TIME_BLOCK_REC_FMT, &recId,
-                     &timeblock[i].num,
-                     &timeblock[i].time,
-                     &timeblock[i].rangeFrom,
-                     &timeblock[i].rangeTo,
-                     &timeblock[i].uTo10BE,
-                     &timeblock[i].sens,
-                     &recCrc );
+	        memset(settingsBuffer, '\0', MAX_SETTINGS_RECLEN);
 
-                if( retVal == TIME_BLOCK_REC_ITEMS )
-                {
-                    sprintf( settingsBuffer, TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
-                        timeblock[i].num,
-                        timeblock[i].time,
-                        timeblock[i].rangeFrom,
-                        timeblock[i].rangeTo,
-                        timeblock[i].uTo10BE,
-                        timeblock[i].sens,
-                        recCrc );
+                if( fgets(settingsBuffer, 
+			  MAX_SETTINGS_RECLEN-1, settingsFile ) == NULL )
+	        {
+		    eofReached = true;
+	        }
+	        else
+	        {
+fprintf(stderr, "Wir sind bei %d bei einer Laenge von %d\n", i, strlen(settingsBuffer));
 
-                    calcCrc = this->crc( settingsBuffer, TIME_BLOCK_REC_LEN );
+                    retVal = sscanf( settingsBuffer, TIME_BLOCK_REC_FMT, &recId,
+                         &timeblock[i].num,
+                         &timeblock[i].time,
+                         &timeblock[i].rangeFrom,
+                         &timeblock[i].rangeTo,
+                         &timeblock[i].uTo10BE,
+                         &timeblock[i].sens,
+                         &recCrc );
 
-                    if( calcCrc == recCrc )
+                    sscanf( settingsBuffer, TIME_BLOCK_REC_FMT, &recId,
+                         &newTimeblock[i]->num,
+                         &newTimeblock[i]->time,
+                         &newTimeblock[i]->rangeFrom,
+                         &newTimeblock[i]->rangeTo,
+                         &newTimeblock[i]->uTo10BE,
+                         &newTimeblock[i]->sens,
+                         &recCrc );
+
+                    if( retVal == TIME_BLOCK_REC_ITEMS )
                     {
-                        retVal = E_SETTINGS_OK;
+                        sprintf(settingsBuffer,
+				TIME_BLOCK_REC_FMT, TIME_BLOCK_REC_ID,
+                                timeblock[i].num,
+                                timeblock[i].time,
+                                timeblock[i].rangeFrom,
+                                timeblock[i].rangeTo,
+                                timeblock[i].uTo10BE,
+                                timeblock[i].sens,
+                                recCrc );
+
+                        calcCrc = this->crc( settingsBuffer, TIME_BLOCK_REC_LEN );
+
+                        if( calcCrc == recCrc )
+                        {
+		            timeBlocksUsed++;
+
+                            retVal = E_SETTINGS_OK;
+                        }
+                        else
+                        {
+                            retVal = E_SETTINGS_CRC;
+                        }
                     }
                     else
                     {
-                        retVal = E_SETTINGS_CRC;
+                        retVal = E_SETTINGS_INV_REC;
                     }
-                }
-                else
-                {
-                    retVal = E_SETTINGS_INV_REC;
-                }
+	        }
             }
         }
     }
-
+fprintf(stderr, "Wir haben %d Timeblocks\n", timeBlocksUsed);
     return( retVal );
 }
 
@@ -709,7 +740,18 @@ this->write();
 int settings::init( void )
 {
     int retVal = E_SETTINGS_OK;
-this-read();
+    newTimeblock = (struct _timeblk**) malloc(MAX_TIME_BLOCKS * sizeof(struct _timeblk*));
+    if( newTimeblock != NULL )
+    {
+	for( int i = 0; i < MAX_TIME_BLOCKS - 1; i++ )
+	{
+            newTimeblock[i]=(struct _timeblk*) malloc( sizeof(struct _timeblk));
+        }
+
+        newTimeblock[MAX_TIME_BLOCKS - 1] = (struct _timeblk*) NULL;
+    }
+    
+    this-read();
     return( retVal );
 }
 

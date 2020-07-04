@@ -44,13 +44,13 @@ HEADERS += \
     datadlg.h \
     dlgsettingsbolus.h \
     inputglucovalue.h \
-    bolus.h \
     dlgtimeblocks.h \
     dlghealthoptions.h \
     dlgrecommendationoptions.h \
     dlgtimeblockedit.h \
     dlgshowdata.h \
-    dlgconfirmbolus.h
+    dlgconfirmbolus.h \
+    ../bolus.h
 
 FORMS += \
         mainwindow.ui \

@@ -15,6 +15,9 @@ public:
     explicit dlgTimeBlockPeriods(QWidget *parent = nullptr);
     ~dlgTimeBlockPeriods();
 
+private slots:
+    void on_buttonBox_accepted();
+
 private:
     Ui::dlgTimeBlockPeriods *ui;
     QWidget *pParent;

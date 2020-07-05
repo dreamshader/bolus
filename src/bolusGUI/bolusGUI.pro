@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+    dlgnoenv.cpp \
     dlgtimeblockperiods.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
     dlgconfirmbolus.cpp
 
 HEADERS += \
+    dlgnoenv.h \
     dlgtimeblockperiods.h \
         mainwindow.h \
     bolusdlg.h \
@@ -55,6 +57,7 @@ HEADERS += \
     ../bolus.h
 
 FORMS += \
+    dlgnoenv.ui \
     dlgtimeblockperiods.ui \
         mainwindow.ui \
     bolusdlg.ui \

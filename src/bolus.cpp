@@ -624,15 +624,97 @@ int bolus::runImport( void )
 #define IMPORT_GLOBALS_NUM_CSV_FIELDS    7
 #define IMPORT_ADJUSTMENTS_NUM_CSV_FIELDS    7
 
+#define MAX_TMBLK_RECLEN     12
+#define MAX_TMBLK_BLOCKS     10
+
         switch( callerArgs.importType )
         {
             case IMPORT_TIMEBLOCKS:
+
+                /* Zweidimensional - 10 Zeilen x 12 Spalten */
+                char buffer[MAX_TMBLK_BLOCKS][MAX_TMBLK_RECLEN];
+                char swapBuffer[MAX_TMBLK_RECLEN];
+                FILE *inFile;
+                int eof;
+                int val1, val2;
+                int val3, val4;
+                int minutes1From, minutes2From;
+                int minutes1To, minutes2To;
+
+
 		fprintf(stderr, "import timeblocks\n");
-#ifdef NEVERDEF
+
+
                 if( (inFile = 
                          fopen(callerArgs.importFile, "r")) != (FILE*) NULL )
                 {
+                    eof = 0;
+                    for( int i = 0; eof == 0 && i < MAX_TMBLK_BLOCKS; i++ )
+                    {
+	                memset(&buffer[i], '\0', MAX_TMBLK_RECLEN);
+                        if( fgets(buffer[i], MAX_TMBLK_RECLEN, inFile) == NULL )
+	                {
+                            eof = 1;
+	                }
+                        buffer[i][strlen(buffer[i])-1] = '\0';
+	            }
+	            fclose(inFile);
 
+
+	            for( int i = 0; i < MAX_TMBLK_BLOCKS; i++ )
+                    {
+	                for( int j = 0; j < MAX_TMBLK_BLOCKS - 1; j++ )
+                        {
+                            sscanf(buffer[j], "%d:%d %d:%d", 
+				            &val1, &val2, &val3, &val4);
+                            minutes1From = val1 * 60 + val2;
+
+                            sscanf(buffer[j+1], "%d:%d %d:%d", 
+				            &val1, &val2, &val3, &val4);
+                            minutes2From = val1 * 60 + val2;
+
+                            if( minutes1From > minutes2From )
+                            {
+                                strcpy( swapBuffer, buffer[j] );
+                                strcpy( buffer[j], buffer[j+1] );
+                                strcpy( buffer[j+1], swapBuffer );
+                            }
+	                }
+	            }
+
+	            for( int i = 0; i < MAX_TMBLK_BLOCKS; i++ )
+                    {
+                        sscanf(buffer[i], "%d:%d %d:%d", 
+				            &val1, &val2, &val3, &val4);
+
+                        minutes1From = val1 * 60 + val2;
+                        minutes1To = val3 * 60 + val4;
+
+	                if( minutes1From == minutes1To )
+	                {
+                            fprintf(stderr, "Ignore %d -> %s\n", i, buffer[i]);
+	                }
+                        else
+	                {
+                            fprintf(stderr, "Buffer %d -> %s\n", i, buffer[i]);
+                            sscanf(buffer[i+1], "%d:%d %d:%d", 
+				            &val1, &val2, &val3, &val4);
+            
+                            minutes2From = val1 * 60 + val2;
+                            minutes2To = val3 * 60 + val4;
+
+	                    if( i < MAX_TMBLK_BLOCKS-1 )
+                            {
+                                if( minutes2From > minutes1To )
+                                {
+                                    fprintf(stderr,
+				            "W gap -> %s - %s\n",buffer[i],buffer[i+1]);
+                                }
+                            }
+	                }
+	            }
+                }
+#ifdef NEVERDEF
                     int tmIndex = callerArgs.timeBlockNumber;
                     if( tmIndex + 1 < numTimeBlocks )
                     {

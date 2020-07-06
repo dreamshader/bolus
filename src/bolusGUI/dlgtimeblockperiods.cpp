@@ -11,7 +11,103 @@ dlgTimeBlockPeriods::dlgTimeBlockPeriods(QWidget *parent) :
     pParent = parent;
 
     ui->setupUi(this);
+
+
+    int loopCount;
+    int retVal;
+    FILE *sysFP;
+    char cmdBuff[40];
+    char dataBuff[80];
+    char newItem[40];
+    int fromHour, fromMinute;
+    int toHour, toMinute;
+
+    QTime valueFrom, valueTo;
+
+    pParent = parent;
+
+    ui->setupUi(this);
+
+//    ui->lstTimeBlocks->addItem("00:00 - 06:00");
+//    ui->lstTimeBlocks->addItem("06:00 - 12:00");
+//    ui->lstTimeBlocks->addItem("12:00 - 16:00");
+//    ui->lstTimeBlocks->addItem("16:00 - 22:00");
+//    ui->lstTimeBlocks->addItem("22:00 - 00:00");
+
+    retVal = system("~/bolus/bolus-cli -qT -T#");
+
+    if( retVal > 128 )
+    {
+        retVal = retVal >> 8;
+    }
+
+    if( retVal > 128 )
+    {
+        this->close();
+    }
+
+
+    for( loopCount = 0; loopCount < retVal; loopCount++ )
+    {
+        sprintf(cmdBuff, "~/bolus/bolus-cli -qT -T%d", loopCount);
+        if((sysFP = popen(cmdBuff, "r")) != nullptr )
+        {
+            fgets(dataBuff, 79, sysFP);
+            fclose(sysFP);
+            sscanf(dataBuff, "%2d:%2d:%2d:%2d", &fromHour, &fromMinute, &toHour, &toMinute);
+
+            valueFrom.setHMS(fromHour, fromMinute, 0, 0);
+            valueTo.setHMS(toHour, toMinute, 0, 0);
+
+            switch(loopCount)
+            {
+                case 0:
+                    ui->edTmFrom_0->setTime(valueFrom);
+                    ui->edTmTo_0->setTime(valueTo);
+                    break;
+                case 1:
+                    ui->edTmFrom_1->setTime(valueFrom);
+                    ui->edTmTo_1->setTime(valueTo);
+                    break;
+                case 2:
+                    ui->edTmFrom_2->setTime(valueFrom);
+                    ui->edTmTo_2->setTime(valueTo);
+                    break;
+                case 3:
+                    ui->edTmFrom_3->setTime(valueFrom);
+                    ui->edTmTo_3->setTime(valueTo);
+                    break;
+                case 4:
+                    ui->edTmFrom_4->setTime(valueFrom);
+                    ui->edTmTo_4->setTime(valueTo);
+                    break;
+                case 5:
+                    ui->edTmFrom_5->setTime(valueFrom);
+                    ui->edTmTo_5->setTime(valueTo);
+                    break;
+                case 6:
+                    ui->edTmFrom_6->setTime(valueFrom);
+                    ui->edTmTo_6->setTime(valueTo);
+                    break;
+                case 7:
+                    ui->edTmFrom_7->setTime(valueFrom);
+                    ui->edTmTo_7->setTime(valueTo);
+                    break;
+                case 8:
+                    ui->edTmFrom_8->setTime(valueFrom);
+                    ui->edTmTo_8->setTime(valueTo);
+                    break;
+                case 9:
+                    ui->edTmFrom_9->setTime(valueFrom);
+                    ui->edTmTo_9->setTime(valueTo);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 }
+
 
 dlgTimeBlockPeriods::~dlgTimeBlockPeriods()
 {
